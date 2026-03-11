@@ -18,7 +18,8 @@ if (!fs.existsSync(dataDir)) fs.mkdirSync(dataDir, { recursive: true });
 
 const STANDORTE = [
   'Frankfurt', 'Koeln', 'Muenchen', 'Berlin', 'Mannheim', 'Hamburg', 'Stuttgart', 'Duesseldorf', 'Dortmund', 'Essen',
-  'Leipzig', 'Bremen', 'Dresden', 'Hannover', 'Nuernberg', 'Duisburg', 'Bochum', 'Wuppertal', 'Bielefeld', 'Bonn'
+  'Leipzig', 'Bremen', 'Dresden', 'Hannover', 'Nuernberg', 'Duisburg', 'Bochum', 'Wuppertal', 'Bielefeld', 'Bonn',
+  'Carlswerk'
 ];
 const FAHRZEUG_STATUS = ['aktiv', 'nicht_aktiv', 'pruefung', 'werkstatt', 'schaden'];
 const WERKSTATT_STATUS = ['offen', 'in_bearbeitung', 'abgeschlossen', 'werkstatt', 'nicht_einsatzbereit', 'aktiv', 'zur_pruefung'];
