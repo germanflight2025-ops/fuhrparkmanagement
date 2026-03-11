@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Fuhrparkmanagement</title>
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+  <div class="app-shell">
+    <aside class="sidebar">
+      <div>
+        <h1>Fuhrpark</h1>
+        <p class="muted">Management by Michael Weber</p>
+      </div>
+      <nav>
+        <button class="nav-btn active" data-view="dashboard">Dashboard</button>
+        <button class="nav-btn" data-view="fahrzeuge">Fahrzeuge</button>
+        <button class="nav-btn" data-view="werkstatt">Werkstatt</button>
+        <button class="nav-btn" data-view="schaeden">Schaeden</button>
+        <button class="nav-btn" data-view="uvv">UVV</button>
+        <button class="nav-btn" data-view="benutzer">Benutzer</button>
+        <button class="nav-btn" data-view="standorte">Standorte</button>
+        <button class="nav-btn" data-view="statistik">Statistik</button>
+        <button class="nav-btn" data-view="suche">Suche</button>
+        <button class="nav-btn" data-view="import">CSV Import</button>
+        <button class="nav-btn" data-view="impressum">Impressum</button>
+      </nav>
+      <div class="sidebar-footer">
+        <div id="userBadge">Nicht angemeldet</div>
+        <button id="logoutBtn" class="secondary">Logout</button>
+      </div>
+    </aside>
+
+    <main class="content">
+      <header class="topbar">
+        <div>
+          <h2 id="viewTitle">Dashboard</h2>
+          <p id="viewSubtitle" class="muted">Responsive Fuhrparkmanagement-Software</p>
+        </div>
+        <div id="topbarControls" class="topbar-controls"></div>
+      </header>
+
+      <section id="loginView" class="panel visible">
+        <div class="login-grid">
+          <div class="panel card accent">
+            <h3>Login</h3>
+            <form id="loginForm" class="form-grid">
+              <label>E-Mail<input name="email" type="email" required value="admin@fuhrpark.local"></label>
+              <label>Passwort<input name="passwort" type="password" required value="Admin123!"></label>
+              <button type="submit">Anmelden</button>
+            </form>
+            <p id="loginError" class="error"></p>
+          </div>
+          <div class="panel card">
+            <h3>Demo-Zug�nge</h3>
+            <div id="demoCredentials" class="stack"></div>
+          </div>
+        </div>
+      </section>
+
+      <section id="appView" class="hidden">
+        <div id="dashboardView" class="view visible">
+          <div id="selectionNotice" class="panel card hidden"></div>
+          <div id="stats" class="stats-grid"></div>
+          <div class="grid-3 dashboard-kpi-grid">
+            <div class="panel card">
+              <div class="section-head"><h3>Fahrzeug KPIs</h3><span id="dashboardUpdatedAt" class="muted"></span></div>
+              <div id="fahrzeugKpis" class="mini-kpi-grid"></div>
+              <div id="latestVehicles" class="stack compact-stack"></div>
+            </div>
+            <div class="panel card">
+              <h3>Werkstatt KPIs</h3>
+              <div id="werkstattKpis" class="mini-kpi-grid"></div>
+              <div id="latestWorkshop" class="stack compact-stack"></div>
+            </div>
+            <div class="panel card">
+              <h3>Schadenmeldungen</h3>
+              <div id="schadenKpis" class="mini-kpi-grid"></div>
+              <div id="latestSchaeden" class="stack compact-stack"></div>
+            </div>
+          </div>
+          <div class="grid-2">
+            <div class="panel card">
+              <h3>Fahrzeuge pro Standort</h3>
+              <div id="locationChart" class="chart-list"></div>
+            </div>
+            <div class="panel card">
+              <h3>Erinnerungen</h3>
+              <div id="reminders" class="stack"></div>
+            </div>
+          </div>
+        </div>
+
+        <section id="fahrzeugeView" class="view hidden">
+          <div class="grid-2 layout-main">
+            <form id="vehicleForm" class="panel card form-grid"></form>
+            <div class="panel card table-wrap">
+              <h3>Fahrzeugliste</h3>
+              <div id="vehiclesTable"></div>
+            </div>
+          </div>
+        </section>
+
+        <section id="werkstattView" class="view hidden">
+          <div class="grid-2 layout-main workshop-view-grid">
+            <form id="workshopForm" class="panel card form-grid workshop-form-panel"></form>
+            <div class="panel card table-wrap workshop-table-panel">
+              <div class="section-head"><h3>Werkstattliste</h3><span class="muted">Auftraege, Status und Laufzeiten</span></div>
+              <div id="workshopTable"></div>
+            </div>
+          </div>
+          <div class="panel card board-panel workshop-board-panel">
+            <div class="section-head"><h3>Werkstatt-Uebersicht</h3><span class="muted">Werkstaetten, Auslastung und offene Themen</span></div>
+            <div id="workshopSummary" class="mini-kpi-grid workshop-summary-grid"></div>
+            <div id="workshopBoard" class="workshop-board workshop-board-large"></div>
+          </div>
+        </section>
+
+        <section id="schaedenView" class="view hidden">
+          <div class="grid-2 layout-main damage-layout" id="damageLayout">
+            <form id="damageForm" class="panel card form-grid"></form>
+            <div class="panel card table-wrap" id="damageTablePanel">
+              <h3>Schadenmeldungen</h3>
+              <div id="damageTable"></div>
+            </div>
+          </div>
+        </section>
+
+        <section id="uvvView" class="view hidden">
+          <div class="grid-2 layout-main uvv-layout">
+            <form id="uvvForm" class="panel card form-grid"></form>
+            <div class="panel card table-wrap">
+              <h3>UVV-Pr�fungen</h3>
+              <div id="uvvTable"></div>
+            </div>
+          </div>
+        </section>
+
+        <section id="benutzerView" class="view hidden">
+          <div class="grid-2 layout-main">
+            <form id="userForm" class="panel card form-grid"></form>
+            <div class="panel card table-wrap">
+              <h3>Benutzer�bersicht</h3>
+              <div id="usersTable"></div>
+            </div>
+          </div>
+        </section>
+
+        <section id="standorteView" class="view hidden">
+          <div class="panel card table-wrap">
+            <h3>Standorte</h3>
+            <div id="locationsTable"></div>
+          </div>
+        </section>
+
+        <section id="statistikView" class="view hidden">
+          <div class="panel card statistik-shell">
+            <div class="section-head">
+              <div>
+                <h3>Fuhrparkanalyse</h3>
+                <p class="muted">Verdichtete Auswertung von Fahrzeugen, Werkstatt, Schaeden und Faelligkeiten.</p>
+              </div>
+            </div>
+            <div id="statisticsHero" class="statistics-hero-grid"></div>
+            <div class="grid-2 statistik-main-grid">
+              <div class="panel card statistik-panel">
+                <h3>Statusverteilung Fahrzeuge</h3>
+                <div id="statisticsSummary" class="statistics-status-list"></div>
+              </div>
+              <div class="panel card statistik-panel">
+                <h3>Detailuebersicht</h3>
+                <div id="statisticsInsights" class="statistics-insights-grid"></div>
+              </div>
+            </div>
+            <div class="panel card statistik-panel table-wrap">
+              <h3>Statusuebersicht als Tabelle</h3>
+              <div id="statisticsTable"></div>
+            </div>
+          </div>
+        </section>
+
+        <section id="sucheView" class="view hidden">
+          <div class="panel card form-grid">
+            <label>Globale Suche<input id="searchInput" placeholder="Kennzeichen, Fahrzeug, Standort, Status"></label>
+            <button id="searchBtn" type="button">Suchen</button>
+          </div>
+          <div class="panel card table-wrap">
+            <h3>Suchergebnisse</h3>
+            <div id="searchTable"></div>
+          </div>
+        </section>
+
+        <section id="importView" class="view hidden">
+          <div class="grid-2">
+            <form id="importForm" class="panel card form-grid">
+              <h3>CSV Import</h3>
+              <p class="muted">Format: Kennzeichen;Fahrzeug;UVV;HU;Standort</p>
+              <label>CSV Datei<input id="csvFileInput" type="file" accept=".csv,text/csv"></label>
+              <label>CSV Inhalt<textarea name="csv" rows="10">F-NEW-6006;Iveco Daily;2026-04-30;2026-05-15;Frankfurt</textarea></label>
+              <div class="action-row">
+                <button type="submit">Import starten</button>
+                <button type="button" class="secondary" id="exportCsvBtn">CSV Export</button>
+              </div>
+            </form>
+            <div class="panel card">
+              <h3>Import-Ergebnis</h3>
+              <pre id="importResult">Noch kein Import ausgef�hrt.</pre>
+            </div>
+          </div>
+        </section>
+
+        <section id="impressumView" class="view hidden">
+          <div class="panel card impressum-shell">
+            <div class="impressum-hero">
+              <div>
+                <p class="eyebrow">Fuhrparkmanagement</p>
+                <h3>Impressum</h3>
+                <p class="muted">Projekt- und Anbieterinformationen fuer die webbasierte Fuhrparkmanagement-Software.</p>
+              </div>
+              <div class="impressum-badge">Stand: Maerz 2026</div>
+            </div>
+            <div class="impressum-grid">
+              <section class="impressum-card">
+                <h4>Angaben zum Projekt</h4>
+                <dl class="impressum-list">
+                  <div><dt>Projektname</dt><dd>Fuhrparkmanagement</dd></div>
+                  <div><dt>Autor</dt><dd>Michael Weber</dd></div>
+                  <div><dt>Projekttyp</dt><dd>Webbasierte Fuhrparkmanagement-Software</dd></div>
+                  <div><dt>Einsatzbereich</dt><dd>Verwaltung von Fahrzeugen, Werkstattauftraegen, Schaeden und UVV-Pruefungen</dd></div>
+                  <div><dt>Version</dt><dd>MVP / Praesentationsstand</dd></div>
+                </dl>
+              </section>
+              <section class="impressum-card">
+                <h4>Verantwortlich fuer Inhalt</h4>
+                <dl class="impressum-list">
+                  <div><dt>Name</dt><dd>Michael Weber</dd></div>
+                  <div><dt>Rolle</dt><dd>Projektverantwortung, Konzeption und Entwicklung</dd></div>
+                  <div><dt>Kontakt</dt><dd>Bitte mit echten Kontaktdaten ergaenzen, falls die Software oeffentlich betrieben wird.</dd></div>
+                </dl>
+              </section>
+              <section class="impressum-card">
+                <h4>Technische Angaben</h4>
+                <dl class="impressum-list">
+                  <div><dt>Backend</dt><dd>Node.js / Express</dd></div>
+                  <div><dt>Frontend</dt><dd>HTML5, CSS3, JavaScript</dd></div>
+                  <div><dt>Datenhaltung</dt><dd>JSON-basierte lokale Datenstruktur, erweiterbar auf PostgreSQL</dd></div>
+                  <div><dt>Funktionen</dt><dd>Rollenlogik, Standortfilter, CSV-Import, Datei-Upload, PDF-Export, Dashboard</dd></div>
+                </dl>
+              </section>
+              <section class="impressum-card">
+                <h4>Nutzungshinweis</h4>
+                <p>Diese Anwendung wurde als Fach- und Praesentationsprojekt fuer ein digitales Fuhrparkmanagement entwickelt. Vor einem produktiven Einsatz sollten rechtliche Pflichtangaben, Datenschutztexte, Sicherheitsrichtlinien und Betreiberinformationen vollstaendig mit echten Unternehmensdaten ergaenzt werden.</p>
+              </section>
+            </div>
+            <div class="impressum-notes">
+              <section class="impressum-note-card">
+                <h4>Haftung fuer Inhalte</h4>
+                <p>Die Inhalte dieser Anwendung wurden mit groesster Sorgfalt erstellt. Fuer die Vollstaendigkeit, Richtigkeit und Aktualitaet der bereitgestellten Informationen kann im Demonstrations- und Entwicklungsstand jedoch keine Gewaehr uebernommen werden.</p>
+              </section>
+              <section class="impressum-note-card">
+                <h4>Datenschutz</h4>
+                <p>Bei einem produktiven Betrieb sind eine vollstaendige Datenschutzerklaerung, Auftragsverarbeitungsregelungen, Zugriffskonzepte sowie organisatorische und technische Schutzmassnahmen verbindlich zu ergaenzen.</p>
+              </section>
+              <section class="impressum-note-card">
+                <h4>Urheberrecht</h4>
+                <p>Struktur, Inhalte, Layout und Quellcode dieses Projektstandes unterliegen dem Schutz des Urheberrechts, soweit gesetzlich zulaessig. Eine Weiterverwendung sollte nur mit Zustimmung des Projektverantwortlichen erfolgen.</p>
+              </section>
+            </div>
+            <div class="impressum-footer">
+              <strong>Fuhrparkmanagement by Michael Weber</strong>
+              <span class="muted">Professionelle Projektpraesentation fuer Verwaltung, Werkstatt, Schadenmanagement und UVV.</span>
+            </div>
+          </div>
+        </section>
+      </section>
+    </main>
+  </div>
+
+  <script src="/js/app.js"></script>
+</body>
+</html>
+
+

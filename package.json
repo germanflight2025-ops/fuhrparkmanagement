@@ -1,0 +1,21 @@
+{
+  "name": "fuhrparkmanagement",
+  "version": "1.0.0",
+  "description": "Webbasierte Fuhrparkmanagement-Software",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node server.js"
+  },
+  "dependencies": {
+    "bcryptjs": "^2.4.3",
+    "csv-parse": "^5.6.0",
+    "express": "^4.21.2",
+    "jsonwebtoken": "^9.0.2",
+    "multer": "^1.4.5-lts.1",
+    "pdfkit": "^0.15.2"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}
