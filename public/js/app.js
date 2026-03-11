@@ -253,6 +253,7 @@ function currentUserDraft() {
   if (!state.editUserId) {
     return {
       id: '',
+      benutzername: '',
       name: '',
       email: '',
       rolle: 'benutzer',
@@ -264,6 +265,7 @@ function currentUserDraft() {
   const user = state.benutzer.find((entry) => String(entry.id) === String(state.editUserId));
   return {
     id: user?.id || '',
+    benutzername: user?.benutzername || '',
     name: user?.name || '',
     email: user?.email || '',
     rolle: user?.rolle || 'benutzer',
@@ -413,6 +415,7 @@ function renderForms() {
       </div>
       ${isEditingUser ? '<button type="button" class="secondary" data-action="user-cancel">Abbrechen</button>' : ''}
     </div>
+    <label>Benutzername<input name="benutzername" required placeholder="z. B. mweber" value="${draftUser.benutzername}"></label>
     <label>Name<input name="name" required placeholder="Vor- und Nachname" value="${draftUser.name}"></label>
     <label>E-Mail<input name="email" type="email" required placeholder="name@firma.de" value="${draftUser.email}"></label>
     <label>${isEditingUser ? 'Neues Passwort' : 'Passwort'}<input name="passwort" type="text" ${isEditingUser ? '' : 'required'} value="${draftUser.passwort}" placeholder="${isEditingUser ? 'leer = unveraendert' : 'Passwort123!'}"></label>
@@ -589,6 +592,7 @@ function renderLists() {
   ]);
 
   el('usersTable').innerHTML = renderTable(state.benutzer, [
+    { key: 'benutzername', label: 'Benutzername' },
     { key: 'name', label: 'Name', render: (v, row) => `${v || '-'}${String(state.editUserId) === String(row.id) ? '<br><span class="muted">Wird gerade bearbeitet</span>' : ''}` },
     { key: 'email', label: 'E-Mail' },
     { key: 'rolle', label: 'Rolle', render: (v) => `<span class="${badgeClass(v)}">${v}</span>` },
@@ -704,11 +708,6 @@ function showView(name) {
   el('viewSubtitle').textContent = subtitle;
 }
 
-async function initDemoCredentials() {
-  const creds = await api('/api/demo-credentials').catch(() => []);
-  el('demoCredentials').innerHTML = creds.map((c) => `<div><strong>${c.rolle}</strong><br>${c.email}<br>${c.passwort}</div>`).join('');
-}
-
 async function handleLogin(event) {
   event.preventDefault();
   try {
@@ -795,7 +794,7 @@ async function handleUserSubmit(event) {
     const payload = Object.fromEntries(new FormData(event.target));
     payload.aktiv = Number(payload.aktiv ?? 1);
     if (state.user?.rolle !== 'hauptadmin') payload.standort_id = state.user?.standort_id || '';
-    if (!payload.name || !payload.email) throw new Error('Name und E-Mail sind Pflichtfelder.');
+    if (!payload.benutzername || !payload.name || !payload.email) throw new Error('Benutzername, Name und E-Mail sind Pflichtfelder.');
     if (!isEditing && !payload.passwort) throw new Error('Beim neuen Benutzer muss ein Passwort vergeben werden.');
 
     if (isEditing) {
@@ -974,7 +973,6 @@ function bindDynamicForms() {
 async function bootstrap() {
   bindEvents();
   updateUserBadge();
-  await initDemoCredentials();
   if (state.token && state.user) {
     toggleApp(true);
     await refreshApp();

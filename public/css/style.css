@@ -215,3 +215,5 @@ img.damage-preview { width: 84px; height: 60px; object-fit: cover; border-radius
 @media (max-width: 920px) {
   .statistics-insights-grid { grid-template-columns: 1fr; }
 }
+
+.login-grid-single { grid-template-columns: minmax(360px, 540px); }

@@ -51,9 +51,9 @@ function seedData() {
   return {
     standorte,
     benutzer: [
-      { id: 1, name: 'Michael Weber', email: 'admin@fuhrpark.local', passwort_hash: bcrypt.hashSync('Admin123!', 10), rolle: 'hauptadmin', standort_id: null, aktiv: 1, created_at: nowIso() },
-      { id: 2, name: 'Admin Frankfurt', email: 'frankfurt@fuhrpark.local', passwort_hash: bcrypt.hashSync('Admin123!', 10), rolle: 'admin', standort_id: findLocationId('Frankfurt'), aktiv: 1, created_at: nowIso() },
-      { id: 3, name: 'Benutzer Frankfurt', email: 'user@fuhrpark.local', passwort_hash: bcrypt.hashSync('User123!', 10), rolle: 'benutzer', standort_id: findLocationId('Frankfurt'), aktiv: 1, created_at: nowIso() }
+      { id: 1, benutzername: 'mweber', name: 'Michael Weber', email: 'admin@fuhrpark.local', passwort_hash: bcrypt.hashSync('Admin123!', 10), rolle: 'hauptadmin', standort_id: null, aktiv: 1, created_at: nowIso() },
+      { id: 2, benutzername: 'frankfurtadmin', name: 'Admin Frankfurt', email: 'frankfurt@fuhrpark.local', passwort_hash: bcrypt.hashSync('Admin123!', 10), rolle: 'admin', standort_id: findLocationId('Frankfurt'), aktiv: 1, created_at: nowIso() },
+      { id: 3, benutzername: 'frankfurtuser', name: 'Benutzer Frankfurt', email: 'user@fuhrpark.local', passwort_hash: bcrypt.hashSync('User123!', 10), rolle: 'benutzer', standort_id: findLocationId('Frankfurt'), aktiv: 1, created_at: nowIso() }
     ],
     fahrzeuge: [
       { id: 1, kennzeichen: 'F-FM-1001', fahrzeug: 'VW Crafter', standort_id: findLocationId('Frankfurt'), status: 'aktiv', hu_datum: '2026-08-10', uvv_datum: '2026-05-20', created_at: nowIso() },
@@ -93,7 +93,7 @@ function migrateData(data) {
     changed = true;
   }
   data.standorte = data.standorte.map((item, index) => ({ id: index + 1, name: sanitizeLocationName(item.name || STANDORTE[index]), created_at: item.created_at || nowIso() }));
-  data.benutzer = (data.benutzer || []).map((item) => ({ ...item, rolle: ['hauptadmin', 'admin', 'benutzer'].includes(item.rolle) ? item.rolle : 'benutzer', aktiv: Number(item.aktiv) ? 1 : 0 }));
+  data.benutzer = (data.benutzer || []).map((item) => ({ ...item, benutzername: item.benutzername || String(item.email || item.name || '').split('@')[0].trim().toLowerCase().replace(/\s+/g, ''), rolle: ['hauptadmin', 'admin', 'benutzer'].includes(item.rolle) ? item.rolle : 'benutzer', aktiv: Number(item.aktiv) ? 1 : 0 }));
   data.fahrzeuge = (data.fahrzeuge || []).map((item) => ({
     ...item,
     status: normalizeStatus({ verfuegbar: 'aktiv', ausser_betrieb: 'nicht_einsatzbereit' }[item.status] || item.status, FAHRZEUG_STATUS, 'aktiv'),
@@ -257,9 +257,10 @@ app.get('/api/meta', authRequired, (req, res) => {
 
 app.post('/api/auth/login', (req, res) => {
   const data = readDb();
-  const user = data.benutzer.find((entry) => entry.email === req.body.email && entry.aktiv);
+  const loginValue = String(req.body.login || req.body.email || '').trim().toLowerCase();
+  const user = data.benutzer.find((entry) => entry.aktiv && (String(entry.benutzername || '').trim().toLowerCase() === loginValue || String(entry.email || '').trim().toLowerCase() === loginValue));
   if (!user || !bcrypt.compareSync(req.body.passwort || '', user.passwort_hash)) {
-    return res.status(401).json({ error: 'E-Mail oder Passwort ist falsch.' });
+    return res.status(401).json({ error: 'Benutzername oder Passwort ist falsch.' });
   }
   const payload = { ...user, standort: user.standort_id ? locationName(data, user.standort_id) : null };
   delete payload.passwort_hash;
@@ -311,7 +312,7 @@ app.post('/api/benutzer', authRequired, requireRoles('hauptadmin', 'admin'), (re
   const data = readDb();
   const standort_id = req.user.rolle === 'hauptadmin' ? Number(req.body.standort_id) || null : req.user.standort_id;
   const rolle = req.user.rolle === 'hauptadmin' ? req.body.rolle : (req.body.rolle === 'hauptadmin' ? 'admin' : req.body.rolle);
-  const row = { id: nextId(data.benutzer), name: req.body.name, email: req.body.email, passwort_hash: bcrypt.hashSync(req.body.passwort || 'Passwort123!', 10), rolle, standort_id, aktiv: 1, created_at: nowIso() };
+  const row = { id: nextId(data.benutzer), benutzername: String(req.body.benutzername || '').trim(), name: req.body.name, email: req.body.email, passwort_hash: bcrypt.hashSync(req.body.passwort || 'Passwort123!', 10), rolle, standort_id, aktiv: 1, created_at: nowIso() };
   data.benutzer.push(row);
   writeDb(data);
   res.json({ ...row, passwort_hash: undefined, standort: standort_id ? locationName(data, standort_id) : null });
@@ -321,6 +322,7 @@ app.put('/api/benutzer/:id', authRequired, requireRoles('hauptadmin', 'admin'), 
   const row = data.benutzer.find((item) => item.id === Number(req.params.id));
   if (!row) return res.status(404).json({ error: 'Benutzer nicht gefunden.' });
   if (req.user.rolle !== 'hauptadmin' && row.standort_id !== req.user.standort_id) return res.status(403).json({ error: 'Kein Zugriff auf diesen Benutzer.' });
+  row.benutzername = req.body.benutzername || row.benutzername;
   row.name = req.body.name || row.name;
   row.email = req.body.email || row.email;
   row.rolle = req.user.rolle === 'hauptadmin' ? (req.body.rolle || row.rolle) : row.rolle;
