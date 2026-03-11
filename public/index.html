@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="de">
 <head>
   <meta charset="UTF-8">
@@ -7,8 +7,8 @@
   <link rel="stylesheet" href="/css/style.css">
 </head>
 <body>
-  <div class="app-shell">
-    <aside class="sidebar">
+  <div id="appShell" class="app-shell app-shell-logged-out">
+    <aside id="sidebar" class="sidebar hidden">
       <div>
         <h1>Fuhrpark</h1>
         <p class="muted">Management by Michael Weber</p>
@@ -32,8 +32,8 @@
       </div>
     </aside>
 
-    <main class="content">
-      <header class="topbar">
+    <main id="content" class="content content-logged-out">
+      <header id="topbar" class="topbar hidden">
         <div>
           <h2 id="viewTitle">Dashboard</h2>
           <p id="viewSubtitle" class="muted">Responsive Fuhrparkmanagement-Software</p>
@@ -127,7 +127,7 @@
           <div class="grid-2 layout-main uvv-layout">
             <form id="uvvForm" class="panel card form-grid"></form>
             <div class="panel card table-wrap">
-              <h3>UVV-Pr�fungen</h3>
+              <h3>UVV-Prï¿½fungen</h3>
               <div id="uvvTable"></div>
             </div>
           </div>
@@ -137,7 +137,7 @@
           <div class="grid-2 layout-main">
             <form id="userForm" class="panel card form-grid"></form>
             <div class="panel card table-wrap">
-              <h3>Benutzer�bersicht</h3>
+              <h3>Benutzerï¿½bersicht</h3>
               <div id="usersTable"></div>
             </div>
           </div>
@@ -201,7 +201,7 @@
             </form>
             <div class="panel card">
               <h3>Import-Ergebnis</h3>
-              <pre id="importResult">Noch kein Import ausgef�hrt.</pre>
+              <pre id="importResult">Noch kein Import ausgefï¿½hrt.</pre>
             </div>
           </div>
         </section>
@@ -276,6 +276,7 @@
   <script src="/js/app.js"></script>
 </body>
 </html>
+
 
 
 

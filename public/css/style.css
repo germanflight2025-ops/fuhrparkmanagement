@@ -1,4 +1,4 @@
-:root {
+﻿:root {
   --bg: #091427;
   --panel: #0f1e3b;
   --panel-soft: #14274b;
@@ -20,6 +20,12 @@ input, select, textarea { width: 100%; padding: 12px 14px; border: 1px solid var
 label { display: grid; gap: 6px; color: var(--muted); }
 textarea { resize: vertical; }
 .app-shell { min-height: 100vh; display: grid; grid-template-columns: 260px 1fr; }
+.app-shell-logged-out { display: block; }
+.content-logged-out { min-height: 100vh; display: grid; place-items: center; padding: 48px 24px; }
+.content-logged-out #loginView { width: 100%; max-width: 560px; margin: 0 auto; }
+.content-logged-out .login-grid-single { grid-template-columns: 1fr; }
+.content-logged-out .panel.card.accent { padding: 28px; }
+
 .sidebar { background: linear-gradient(180deg, #081325, #0a1a35); color: white; padding: 24px 18px; display: flex; flex-direction: column; gap: 24px; border-right: 1px solid rgba(255,255,255,0.06); }
 .sidebar h1 { margin: 0; font-size: 30px; }
 .sidebar .muted { color: #cbd5e1; }
@@ -219,3 +225,4 @@ img.damage-preview { width: 84px; height: 60px; object-fit: cover; border-radius
 .login-grid-single { grid-template-columns: minmax(360px, 540px); }
 
 .topbar-stack { display: grid; gap: 8px; }
+

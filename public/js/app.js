@@ -1,4 +1,4 @@
-const state = {
+﻿const state = {
   token: sessionStorage.getItem('fuhrpark_token') || localStorage.getItem('fuhrpark_token') || '',
   user: JSON.parse(sessionStorage.getItem('fuhrpark_user') || localStorage.getItem('fuhrpark_user') || 'null'),
   selectedStandortId: sessionStorage.getItem('fuhrpark_selected_standort') || localStorage.getItem('fuhrpark_selected_standort') || '',
@@ -80,8 +80,25 @@ function updateUserBadge() {
 }
 
 function toggleApp(isLoggedIn) {
+  const appShell = el('appShell');
+  const sidebar = el('sidebar');
+  const topbar = el('topbar');
+  const content = el('content');
+
   el('loginView').className = isLoggedIn ? 'hidden' : 'panel visible';
   el('appView').className = isLoggedIn ? '' : 'hidden';
+
+  if (isLoggedIn) {
+    appShell?.classList.remove('app-shell-logged-out');
+    sidebar?.classList.remove('hidden');
+    topbar?.classList.remove('hidden');
+    content?.classList.remove('content-logged-out');
+  } else {
+    appShell?.classList.add('app-shell-logged-out');
+    sidebar?.classList.add('hidden');
+    topbar?.classList.add('hidden');
+    content?.classList.add('content-logged-out');
+  }
 }
 
 function badgeClass(text) {
@@ -985,5 +1002,6 @@ setInterval(async () => {
 }, 120000);
 
 bootstrap();
+
 
 
