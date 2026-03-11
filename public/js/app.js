@@ -116,7 +116,7 @@ function renderTopbarControls() {
   if (!state.user) return;
   if (state.user.rolle === 'hauptadmin') {
     const options = state.meta.standorte.map((s) => `<option value="${s.id}" ${String(s.id) === String(state.selectedStandortId) ? 'selected' : ''}>${s.name}</option>`).join('');
-    el('topbarControls').innerHTML = `<label class="topbar-label">Standort<select id="standortFilter"><option value="">Gesamtuebersicht alle Standorte</option>${options}</select></label>`;
+    el('topbarControls').innerHTML = `<div class="topbar-stack"><div class="topbar-pill">Hauptverwaltung: Carlswerk</div><label class="topbar-label">Standort<select id="standortFilter"><option value="">Gesamtuebersicht alle Standorte</option>${options}</select></label></div>`;
     el('standortFilter').onchange = async (event) => {
       state.selectedStandortId = event.target.value;
       sessionStorage.setItem('fuhrpark_selected_standort', state.selectedStandortId || '');
@@ -130,7 +130,7 @@ function renderTopbarControls() {
 function renderSelectionNotice() {
   if (shouldWaitForStandort()) {
     el('selectionNotice').className = 'panel card visible';
-    el('selectionNotice').innerHTML = '<h3>Gesamtuebersicht aktiv</h3><p>Ohne Standortauswahl sieht der Hauptadmin alle Standorte zusammen. Mit Auswahl wird auf einen Standort gefiltert.</p>';
+    el('selectionNotice').innerHTML = '<h3>Hauptverwaltung Carlswerk</h3><p>Ohne Standortauswahl sieht die Hauptverwaltung in Carlswerk alle Standorte zusammen. Mit Auswahl wird auf einen einzelnen Standort gefiltert.</p>';
     return;
   } else {
     el('selectionNotice').className = 'hidden';

@@ -52,7 +52,7 @@ function seedData() {
   return {
     standorte,
     benutzer: [
-      { id: 1, benutzername: 'mweber', name: 'Michael Weber', email: 'admin@fuhrpark.local', passwort_hash: bcrypt.hashSync('Admin123!', 10), rolle: 'hauptadmin', standort_id: null, aktiv: 1, created_at: nowIso() },
+      { id: 1, benutzername: 'mweber', name: 'Michael Weber', email: 'admin@fuhrpark.local', passwort_hash: bcrypt.hashSync('Admin123!', 10), rolle: 'hauptadmin', standort_id: findLocationId('Carlswerk'), aktiv: 1, created_at: nowIso() },
       { id: 2, benutzername: 'frankfurtadmin', name: 'Admin Frankfurt', email: 'frankfurt@fuhrpark.local', passwort_hash: bcrypt.hashSync('Admin123!', 10), rolle: 'admin', standort_id: findLocationId('Frankfurt'), aktiv: 1, created_at: nowIso() },
       { id: 3, benutzername: 'frankfurtuser', name: 'Benutzer Frankfurt', email: 'user@fuhrpark.local', passwort_hash: bcrypt.hashSync('User123!', 10), rolle: 'benutzer', standort_id: findLocationId('Frankfurt'), aktiv: 1, created_at: nowIso() }
     ],
@@ -94,7 +94,7 @@ function migrateData(data) {
     changed = true;
   }
   data.standorte = data.standorte.map((item, index) => ({ id: index + 1, name: sanitizeLocationName(item.name || STANDORTE[index]), created_at: item.created_at || nowIso() }));
-  data.benutzer = (data.benutzer || []).map((item) => ({ ...item, benutzername: item.benutzername || String(item.email || item.name || '').split('@')[0].trim().toLowerCase().replace(/\s+/g, ''), rolle: ['hauptadmin', 'admin', 'benutzer'].includes(item.rolle) ? item.rolle : 'benutzer', aktiv: Number(item.aktiv) ? 1 : 0 }));
+  data.benutzer = (data.benutzer || []).map((item) => ({ ...item, benutzername: item.benutzername || String(item.email || item.name || '').split('@')[0].trim().toLowerCase().replace(/\s+/g, ''), standort_id: item.rolle === 'hauptadmin' ? (item.standort_id || findLocationId('Carlswerk')) : item.standort_id, rolle: ['hauptadmin', 'admin', 'benutzer'].includes(item.rolle) ? item.rolle : 'benutzer', aktiv: Number(item.aktiv) ? 1 : 0 }));
   data.fahrzeuge = (data.fahrzeuge || []).map((item) => ({
     ...item,
     status: normalizeStatus({ verfuegbar: 'aktiv', ausser_betrieb: 'nicht_einsatzbereit' }[item.status] || item.status, FAHRZEUG_STATUS, 'aktiv'),
@@ -311,8 +311,9 @@ app.get('/api/benutzer', authRequired, requireRoles('hauptadmin', 'admin'), (req
 });
 app.post('/api/benutzer', authRequired, requireRoles('hauptadmin', 'admin'), (req, res) => {
   const data = readDb();
-  const standort_id = req.user.rolle === 'hauptadmin' ? Number(req.body.standort_id) || null : req.user.standort_id;
+  const requestedStandortId = Number(req.body.standort_id) || null;
   const rolle = req.user.rolle === 'hauptadmin' ? req.body.rolle : (req.body.rolle === 'hauptadmin' ? 'admin' : req.body.rolle);
+  const standort_id = rolle === 'hauptadmin' ? (requestedStandortId || findLocationId('Carlswerk')) : (req.user.rolle === 'hauptadmin' ? requestedStandortId : req.user.standort_id);
   const row = { id: nextId(data.benutzer), benutzername: String(req.body.benutzername || '').trim(), name: req.body.name, email: req.body.email, passwort_hash: bcrypt.hashSync(req.body.passwort || 'Passwort123!', 10), rolle, standort_id, aktiv: 1, created_at: nowIso() };
   data.benutzer.push(row);
   writeDb(data);
@@ -327,7 +328,7 @@ app.put('/api/benutzer/:id', authRequired, requireRoles('hauptadmin', 'admin'), 
   row.name = req.body.name || row.name;
   row.email = req.body.email || row.email;
   row.rolle = req.user.rolle === 'hauptadmin' ? (req.body.rolle || row.rolle) : row.rolle;
-  row.standort_id = req.user.rolle === 'hauptadmin' ? Number(req.body.standort_id) || row.standort_id : req.user.standort_id;
+  row.standort_id = req.user.rolle === 'hauptadmin' ? ((req.body.rolle || row.rolle) === 'hauptadmin' ? (Number(req.body.standort_id) || findLocationId('Carlswerk')) : Number(req.body.standort_id) || row.standort_id) : req.user.standort_id;
   if (typeof req.body.aktiv !== 'undefined') row.aktiv = Number(req.body.aktiv) ? 1 : 0;
   if (req.body.passwort) row.passwort_hash = bcrypt.hashSync(req.body.passwort, 10);
   writeDb(data);

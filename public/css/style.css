@@ -217,3 +217,5 @@ img.damage-preview { width: 84px; height: 60px; object-fit: cover; border-radius
 }
 
 .login-grid-single { grid-template-columns: minmax(360px, 540px); }
+
+.topbar-stack { display: grid; gap: 8px; }
