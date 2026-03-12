@@ -1,4 +1,4 @@
-# Fuhrparkmanagement
+﻿# Fuhrparkmanagement
 
 Lauffaehige MVP-Webanwendung mit:
 
@@ -75,3 +75,40 @@ Neu im Projekt:
 ### Wichtiger Hinweis
 
 Die App nutzt lokal jetzt eine getrennte Runtime-Datei und kann mit gesetzter `DATABASE_URL` beim Start aus PostgreSQL bootstrappen. `data/seed.json` bleibt dabei die feste Projektbasis.
+
+## Backup und Restore fuer PostgreSQL
+
+Fuer euren internen Betrieb gibt es jetzt zwei PowerShell-Skripte:
+
+- `scripts/backup-postgres.ps1`
+- `scripts/restore-postgres.ps1`
+
+### Typische lokale Vorbereitung
+
+```powershell
+$env:PGPASSWORD="DEIN_PASSWORT"
+$env:DATABASE_URL="postgres://postgres@localhost:5432/fuhrparkmanagement"
+```
+
+### Backup erstellen
+
+```powershell
+powershell -ExecutionPolicy Bypass -File .\scripts\backup-postgres.ps1
+```
+
+Das Backup wird standardmaessig hier abgelegt:
+
+- `backups/postgres/`
+
+### Backup wiederherstellen
+
+```powershell
+powershell -ExecutionPolicy Bypass -File .\scripts\restore-postgres.ps1 -BackupFile ".\backups\postgres\DATEI.dump"
+```
+
+### Wichtige Hinweise
+
+- Vor einem Restore am besten den laufenden Server stoppen.
+- `PGPASSWORD` und `DATABASE_URL` muessen gesetzt sein oder als Parameter uebergeben werden.
+- Die Skripte nutzen standardmaessig PostgreSQL 18 unter `C:\Program Files\PostgreSQL\18\bin`.
+- Wenn spaeter eine andere PostgreSQL-Version genutzt wird, kann der Pfad ueber `-PgBinPath` angepasst werden.
