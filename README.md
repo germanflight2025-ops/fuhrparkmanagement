@@ -78,19 +78,24 @@ Die App nutzt lokal jetzt eine getrennte Runtime-Datei und kann mit gesetzter `D
 
 ## Backup und Restore fuer PostgreSQL
 
-Fuer euren internen Betrieb gibt es jetzt zwei PowerShell-Skripte:
+Fuer euren internen Betrieb gibt es jetzt vier PowerShell-Skripte:
 
 - `scripts/backup-postgres.ps1`
 - `scripts/restore-postgres.ps1`
+- `scripts/setup-postgres-env.ps1`
+- `scripts/setup-daily-backup-task.ps1`
 
 ### Typische lokale Vorbereitung
 
+Einmalig Benutzer-Variablen speichern:
+
 ```powershell
-$env:PGPASSWORD="DEIN_PASSWORT"
-$env:DATABASE_URL="postgres://postgres@localhost:5432/fuhrparkmanagement"
+powershell -ExecutionPolicy Bypass -File .\scripts\setup-postgres-env.ps1 -DatabaseUrl "postgres://postgres@localhost:5432/fuhrparkmanagement" -PgPassword "DEIN_PASSWORT"
 ```
 
-### Backup erstellen
+Danach PowerShell neu oeffnen.
+
+### Manuelles Backup erstellen
 
 ```powershell
 powershell -ExecutionPolicy Bypass -File .\scripts\backup-postgres.ps1
@@ -106,9 +111,18 @@ Das Backup wird standardmaessig hier abgelegt:
 powershell -ExecutionPolicy Bypass -File .\scripts\restore-postgres.ps1 -BackupFile ".\backups\postgres\DATEI.dump"
 ```
 
+### Taegliches automatisches Backup einrichten
+
+```powershell
+powershell -ExecutionPolicy Bypass -File .\scripts\setup-daily-backup-task.ps1 -StartTime "20:00"
+```
+
+Danach legt Windows eine geplante Aufgabe an, die jeden Tag zur angegebenen Uhrzeit ein Backup ausfuehrt.
+
 ### Wichtige Hinweise
 
 - Vor einem Restore am besten den laufenden Server stoppen.
 - `PGPASSWORD` und `DATABASE_URL` muessen gesetzt sein oder als Parameter uebergeben werden.
 - Die Skripte nutzen standardmaessig PostgreSQL 18 unter `C:\Program Files\PostgreSQL\18\bin`.
 - Wenn spaeter eine andere PostgreSQL-Version genutzt wird, kann der Pfad ueber `-PgBinPath` angepasst werden.
+- Der Backup-Ordner ist in Git ignoriert und bleibt lokal.
