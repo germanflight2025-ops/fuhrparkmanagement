@@ -41,9 +41,17 @@
         <div id="topbarControls" class="topbar-controls"></div>
       </header>
 
-      <section id="loginView" class="panel visible">
-        <div class="login-grid login-grid-single">
-          <div class="panel card accent">
+      <section id="loginView" class="panel visible login-stage">
+        <div class="login-grid login-grid-hero">
+          <div class="login-hero-media">
+            <div class="login-hero-image" aria-hidden="true"></div>
+            <div class="login-hero-copy">
+              <span class="login-kicker">Fuhrparkmanagement</span>
+              <h3>Fahrzeuge, Werkstatt, Schaeden und UVV in einer Oberflaeche.</h3>
+              <p>Der Login kann mit deinem Bild individualisiert werden. Die Bildflaeche ist bereits vorbereitet.</p>
+            </div>
+          </div>
+          <div class="panel card accent login-card">
             <h3>Login</h3>
             <form id="loginForm" class="form-grid">
               <label>Benutzername oder E-Mail<input name="login" required placeholder="z. B. Michael Weber oder admin@firma.de"></label>
