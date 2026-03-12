@@ -48,3 +48,29 @@ Diese Version speichert Daten aktuell in `data/db.json`. Das ist fuer eine Demo 
 - `package.json`
 - `render.yaml`
 - `data/db.json`
+
+## PostgreSQL Vorbereitung
+
+Diese Projektversion bleibt aktuell weiter auf `data/db.json` lauffaehig, ist aber jetzt fuer den naechsten Schritt Richtung Firmenbetrieb vorbereitet.
+
+Neu im Projekt:
+
+- `.env.example` mit `DATABASE_URL`
+- `db/postgres-schema.sql` mit dem Tabellenmodell
+- `scripts/import-json-to-postgres.js` fuer den Import aus der JSON-Demo-Datenbank
+- neues npm-Skript: `npm run pg:import`
+
+### Empfohlener Ablauf fuer die Umstellung
+
+1. PostgreSQL lokal oder auf dem Server bereitstellen.
+2. `.env.example` nach `.env` kopieren und `DATABASE_URL` anpassen.
+3. Abhaengigkeit installieren:
+   - `npm install`
+4. Schema in PostgreSQL einspielen:
+   - Inhalt aus `db/postgres-schema.sql` ausfuehren
+5. Bestehende JSON-Daten importieren:
+   - `npm run pg:import`
+
+### Wichtiger Hinweis
+
+Die App liest aktuell zur Laufzeit noch aus der JSON-Datei. Mit den neuen Dateien ist jetzt aber der technische Unterbau fuer die saubere Umstellung vorbereitet, ohne die laufende Demo-Version zu riskieren.

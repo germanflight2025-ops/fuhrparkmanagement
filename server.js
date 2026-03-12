@@ -1,9 +1,10 @@
-const fs = require('fs');
+﻿const fs = require('fs');
 const path = require('path');
 const express = require('express');
 const multer = require('multer');
 const bcrypt = require('bcryptjs');
 const PDFDocument = require('pdfkit');
+const { Pool } = require('pg');
 const { parse } = require('csv-parse/sync');
 const { authRequired, requireRoles, signUser } = require('./middleware/auth');
 
@@ -12,6 +13,13 @@ const PORT = process.env.PORT || 3000;
 const uploadsDir = path.join(__dirname, 'public', 'uploads');
 const dataDir = path.join(__dirname, 'data');
 const dataFile = path.join(dataDir, 'db.json');
+const pgSchemaFile = path.join(__dirname, 'db', 'postgres-schema.sql');
+const usePostgres = Boolean(process.env.DATABASE_URL);
+const pgPool = usePostgres ? new Pool({
+  connectionString: process.env.DATABASE_URL,
+  ssl: process.env.PGSSLMODE === 'require' ? { rejectUnauthorized: false } : false
+}) : null;
+let pgSchemaReady = false;
 
 if (!fs.existsSync(uploadsDir)) fs.mkdirSync(uploadsDir, { recursive: true });
 if (!fs.existsSync(dataDir)) fs.mkdirSync(dataDir, { recursive: true });
@@ -110,8 +118,114 @@ function ensureDataFile() {
   }
 }
 
+function normalizePersistValue(value) {
+  return value === '' || typeof value === 'undefined' ? null : value;
+}
+
+function normalizePgValue(key, value) {
+  if (value === null || typeof value === 'undefined') return value;
+  if (value instanceof Date) {
+    return key.endsWith('_at') ? value.toISOString() : value.toISOString().slice(0, 10);
+  }
+  return value;
+}
+
+function normalizePgRows(rows) {
+  return rows.map((row) => Object.fromEntries(Object.entries(row).map(([key, value]) => [key, normalizePgValue(key, value)])));
+}
+
+async function ensurePgSchema() {
+  if (!usePostgres || pgSchemaReady) return;
+  const schemaSql = fs.readFileSync(pgSchemaFile, 'utf8').replace(/^\uFEFF/, '');
+  await pgPool.query(schemaSql);
+  pgSchemaReady = true;
+}
+
+async function insertPgRows(client, table, columns, rows) {
+  if (!rows.length) return;
+  const placeholders = columns.map((_, index) => '$' + (index + 1)).join(', ');
+  const sql = 'INSERT INTO ' + table + ' (' + columns.join(', ') + ') VALUES (' + placeholders + ')';
+  for (const row of rows) {
+    const values = columns.map((column) => normalizePersistValue(row[column]));
+    await client.query(sql, values);
+  }
+}
+
+async function loadFromPostgres() {
+  await ensurePgSchema();
+  const queries = [
+    ['standorte', 'SELECT * FROM standorte ORDER BY id'],
+    ['benutzer', 'SELECT * FROM benutzer ORDER BY id'],
+    ['fahrzeuge', 'SELECT * FROM fahrzeuge ORDER BY id'],
+    ['workshop_bereiche', 'SELECT * FROM werkstatt_bereiche ORDER BY id'],
+    ['werkstatt', 'SELECT * FROM werkstatt ORDER BY id'],
+    ['schaeden', 'SELECT * FROM schaeden ORDER BY id'],
+    ['uvv_pruefungen', 'SELECT * FROM uvv_pruefungen ORDER BY id'],
+    ['uvv_checkpunkte', 'SELECT * FROM uvv_checkpunkte ORDER BY id']
+  ];
+  const data = {};
+  for (const [key, sql] of queries) {
+    const result = await pgPool.query(sql);
+    data[key] = normalizePgRows(result.rows);
+  }
+  return data;
+}
+
+function hasPgData(data) {
+  return ['standorte', 'benutzer', 'fahrzeuge', 'werkstatt', 'schaeden', 'uvv_pruefungen']
+    .some((key) => Array.isArray(data[key]) && data[key].length);
+}
+
+async function saveToPostgres(data) {
+  await ensurePgSchema();
+  const client = await pgPool.connect();
+  try {
+    await client.query('BEGIN');
+    await client.query('TRUNCATE uvv_checkpunkte, uvv_pruefungen, schaeden, werkstatt, werkstatt_bereiche, fahrzeuge, benutzer, standorte RESTART IDENTITY CASCADE');
+    await insertPgRows(client, 'standorte', ['id', 'name', 'created_at'], data.standorte || []);
+    await insertPgRows(client, 'benutzer', ['id', 'benutzername', 'name', 'email', 'passwort_hash', 'rolle', 'standort_id', 'aktiv', 'created_at'], data.benutzer || []);
+    await insertPgRows(client, 'fahrzeuge', ['id', 'kennzeichen', 'fahrzeug', 'standort_id', 'status', 'hu_datum', 'uvv_datum', 'fahrzeugschein_pdf', 'created_at'], data.fahrzeuge || []);
+    await insertPgRows(client, 'werkstatt_bereiche', ['id', 'standort_id', 'slot', 'name', 'created_at'], data.workshop_bereiche || []);
+    await insertPgRows(client, 'werkstatt', ['id', 'fahrzeug_id', 'workshop_slot', 'werkstatt_name', 'positionsnummer', 'problem', 'pruefzeichen', 'status_datum', 'datum_von', 'datum_bis', 'tage', 'beschreibung', 'status', 'created_at'], data.werkstatt || []);
+    await insertPgRows(client, 'schaeden', ['id', 'fahrzeug_id', 'fahrer_name', 'fahrer_telefon', 'beschreibung', 'unfallgegner_name', 'unfallgegner_kennzeichen', 'versicherung', 'telefon', 'foto', 'datum', 'status', 'polizei_vor_ort', 'verletzte', 'vu_nummer', 'created_by', 'created_at'], data.schaeden || []);
+    await insertPgRows(client, 'uvv_pruefungen', ['id', 'fahrzeug_id', 'pruefer', 'datum', 'naechste_pruefung_datum', 'kommentar', 'created_at'], data.uvv_pruefungen || []);
+    await insertPgRows(client, 'uvv_checkpunkte', ['id', 'uvv_pruefung_id', 'punkt_nr', 'punkt_name', 'status', 'kommentar'], data.uvv_checkpunkte || []);
+    await client.query('COMMIT');
+  } catch (error) {
+    await client.query('ROLLBACK');
+    throw error;
+  } finally {
+    client.release();
+  }
+}
+
+function syncToPostgres(data) {
+  if (!usePostgres) return;
+  const payload = JSON.parse(JSON.stringify(data));
+  delete payload.__needs_write;
+  saveToPostgres(payload).catch((error) => console.error('PostgreSQL Sync fehlgeschlagen:', error.message));
+}
+
+async function bootstrapFromPostgres() {
+  if (!usePostgres) return;
+  const pgData = await loadFromPostgres();
+  if (!hasPgData(pgData)) {
+    const fallback = readDb();
+    writeDb(fallback);
+    return;
+  }
+  const loaded = migrateData(pgData);
+  const payload = { ...loaded };
+  delete payload.__needs_write;
+  fs.writeFileSync(dataFile, JSON.stringify(payload, null, 2), 'utf8');
+  if (loaded.__needs_write) await saveToPostgres(payload);
+}
+
 function writeDb(data) {
-  fs.writeFileSync(dataFile, JSON.stringify(data, null, 2), 'utf8');
+  const payload = { ...data };
+  delete payload.__needs_write;
+  fs.writeFileSync(dataFile, JSON.stringify(payload, null, 2), 'utf8');
+  syncToPostgres(payload);
 }
 
 function migrateData(data) {
@@ -121,8 +235,17 @@ function migrateData(data) {
     changed = true;
   }
   data.standorte = data.standorte.map((item, index) => ({ id: index + 1, name: sanitizeLocationName(item.name || STANDORTE[index]), created_at: item.created_at || nowIso() }));
-  data.workshop_bereiche = createWorkshopAreas(data.standorte, data.workshop_bereiche || []);
-  data.benutzer = (data.benutzer || []).map((item) => ({ ...item, benutzername: item.benutzername || String(item.email || item.name || '').split('@')[0].trim().toLowerCase().replace(/\s+/g, ''), standort_id: item.rolle === 'hauptadmin' ? (item.standort_id || findLocationId(data, 'Carlswerk')) : item.standort_id, rolle: ['hauptadmin', 'admin', 'benutzer'].includes(item.rolle) ? item.rolle : 'benutzer', aktiv: Number(item.aktiv) ? 1 : 0 }));
+  const workshopBereiche = createWorkshopAreas(data.standorte, data.workshop_bereiche || []);
+  if (JSON.stringify(workshopBereiche) !== JSON.stringify(data.workshop_bereiche || [])) changed = true;
+  data.workshop_bereiche = workshopBereiche;
+  data.benutzer = (data.benutzer || []).map((item) => {
+    const benutzername = item.benutzername || String(item.email || item.name || '').split('@')[0].trim().toLowerCase().replace(/\s+/g, '');
+    const standort_id = item.rolle === 'hauptadmin' ? (item.standort_id || findLocationId(data, 'Carlswerk')) : item.standort_id;
+    const rolle = ['hauptadmin', 'admin', 'benutzer'].includes(item.rolle) ? item.rolle : 'benutzer';
+    const aktiv = Number(item.aktiv) ? 1 : 0;
+    if (benutzername !== item.benutzername || standort_id !== item.standort_id || rolle !== item.rolle || aktiv !== item.aktiv) changed = true;
+    return { ...item, benutzername, standort_id, rolle, aktiv };
+  });
   data.fahrzeuge = (data.fahrzeuge || []).map((item) => ({
     ...item,
     status: normalizeStatus({ verfuegbar: 'aktiv', ausser_betrieb: 'nicht_einsatzbereit' }[item.status] || item.status, FAHRZEUG_STATUS, 'aktiv'),
@@ -154,7 +277,7 @@ function migrateData(data) {
   }));
   data.uvv_pruefungen = (data.uvv_pruefungen || []).map((item) => ({ ...item, naechste_pruefung_datum: item.naechste_pruefung_datum || plusOneYear(item.datum) }));
   data.uvv_checkpunkte = data.uvv_checkpunkte || [];
-  if (changed) writeDb(data);
+  data.__needs_write = changed;
   return data;
 }
 
@@ -854,9 +977,18 @@ app.use((error, req, res, next) => {
   res.status(error.statusCode || 500).json({ error: error.message || 'Serverfehler.' });
 });
 
-const migrated = readDb();
-writeDb(migrated);
-app.listen(PORT, () => console.log(`Fuhrparkmanagement laeuft auf http://localhost:${PORT}`));
+async function start() {
+  ensureDataFile();
+  if (usePostgres) await bootstrapFromPostgres();
+  const migrated = readDb();
+  writeDb(migrated);
+  app.listen(PORT, () => console.log(`Fuhrparkmanagement laeuft auf http://localhost:${PORT}`));
+}
+
+start().catch((error) => {
+  console.error('Serverstart fehlgeschlagen:', error);
+  process.exit(1);
+});
 
 
 
