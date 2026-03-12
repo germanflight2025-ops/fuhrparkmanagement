@@ -495,15 +495,71 @@ function renderDashboard() {
   el('reminders').innerHTML = data.reminders.length ? data.reminders.map((item) => `<div><strong>${item.kennzeichen}</strong> - ${item.fahrzeug}<br><span class="badge warn">HU ${item.hu_in_tagen} Tage</span> <span class="badge warn">UVV ${item.uvv_in_tagen} Tage</span></div>`).join('') : "<p class=\"muted\">Keine kurzfristigen Faelligkeiten.</p>";
 }
 
-function currentWorkshopAreas() {
-  const activeId = Number(activeLocationId() || 0);
-  const source = (state.workshopBereiche || []).filter((item) => Number(item.standort_id) === activeId);
+function isWorkshopOverallView() {
+  return state.user?.rolle === 'hauptadmin' && !state.selectedStandortId;
+}
+
+function workshopStandortName(standortId) {
+  return state.meta.standorte.find((item) => Number(item.id) === Number(standortId))?.name || '-';
+}
+
+function workshopAreaGroups() {
   const slots = state.meta.workshopSlots || [1, 2, 3, 4, 5, 6, 7, 8, 9];
-  return slots.map((slot) => source.find((item) => Number(item.slot) === Number(slot)) || { id: '', slot, name: `Werkstatt ${slot}`, standort_id: activeId });
+  const source = state.workshopBereiche || [];
+  if (isWorkshopOverallView()) {
+    return state.meta.standorte.map((standort) => ({
+      standort,
+      areas: slots.map((slot) => source.find((item) => Number(item.standort_id) === Number(standort.id) && Number(item.slot) === Number(slot)) || { id: '', slot, name: `Werkstatt ${slot}`, standort_id: standort.id })
+    }));
+  }
+  const activeId = Number(activeLocationId() || 0);
+  const standort = state.meta.standorte.find((item) => Number(item.id) === activeId) || { id: activeId, name: workshopStandortName(activeId) };
+  return [{
+    standort,
+    areas: slots.map((slot) => source.find((item) => Number(item.standort_id) === activeId && Number(item.slot) === Number(slot)) || { id: '', slot, name: `Werkstatt ${slot}`, standort_id: activeId })
+  }];
+}
+
+function renderWorkshopTile(area, entries) {
+  const counts = {
+    offen: entries.filter((item) => item.status === 'offen').length,
+    bearbeitung: entries.filter((item) => item.status === 'in_bearbeitung').length,
+    abgeschlossen: entries.filter((item) => item.status === 'abgeschlossen').length,
+    tage: entries.reduce((sum, item) => sum + Number(item.tage || 0), 0)
+  };
+  return `
+    <section class="workshop-tile">
+      <div class="workshop-tile-head">
+        <div>
+          <span class="workshop-tile-kicker">Werkstatt ${area.slot}</span>
+          <input class="workshop-area-input" data-action="workshop-area-name" data-id="${area.id}" value="${area.name || `Werkstatt ${area.slot}`}" placeholder="Werkstattname">
+        </div>
+        <button class="icon-btn" data-action="workshop-area-save" data-id="${area.id}" title="Werkstattname speichern">&#10010;</button>
+      </div>
+      <div class="workshop-tile-stats">
+        <span>${entries.length} Auftraege</span>
+        <span>${counts.offen} offen</span>
+        <span>${counts.bearbeitung} Bearbeitung</span>
+        <span>${counts.abgeschlossen} abgeschlossen</span>
+        <span>${counts.tage} Tage gesamt</span>
+      </div>
+      <div class="workshop-tile-list">
+        ${entries.length ? entries.map((item) => `
+          <article class="workshop-tile-entry">
+            <div class="workshop-tile-entry-head">
+              <strong>${item.kennzeichen || '-'}</strong>
+              <span class="badge ${badgeClass(item.status).replace('badge ', '')}">${item.status}</span>
+            </div>
+            <div class="workshop-tile-entry-meta">${item.problem || item.beschreibung || 'Kein Problemtext'}</div>
+            <div class="workshop-tile-entry-meta">Nr. ${item.positionsnummer || '-'} | ${item.datum_von || '-'} bis ${item.datum_bis || 'offen'} | ${item.tage || 0} Tage</div>
+          </article>
+        `).join('') : '<p class="muted">Noch keine Eintraege.</p>'}
+      </div>
+    </section>`;
 }
 
 function renderWorkshopBoard() {
-  const slots = currentWorkshopAreas();
+  const groups = workshopAreaGroups();
   const totalDays = state.werkstatt.reduce((sum, item) => sum + Number(item.tage || 0), 0);
   const summaryCards = [
     ['Gesamt', state.werkstatt.length],
@@ -515,46 +571,22 @@ function renderWorkshopBoard() {
   if (el('workshopSummary')) {
     el('workshopSummary').innerHTML = summaryCards.map(([label, value]) => `<div class="mini-kpi mini-kpi-workshop"><span>${label}</span><strong>${value}</strong></div>`).join('');
   }
-  el('workshopBoard').innerHTML = slots.map((area) => {
-    const entries = state.werkstatt
-      .filter((item) => Number(item.workshop_slot || 1) === Number(area.slot))
-      .sort((a, b) => String(b.status_datum || b.datum_von || '').localeCompare(String(a.status_datum || a.datum_von || '')));
-    const counts = {
-      offen: entries.filter((item) => item.status === 'offen').length,
-      bearbeitung: entries.filter((item) => item.status === 'in_bearbeitung').length,
-      abgeschlossen: entries.filter((item) => item.status === 'abgeschlossen').length,
-      tage: entries.reduce((sum, item) => sum + Number(item.tage || 0), 0)
-    };
-    return `
-      <section class="workshop-tile">
-        <div class="workshop-tile-head">
-          <div>
-            <span class="workshop-tile-kicker">Werkstatt ${area.slot}</span>
-            <input class="workshop-area-input" data-action="workshop-area-name" data-id="${area.id}" value="${area.name || `Werkstatt ${area.slot}`}" placeholder="Werkstattname">
-          </div>
-          <button class="icon-btn" data-action="workshop-area-save" data-id="${area.id}" title="Werkstattname speichern">&#10010;</button>
-        </div>
-        <div class="workshop-tile-stats">
-          <span>${entries.length} Auftraege</span>
-          <span>${counts.offen} offen</span>
-          <span>${counts.bearbeitung} Bearbeitung</span>
-          <span>${counts.abgeschlossen} abgeschlossen</span>
-          <span>${counts.tage} Tage gesamt</span>
-        </div>
-        <div class="workshop-tile-list">
-          ${entries.length ? entries.map((item) => `
-            <article class="workshop-tile-entry">
-              <div class="workshop-tile-entry-head">
-                <strong>${item.kennzeichen || '-'}</strong>
-                <span class="badge ${badgeClass(item.status).replace('badge ', '')}">${item.status}</span>
-              </div>
-              <div class="workshop-tile-entry-meta">${item.problem || item.beschreibung || 'Kein Problemtext'}</div>
-              <div class="workshop-tile-entry-meta">Nr. ${item.positionsnummer || '-'} | ${item.datum_von || '-'} bis ${item.datum_bis || 'offen'} | ${item.tage || 0} Tage</div>
-            </article>
-          `).join('') : '<p class="muted">Noch keine Eintraege.</p>'}
-        </div>
-      </section>`;
-  }).join('');
+  el('workshopBoard').innerHTML = groups.map((group) => `
+    <section class="workshop-board-group">
+      <div class="workshop-board-group-head">
+        <h4>${group.standort?.name || '-'}</h4>
+        <span class="muted">${group.areas.length} Bereiche</span>
+      </div>
+      <div class="workshop-board-large workshop-board-nested">
+        ${group.areas.map((area) => {
+          const entries = state.werkstatt
+            .filter((item) => Number(item.standort_id) === Number(area.standort_id) && Number(item.workshop_slot || 1) === Number(area.slot))
+            .sort((a, b) => String(b.status_datum || b.datum_von || '').localeCompare(String(a.status_datum || a.datum_von || '')));
+          return renderWorkshopTile(area, entries);
+        }).join('')}
+      </div>
+    </section>
+  `).join('');
 }
 
 function renderLists() {
