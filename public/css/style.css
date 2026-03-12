@@ -407,4 +407,30 @@ img.damage-preview { width: 84px; height: 60px; object-fit: cover; border-radius
   .workshop-detail-grid {
     grid-template-columns: 1fr;
   }
+
+.workshop-list-inline-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 10px 16px;
+  color: #d6e2f8;
+  font-size: 14px;
+}
+.workshop-list-inline-grid strong {
+  display: block;
+  margin-bottom: 4px;
+  color: #8ea3c2;
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+@media (max-width: 1280px) {
+  .workshop-list-inline-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+@media (max-width: 640px) {
+  .workshop-list-inline-grid {
+    grid-template-columns: 1fr;
+  }
 }
