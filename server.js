@@ -20,6 +20,7 @@ const pgPool = usePostgres ? new Pool({
   ssl: process.env.PGSSLMODE === 'require' ? { rejectUnauthorized: false } : false
 }) : null;
 let pgSchemaReady = false;
+let currentData = null;
 
 if (!fs.existsSync(uploadsDir)) fs.mkdirSync(uploadsDir, { recursive: true });
 if (!fs.existsSync(dataDir)) fs.mkdirSync(dataDir, { recursive: true });
@@ -114,12 +115,18 @@ function seedData() {
 
 function ensureDataFile() {
   if (!fs.existsSync(dataFile)) {
-    fs.writeFileSync(dataFile, JSON.stringify(seedData(), null, 2), 'utf8');
+    const seeded = seedData();
+    currentData = cloneData(seeded);
+    fs.writeFileSync(dataFile, JSON.stringify(seeded, null, 2), 'utf8');
   }
 }
 
 function normalizePersistValue(value) {
   return value === '' || typeof value === 'undefined' ? null : value;
+}
+
+function cloneData(data) {
+  return JSON.parse(JSON.stringify(data));
 }
 
 function normalizePgValue(key, value) {
@@ -217,13 +224,15 @@ async function bootstrapFromPostgres() {
   const loaded = migrateData(pgData);
   const payload = { ...loaded };
   delete payload.__needs_write;
+  currentData = payload;
   fs.writeFileSync(dataFile, JSON.stringify(payload, null, 2), 'utf8');
   if (loaded.__needs_write) await saveToPostgres(payload);
 }
 
 function writeDb(data) {
-  const payload = { ...data };
+  const payload = cloneData(data);
   delete payload.__needs_write;
+  currentData = payload;
   fs.writeFileSync(dataFile, JSON.stringify(payload, null, 2), 'utf8');
   syncToPostgres(payload);
 }
@@ -283,7 +292,10 @@ function migrateData(data) {
 
 function readDb() {
   ensureDataFile();
-  return migrateData(JSON.parse(fs.readFileSync(dataFile, 'utf8')));
+  if (!currentData) {
+    currentData = migrateData(JSON.parse(fs.readFileSync(dataFile, 'utf8')));
+  }
+  return cloneData(currentData);
 }
 
 function locationName(data, id) {
