@@ -249,7 +249,7 @@ function mapWorkshopStatusToVehicleStatus(status) {
 
 function visibleViewsForRole(role) {
   if (role === 'benutzer') return ['schaeden'];
-  return ['dashboard', 'fahrzeuge', 'werkstatt', 'werkstattliste', 'schaeden', 'uvv', 'benutzer', 'standorte', 'statistik', 'suche', 'import', 'impressum'];
+  return ['dashboard', 'fahrzeuge', 'werkstatt', 'schaeden', 'uvv', 'benutzer', 'standorte', 'statistik', 'suche', 'import', 'impressum'];
 }
 
 function assertAllowedStatus(value, allowed) {
