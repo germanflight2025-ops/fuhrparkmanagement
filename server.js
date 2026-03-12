@@ -126,6 +126,7 @@ function migrateData(data) {
   data.fahrzeuge = (data.fahrzeuge || []).map((item) => ({
     ...item,
     status: normalizeStatus({ verfuegbar: 'aktiv', ausser_betrieb: 'nicht_einsatzbereit' }[item.status] || item.status, FAHRZEUG_STATUS, 'aktiv'),
+    fahrzeugschein_pdf: item.fahrzeugschein_pdf || '',
     created_at: item.created_at || nowIso()
   }));
   data.werkstatt = (data.werkstatt || []).map((item) => {
@@ -221,6 +222,7 @@ function vehicleWithLocation(data, vehicle) {
   return {
     ...vehicle,
     standort: locationName(data, vehicle.standort_id),
+    fahrzeugschein_pdf: vehicle.fahrzeugschein_pdf || '',
     hu_in_tagen: daysUntil(vehicle.hu_datum),
     uvv_in_tagen: daysUntil(vehicle.uvv_datum)
   };
@@ -275,6 +277,14 @@ const upload = multer({
   fileFilter: (req, file, cb) => {
     const allowed = ['image/jpeg', 'image/png', 'image/webp'];
     if (!allowed.includes(file.mimetype)) return cb(new Error('Nur Bilddateien erlaubt.'));
+    cb(null, true);
+  }
+});
+const uploadPdf = multer({
+  storage,
+  limits: { fileSize: 10 * 1024 * 1024 },
+  fileFilter: (req, file, cb) => {
+    if (file.mimetype !== 'application/pdf') return cb(new Error('Nur PDF-Dateien erlaubt.'));
     cb(null, true);
   }
 });
@@ -377,7 +387,7 @@ app.get('/api/fahrzeuge', authRequired, (req, res) => res.json(scopedVehicles(re
 app.post('/api/fahrzeuge', authRequired, requireRoles('hauptadmin', 'admin'), (req, res) => {
   assertAllowedStatus(req.body.status, FAHRZEUG_STATUS);
   const data = readDb();
-  const row = { id: nextId(data.fahrzeuge), kennzeichen: req.body.kennzeichen, fahrzeug: req.body.fahrzeug, standort_id: req.user.rolle === 'hauptadmin' ? Number(req.body.standort_id) : req.user.standort_id, status: req.body.status, hu_datum: req.body.hu_datum, uvv_datum: req.body.uvv_datum, created_at: nowIso() };
+  const row = { id: nextId(data.fahrzeuge), kennzeichen: req.body.kennzeichen, fahrzeug: req.body.fahrzeug, standort_id: req.user.rolle === 'hauptadmin' ? Number(req.body.standort_id) : req.user.standort_id, status: req.body.status, hu_datum: req.body.hu_datum, uvv_datum: req.body.uvv_datum, fahrzeugschein_pdf: req.body.fahrzeugschein_pdf || '', created_at: nowIso() };
   data.fahrzeuge.push(row);
   writeDb(data);
   res.json(vehicleWithLocation(data, row));
@@ -394,11 +404,22 @@ app.put('/api/fahrzeuge/:id', authRequired, requireRoles('hauptadmin', 'admin'),
     standort_id: req.user.rolle === 'hauptadmin' ? Number(req.body.standort_id) || row.standort_id : req.user.standort_id,
     status: req.body.status || row.status,
     hu_datum: req.body.hu_datum || row.hu_datum,
-    uvv_datum: req.body.uvv_datum || row.uvv_datum
+    uvv_datum: req.body.uvv_datum || row.uvv_datum,
+    fahrzeugschein_pdf: req.body.fahrzeugschein_pdf || row.fahrzeugschein_pdf || ''
   });
   writeDb(data);
   res.json(vehicleWithLocation(data, row));
 });
+app.post('/api/fahrzeuge/:id/upload-fahrzeugschein', authRequired, requireRoles('hauptadmin', 'admin'), uploadPdf.single('fahrzeugschein_pdf'), (req, res) => {
+  const data = readDb();
+  const row = data.fahrzeuge.find((item) => item.id === Number(req.params.id));
+  if (!row) return res.status(404).json({ error: 'Fahrzeug nicht gefunden.' });
+  if (!canAccessVehicle(req.user, row) && req.user.rolle !== 'hauptadmin') return res.status(403).json({ error: 'Kein Zugriff auf dieses Fahrzeug.' });
+  row.fahrzeugschein_pdf = `/uploads/${req.file.filename}`;
+  writeDb(data);
+  res.json({ success: true, fahrzeugschein_pdf: row.fahrzeugschein_pdf });
+});
+
 app.delete('/api/fahrzeuge/:id', authRequired, requireRoles('hauptadmin', 'admin'), (req, res) => {
   const data = readDb();
   const row = data.fahrzeuge.find((item) => item.id === Number(req.params.id));

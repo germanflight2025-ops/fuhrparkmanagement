@@ -183,7 +183,8 @@ function currentVehicleDraft() {
       standort_id: activeLocationId(),
       status: 'aktiv',
       hu_datum: '',
-      uvv_datum: ''
+      uvv_datum: '',
+      fahrzeugschein_pdf: ''
     };
   }
   const vehicle = state.fahrzeuge.find((entry) => String(entry.id) === String(state.editVehicleId));
@@ -194,7 +195,8 @@ function currentVehicleDraft() {
     standort_id: vehicle?.standort_id || activeLocationId(),
     status: vehicle?.status || 'aktiv',
     hu_datum: vehicle?.hu_datum || '',
-    uvv_datum: vehicle?.uvv_datum || ''
+    uvv_datum: vehicle?.uvv_datum || '',
+    fahrzeugschein_pdf: vehicle?.fahrzeugschein_pdf || ''
   };
 }
 
@@ -340,6 +342,8 @@ function renderForms() {
       <label>HU Datum<input name="hu_datum" type="date" value="${draftVehicle.hu_datum}"></label>
       <label>UVV Datum<input name="uvv_datum" type="date" value="${draftVehicle.uvv_datum}"></label>
     </div>
+    <label>Fahrzeugschein PDF<input name="fahrzeugschein_pdf" type="file" accept="application/pdf"></label>
+    ${draftVehicle.fahrzeugschein_pdf ? `<p class="muted">Aktuelle Datei: <a class="secondary-link" href="${draftVehicle.fahrzeugschein_pdf}" target="_blank" rel="noopener">PDF oeffnen</a></p>` : '<p class="muted">Aktuell ist kein Fahrzeugschein hinterlegt.</p>'}
     <p id="vehicleFormMessage" class="muted">${isEditingVehicle ? 'Hier kannst du das Fahrzeug direkt bearbeiten.' : 'Hier kannst du ein neues Fahrzeug anlegen.'}</p>
     <button type="submit">${isEditingVehicle ? 'Aenderungen speichern' : 'Speichern'}</button>`;
 
@@ -562,8 +566,9 @@ function renderLists() {
     { key: 'status', label: 'Status', render: (v) => `<span class="${badgeClass(v)}">${v}</span>` },
     { key: 'hu_datum', label: 'HU' },
     { key: 'uvv_datum', label: 'UVV' },
+    { key: 'fahrzeugschein_pdf', label: 'Fahrzeugschein', render: (v) => v ? `<a class="secondary-link" href="${v}" target="_blank" rel="noopener">PDF oeffnen</a>` : '<span class="muted">Kein PDF</span>' },
     { key: 'created_at', label: 'Angelegt', render: (v) => String(v || '').slice(0, 10) },
-    { key: 'id', label: 'Aktion', render: (v) => canManage ? `<div class="action-row"><button class="icon-btn" data-action="vehicle-edit" data-id="${v}" title="Fahrzeug bearbeiten">&#9998;</button><button class="secondary" data-action="vehicle-delete" data-id="${v}">Loeschen</button></div>` : '-' }
+    { key: 'id', label: 'Aktion', render: (v, row) => canManage ? `<div class="action-row">${row.fahrzeugschein_pdf ? `<a class="icon-btn secondary-link" href="${row.fahrzeugschein_pdf}" target="_blank" rel="noopener" title="Fahrzeugschein oeffnen">PDF</a>` : ''}<button class="icon-btn" data-action="vehicle-edit" data-id="${v}" title="Fahrzeug bearbeiten">&#9998;</button><button class="secondary" data-action="vehicle-delete" data-id="${v}">Loeschen</button></div>` : '-' }
   ]);
   el('workshopTable').innerHTML = renderTable(state.werkstatt, [
     { key: 'werkstatt_name', label: 'Werkstattname', render: (v, row) => `${v || '-'}${String(state.editWorkshopId) === String(row.id) ? '<br><span class="muted">Wird gerade bearbeitet</span>' : ''}` },
@@ -737,14 +742,22 @@ async function handleVehicleSubmit(event) {
   event.preventDefault();
   try {
     const isEditing = Boolean(state.editVehicleId);
-    const payload = Object.fromEntries(new FormData(event.target));
+    const formData = new FormData(event.target);
+    const pdfFile = formData.get('fahrzeugschein_pdf');
+    const payload = Object.fromEntries([...formData.entries()].filter(([key]) => key !== 'fahrzeugschein_pdf'));
     if (state.user?.rolle !== 'hauptadmin') payload.standort_id = state.user?.standort_id || '';
     if (!payload.kennzeichen || !payload.fahrzeug) throw new Error('Kennzeichen und Fahrzeugmodell sind Pflichtfelder.');
+    let savedVehicle;
     if (isEditing) {
-      await api(`/api/fahrzeuge/${state.editVehicleId}`, { method: 'PUT', body: JSON.stringify(payload) });
+      savedVehicle = await api(`/api/fahrzeuge/${state.editVehicleId}`, { method: 'PUT', body: JSON.stringify(payload) });
       state.editVehicleId = null;
     } else {
-      await api('/api/fahrzeuge', { method: 'POST', body: JSON.stringify(payload) });
+      savedVehicle = await api('/api/fahrzeuge', { method: 'POST', body: JSON.stringify(payload) });
+    }
+    if (pdfFile && pdfFile.size > 0) {
+      const pdfData = new FormData();
+      pdfData.append('fahrzeugschein_pdf', pdfFile);
+      await api(`/api/fahrzeuge/${savedVehicle.id}/upload-fahrzeugschein`, { method: 'POST', body: pdfData });
     }
     event.target.reset();
     await refreshApp();
