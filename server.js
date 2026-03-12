@@ -65,7 +65,7 @@ function createWorkshopAreas(standorte, existing = []) {
         id: match?.id || rows.length + 1,
         standort_id: standort.id,
         slot,
-        name: match?.name || Werkstatt ,
+        name: match?.name || `Werkstatt ${slot}`,
         created_at: match?.created_at || now
       });
     }
