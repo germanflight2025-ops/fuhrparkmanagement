@@ -357,7 +357,7 @@ function renderForms() {
 
     <div class="three-col">
       <label>Werkstatt Bereich<select name="workshop_slot">
-        ${(state.meta.workshopSlots || [1, 2, 3, 4, 5, 6, 7, 8, 9]).map((slot) => `<option value="${slot}" ${String(draftWorkshop.workshop_slot) === String(slot) ? 'selected' : ''}>Werkstatt ${slot}</option>`).join('')}
+        ${(state.meta.workshopSlots || [1, 2, 3, 4, 5, 6, 7, 8, 9]).map((slot) => `<option value="${slot}" ${String(draftWorkshop.workshop_slot) === String(slot) ? 'selected' : ''}>${workshopAreaDisplayName(activeLocationId(), Number(slot))}</option>`).join('')}
       </select></label>
       <label>Werkstattname<input id="workshopAreaNamePreview" name="werkstatt_name" value="${workshopAreaDisplayName(activeLocationId(), Number(draftWorkshop.workshop_slot || 1))}" readonly></label>
       <label>Symbol<select name="pruefzeichen"><option value="nein" ${draftWorkshop.pruefzeichen === 'nein' ? 'selected' : ''}>Nein</option><option value="ok" ${draftWorkshop.pruefzeichen === 'ok' ? 'selected' : ''}>OK</option></select></label>
@@ -611,7 +611,7 @@ function renderLists() {
   ]);
 
   el('workshopTable').innerHTML = renderTable(state.werkstatt, [
-    { key: 'workshop_slot', label: 'Bereich', render: (v) => `Werkstatt ${v || 1}` },
+    { key: 'workshop_slot', label: 'Bereich', render: (v, row) => workshopAreaDisplayName(row?.standort_id, Number(v || 1)) },
     { key: 'werkstatt_name', label: 'Werkstattname', render: (v, row) => `${v || '-'}${String(state.editWorkshopId) === String(row.id) ? '<br><span class="muted">Wird gerade bearbeitet</span>' : ''}` },
     { key: 'kennzeichen', label: 'Fahrzeug' },
     { key: 'positionsnummer', label: 'Nr.' },
