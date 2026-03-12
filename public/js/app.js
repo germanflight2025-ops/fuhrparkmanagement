@@ -1,4 +1,4 @@
-﻿const state = {
+const state = {
   token: sessionStorage.getItem('fuhrpark_token') || localStorage.getItem('fuhrpark_token') || '',
   user: JSON.parse(sessionStorage.getItem('fuhrpark_user') || localStorage.getItem('fuhrpark_user') || 'null'),
   selectedStandortId: sessionStorage.getItem('fuhrpark_selected_standort') || localStorage.getItem('fuhrpark_selected_standort') || '',
@@ -20,7 +20,8 @@ const SYMBOLS = { ok: '&#10004;', nein: '&#10006;', nicht_ok: '&#10006;' };
 const viewMeta = {
   dashboard: ['Dashboard', 'Zentrale Uebersicht des Fuhrparks.'],
   fahrzeuge: ['Fahrzeuge', 'Verwalten Sie Ihren Fuhrparkbestand.'],
-  werkstatt: ['Werkstatt', 'Werkstattauftraege und externe Werkstaetten verwalten.'],
+  werkstatt: ['Werkstatt', 'Werkstatt-Uebersicht mit aktiven Auftraegen und Bereichen.'],
+  werkstattliste: ['Werkstattliste', 'Alle Werkstattauftraege sortiert nach Werkstattnamen.'],
   schaeden: ['Schaeden', 'Unfall- und Schadenmeldungen strukturiert erfassen.'],
   uvv: ['UVV', 'Pruefungen mit 20 Punkten dokumentieren.'],
   benutzer: ['Benutzer', 'Benutzer anlegen, aktivieren und verwalten.'],
@@ -529,7 +530,6 @@ function renderWorkshopTile(area, entries) {
   const counts = {
     offen: entries.filter((item) => item.status === 'offen').length,
     bearbeitung: entries.filter((item) => item.status === 'in_bearbeitung').length,
-    abgeschlossen: entries.filter((item) => item.status === 'abgeschlossen').length,
     tage: entries.reduce((sum, item) => sum + Number(item.tage || 0), 0)
   };
   return `
@@ -544,36 +544,43 @@ function renderWorkshopTile(area, entries) {
         </div>
       </div>
       <div class="workshop-tile-stats">
-        <span>${entries.length} Auftraege</span>
+        <span>${entries.length} aktive Auftraege</span>
         <span>${counts.offen} offen</span>
         <span>${counts.bearbeitung} Bearbeitung</span>
-        <span>${counts.abgeschlossen} abgeschlossen</span>
         <span>${counts.tage} Tage gesamt</span>
       </div>
       <div class="workshop-tile-list">
         ${entries.length ? entries.map((item) => `
-          <article class="workshop-tile-entry">
+          <article class="workshop-tile-entry workshop-tile-entry-detailed">
             <div class="workshop-tile-entry-head">
               <strong>${item.kennzeichen || '-'}</strong>
               <span class="badge ${badgeClass(item.status).replace('badge ', '')}">${item.status}</span>
             </div>
-            <div class="workshop-tile-entry-meta">${item.problem || item.beschreibung || 'Kein Problemtext'}</div>
-            <div class="workshop-tile-entry-meta">Nr. ${item.positionsnummer || '-'} | ${item.datum_von || '-'} bis ${item.datum_bis || 'offen'} | ${item.tage || 0} Tage</div>
+            <div class="workshop-detail-grid">
+              <span><strong>Nr.</strong> ${item.positionsnummer || '-'}</span>
+              <span><strong>Problem</strong> ${item.problem || '-'}</span>
+              <span><strong>Symbol</strong> ${symbolFor(item.pruefzeichen)}</span>
+              <span><strong>Von</strong> ${item.datum_von || '-'}</span>
+              <span><strong>Bis</strong> ${item.datum_bis || '-'}</span>
+              <span><strong>Tage</strong> ${item.tage || 0}</span>
+            </div>
           </article>
-        `).join('') : '<p class="muted">Noch keine Eintraege.</p>'}
+        `).join('') : '<p class="muted">Noch keine laufenden Eintraege.</p>'}
       </div>
-    </section>`;
+    </section>
+  `;
 }
 
 function renderWorkshopBoard() {
   const groups = workshopAreaGroups();
-  const totalDays = state.werkstatt.reduce((sum, item) => sum + Number(item.tage || 0), 0);
+  const activeWorkshopEntries = state.werkstatt.filter((item) => item.status !== 'abgeschlossen');
+  const totalDays = activeWorkshopEntries.reduce((sum, item) => sum + Number(item.tage || 0), 0);
   const summaryCards = [
-    ['Gesamt', state.werkstatt.length],
-    ['Offen', state.werkstatt.filter((item) => item.status === 'offen').length],
-    ['In Bearbeitung', state.werkstatt.filter((item) => item.status === 'in_bearbeitung').length],
-    ['Abgeschlossen', state.werkstatt.filter((item) => item.status === 'abgeschlossen').length],
-    ['Tage gesamt', totalDays]
+    ['Aktiv gesamt', activeWorkshopEntries.length],
+    ['Offen', activeWorkshopEntries.filter((item) => item.status === 'offen').length],
+    ['In Bearbeitung', activeWorkshopEntries.filter((item) => item.status === 'in_bearbeitung').length],
+    ['Werkstaetten aktiv', new Set(activeWorkshopEntries.map((item) => `${item.standort_id}-${item.workshop_slot || 1}`)).size],
+    ['Tage aktiv', totalDays]
   ];
   if (el('workshopSummary')) {
     el('workshopSummary').innerHTML = summaryCards.map(([label, value]) => `<div class="mini-kpi mini-kpi-workshop"><span>${label}</span><strong>${value}</strong></div>`).join('');
@@ -582,11 +589,11 @@ function renderWorkshopBoard() {
     <section class="workshop-board-group">
       <div class="workshop-board-group-head">
         <h4>${group.standort?.name || '-'}</h4>
-        <span class="muted">${group.areas.length} Bereiche</span>
+        <span class="muted">Nur aktive Bereiche</span>
       </div>
       <div class="workshop-board-large workshop-board-nested">
         ${group.areas.map((area) => {
-          const entries = state.werkstatt
+          const entries = activeWorkshopEntries
             .filter((item) => Number(item.standort_id) === Number(area.standort_id) && Number(item.workshop_slot || 1) === Number(area.slot))
             .sort((a, b) => String(b.status_datum || b.datum_von || '').localeCompare(String(a.status_datum || a.datum_von || '')));
           return renderWorkshopTile(area, entries);
@@ -594,6 +601,53 @@ function renderWorkshopBoard() {
       </div>
     </section>
   `).join('');
+}
+
+function renderWorkshopListPage() {
+  const entries = [...state.werkstatt].sort((a, b) => {
+    const nameCompare = String(a.werkstatt_name || '').localeCompare(String(b.werkstatt_name || ''));
+    if (nameCompare !== 0) return nameCompare;
+    return String(b.status_datum || b.datum_von || '').localeCompare(String(a.status_datum || a.datum_von || ''));
+  });
+  const summaryCards = [
+    ['Gesamt', entries.length],
+    ['Offen', entries.filter((item) => item.status === 'offen').length],
+    ['In Bearbeitung', entries.filter((item) => item.status === 'in_bearbeitung').length],
+    ['Abgeschlossen', entries.filter((item) => item.status === 'abgeschlossen').length],
+    ['Werkstaetten', new Set(entries.map((item) => String(item.werkstatt_name || workshopAreaDisplayName(item.standort_id, item.workshop_slot || 1)))).size]
+  ];
+  if (el('workshopListSummary')) {
+    el('workshopListSummary').innerHTML = summaryCards.map(([label, value]) => `<div class="mini-kpi mini-kpi-workshop"><span>${label}</span><strong>${value}</strong></div>`).join('');
+  }
+  const grouped = entries.reduce((acc, item) => {
+    const name = item.werkstatt_name || workshopAreaDisplayName(item.standort_id, item.workshop_slot || 1);
+    acc[name] ||= [];
+    acc[name].push(item);
+    return acc;
+  }, {});
+  const groupHtml = Object.entries(grouped).map(([name, rows]) => `
+    <section class="panel card workshop-list-group-card">
+      <div class="section-head">
+        <h3>${name}</h3>
+        <span class="muted">${rows.length} Auftraege</span>
+      </div>
+      <div class="table-wrap">
+        ${renderTable(rows, [
+          { key: 'workshop_slot', label: 'Bereich', render: (v, row) => workshopAreaDisplayName(row?.standort_id, Number(v || 1)) },
+          { key: 'kennzeichen', label: 'Fahrzeug' },
+          { key: 'positionsnummer', label: 'Nr.' },
+          { key: 'problem', label: 'Problem' },
+          { key: 'pruefzeichen', label: 'Symbol', render: (v) => `<span class="${badgeClass(v)} symbol-badge">${symbolFor(v)}</span>` },
+          { key: 'datum_von', label: 'Von Datum', render: (v) => v || '-' },
+          { key: 'datum_bis', label: 'Bis Datum', render: (v) => v || '-' },
+          { key: 'tage', label: 'Tage' },
+          { key: 'status', label: 'Status', render: (v) => `<span class="${badgeClass(v)}">${v}</span>` },
+          { key: 'id', label: 'Aktion', render: (v) => state.user && state.user.rolle !== 'benutzer' ? `<div class="action-row"><button class="icon-btn" data-action="workshop-edit" data-id="${v}" title="Werkstattauftrag bearbeiten">&#9998;</button><button class="secondary" data-action="workshop-delete" data-id="${v}">Loeschen</button></div>` : '-' }
+        ])}
+      </div>
+    </section>
+  `).join('');
+  el('workshopListGroups').innerHTML = groupHtml || '<p class="muted">Keine Werkstattauftraege vorhanden.</p>';
 }
 
 function renderLists() {
@@ -609,20 +663,7 @@ function renderLists() {
     { key: 'created_at', label: 'Angelegt', render: (v) => String(v || '').slice(0, 10) },
     { key: 'id', label: 'Aktion', render: (v) => canManage ? `<div class="action-row"><button class="icon-btn" data-action="vehicle-edit" data-id="${v}" title="Fahrzeug bearbeiten">&#9998;</button><button class="secondary" data-action="vehicle-delete" data-id="${v}">Loeschen</button></div>` : '-' }
   ]);
-
-  el('workshopTable').innerHTML = renderTable(state.werkstatt, [
-    { key: 'workshop_slot', label: 'Bereich', render: (v, row) => workshopAreaDisplayName(row?.standort_id, Number(v || 1)) },
-    { key: 'werkstatt_name', label: 'Werkstattname', render: (v, row) => `${v || '-'}${String(state.editWorkshopId) === String(row.id) ? '<br><span class="muted">Wird gerade bearbeitet</span>' : ''}` },
-    { key: 'kennzeichen', label: 'Fahrzeug' },
-    { key: 'positionsnummer', label: 'Nr.' },
-    { key: 'problem', label: 'Problem' },
-    { key: 'pruefzeichen', label: 'Symbol', render: (v) => `<span class="${badgeClass(v)} symbol-badge">${symbolFor(v)}</span>` },
-    { key: 'datum_von', label: 'Von Datum', render: (v) => v || '-' },
-    { key: 'datum_bis', label: 'Bis Datum', render: (v) => v || '-' },
-    { key: 'tage', label: 'Tage' },
-    { key: 'status', label: 'Status', render: (v) => `<span class="${badgeClass(v)}">${v}</span>` },
-    { key: 'id', label: 'Aktion', render: (v) => canManage ? `<div class="action-row"><button class="icon-btn" data-action="workshop-edit" data-id="${v}" title="Werkstattauftrag bearbeiten">&#9998;</button><button class="secondary" data-action="workshop-delete" data-id="${v}">Loeschen</button></div>` : '-' }
-  ]);
+  renderWorkshopListPage();
 
   el('damageTable').innerHTML = renderTable(state.schaeden, [
     { key: 'kennzeichen', label: 'Kennzeichen' },

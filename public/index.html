@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="de">
 <head>
   <meta charset="UTF-8">
@@ -17,6 +17,7 @@
         <button class="nav-btn active" data-view="dashboard">Dashboard</button>
         <button class="nav-btn" data-view="fahrzeuge">Fahrzeuge</button>
         <button class="nav-btn" data-view="werkstatt">Werkstatt</button>
+        <button class="nav-btn" data-view="werkstattliste">Werkstattliste</button>
         <button class="nav-btn" data-view="schaeden">Schaeden</button>
         <button class="nav-btn" data-view="uvv">UVV</button>
         <button class="nav-btn" data-view="benutzer">Benutzer</button>
@@ -99,19 +100,23 @@
         </section>
 
         <section id="werkstattView" class="view hidden">
-          <div class="grid-2 layout-main workshop-view-grid">
-            <form id="workshopForm" class="panel card form-grid workshop-form-panel"></form>
-            <div class="panel card table-wrap workshop-table-panel">
-              <div class="section-head"><h3>Werkstattliste</h3><span class="muted">Auftraege, Status und Laufzeiten</span></div>
-              <div id="workshopTable"></div>
+            <div class="grid-2 layout-main workshop-view-grid">
+              <form id="workshopForm" class="panel card form-grid workshop-form-panel"></form>
             </div>
-          </div>
-          <div class="panel card board-panel workshop-board-panel">
-            <div class="section-head"><h3>Werkstatt-Uebersicht</h3><span class="muted">Werkstaetten, Auslastung und offene Themen</span></div>
-            <div id="workshopSummary" class="mini-kpi-grid workshop-summary-grid"></div>
-            <div id="workshopBoard" class="workshop-board workshop-board-large"></div>
-          </div>
-        </section>
+            <div class="panel card board-panel workshop-board-panel">
+              <div class="section-head"><h3>Werkstatt-Uebersicht</h3><span class="muted">Nur laufende Auftraege und offene Themen</span></div>
+              <div id="workshopSummary" class="mini-kpi-grid workshop-summary-grid"></div>
+              <div id="workshopBoard" class="workshop-board workshop-board-large"></div>
+            </div>
+          </section>
+
+          <section id="werkstattlisteView" class="view hidden">
+            <div class="panel card workshop-list-page">
+              <div class="section-head"><h3>Werkstattliste nach Werkstattnamen</h3><span class="muted">Alle Auftraege, Status und Laufzeiten pro Werkstatt</span></div>
+              <div id="workshopListSummary" class="mini-kpi-grid workshop-summary-grid"></div>
+              <div id="workshopListGroups" class="workshop-list-groups"></div>
+            </div>
+          </section>
 
         <section id="schaedenView" class="view hidden">
           <div class="grid-2 layout-main damage-layout" id="damageLayout">

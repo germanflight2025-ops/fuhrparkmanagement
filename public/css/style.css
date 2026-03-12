@@ -1,4 +1,4 @@
-﻿:root {
+:root {
   --bg: #091427;
   --panel: #0f1e3b;
   --panel-soft: #14274b;
@@ -371,4 +371,40 @@ img.damage-preview { width: 84px; height: 60px; object-fit: cover; border-radius
 @media (max-width: 920px) {
   .workshop-board-group-head { align-items: flex-start; flex-direction: column; }
   .workshop-board-nested { grid-template-columns: 1fr; }
+}
+.workshop-detail-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 10px 14px;
+  color: #c9d6ee;
+  font-size: 14px;
+}
+.workshop-detail-grid strong {
+  color: #8ea3c2;
+  font-weight: 600;
+  margin-right: 6px;
+}
+.workshop-list-page {
+  display: grid;
+  gap: 18px;
+}
+.workshop-list-groups {
+  display: grid;
+  gap: 18px;
+}
+.workshop-list-group-card {
+  background: linear-gradient(180deg, rgba(15,30,59,0.98), rgba(9,20,39,0.98));
+}
+.workshop-list-group-card .section-head {
+  margin-bottom: 14px;
+}
+@media (max-width: 920px) {
+  .workshop-detail-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+@media (max-width: 640px) {
+  .workshop-detail-grid {
+    grid-template-columns: 1fr;
+  }
 }
