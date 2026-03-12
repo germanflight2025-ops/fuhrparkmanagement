@@ -527,31 +527,28 @@ function workshopAreaGroups() {
 }
 
 function renderWorkshopTile(area, entries) {
-  const counts = {
-    offen: entries.filter((item) => item.status === 'offen').length,
-    bearbeitung: entries.filter((item) => item.status === 'in_bearbeitung').length,
-    tage: entries.reduce((sum, item) => sum + Number(item.tage || 0), 0)
-  };
   return `
-    <section class="workshop-tile">
-      <div class="workshop-tile-head">
+    <section class="workshop-tile workshop-board-column">
+      <div class="workshop-tile-head workshop-board-column-head">
         <div>
           ${String(state.editingWorkshopAreaId) === String(area.id) ? `<input class="workshop-area-input" data-action="workshop-area-name" data-id="${area.id}" value="${area.name || `Werkstatt ${area.slot}`}" placeholder="Werkstattname">` : `<strong class="workshop-area-title">${area.name || `Werkstatt ${area.slot}`}</strong>`}
-          <span class="workshop-tile-kicker">Bereich: Werkstatt ${area.slot}</span>
+          <span class="workshop-tile-kicker">Bereich ${area.slot}</span>
         </div>
         <div class="action-row">
           ${String(state.editingWorkshopAreaId) === String(area.id) ? `<button class="icon-btn workshop-head-btn" data-action="workshop-area-save" data-id="${area.id}" title="Werkstattname speichern">&#10003;</button><button class="icon-btn secondary workshop-head-btn" data-action="workshop-area-cancel" data-id="${area.id}" title="Abbrechen">&#10005;</button>` : `<button class="icon-btn workshop-edit-btn" data-action="workshop-area-edit" data-id="${area.id}" title="Werkstattname bearbeiten">&#9998;</button>`}
         </div>
       </div>
-      <div class="workshop-tile-list">
+      <div class="workshop-board-rows">
         ${entries.map((item) => `
-          <article class="workshop-tile-entry workshop-tile-entry-detailed">
-            <div class="workshop-list-inline-grid workshop-list-inline-grid-compact">
-              <span><strong>Fahrzeug</strong> ${item.kennzeichen || '-'}</span>
-              <span><strong>Nr.</strong> ${item.positionsnummer || '-'}</span>
-              <span><strong>Problem</strong> ${item.problem || '-'}</span>
-              <span><strong>Symbol</strong> ${symbolFor(item.pruefzeichen)}</span>
-              <span><strong>Status</strong> <span class="${badgeClass(item.status)}">${item.status}</span></span>
+          <article class="workshop-board-row">
+            <div class="workshop-board-row-main">
+              <span class="workshop-board-code">${item.kennzeichen || '-'}</span>
+              <span class="workshop-board-problem">${item.problem || '-'}</span>
+              <span class="workshop-board-symbol ${item.pruefzeichen === 'ok' ? 'is-ok' : 'is-nein'}">${symbolFor(item.pruefzeichen)}</span>
+            </div>
+            <div class="workshop-board-row-date">
+              <span>Datum:</span>
+              <strong>${item.status_datum || item.datum_bis || item.datum_von || '-'}</strong>
             </div>
           </article>
         `).join('')}
@@ -562,29 +559,30 @@ function renderWorkshopTile(area, entries) {
 
 function renderWorkshopBoard() {
   const groups = workshopAreaGroups();
-  const activeWorkshopEntries = state.werkstatt.filter((item) => item.status !== 'abgeschlossen');
+  const activeGroups = groups.map((group) => ({
+    ...group,
+    areas: group.areas.map((area) => ({
+      ...area,
+      entries: state.werkstatt
+        .filter((item) => item.status !== 'abgeschlossen' && Number(item.standort_id) === Number(area.standort_id) && Number(item.workshop_slot || 1) === Number(area.slot))
+        .sort((a, b) => String(b.status_datum || b.datum_bis || b.datum_von || '').localeCompare(String(a.status_datum || a.datum_bis || a.datum_von || '')))
+    })).filter((area) => area.entries.length)
+  })).filter((group) => group.areas.length);
   if (el('workshopSummary')) {
     el('workshopSummary').innerHTML = '';
+    el('workshopSummary').style.display = 'none';
   }
-  el('workshopBoard').innerHTML = groups.map((group) => `
-    <section class="workshop-board-group">
+  el('workshopBoard').innerHTML = activeGroups.length ? activeGroups.map((group) => `
+    <section class="workshop-board-group workshop-board-stage">
       <div class="workshop-board-group-head">
         <h4>${group.standort?.name || '-'}</h4>
-        <span class="muted">Nur aktive Bereiche</span>
       </div>
-      <div class="workshop-board-large workshop-board-nested">
-        ${group.areas.map((area) => {
-          const entries = activeWorkshopEntries
-            .filter((item) => Number(item.standort_id) === Number(area.standort_id) && Number(item.workshop_slot || 1) === Number(area.slot))
-            .sort((a, b) => String(b.status_datum || b.datum_von || '').localeCompare(String(a.status_datum || a.datum_von || '')));
-          if (!entries.length) return '';
-          return renderWorkshopTile(area, entries);
-        }).join('')}
+      <div class="workshop-board-stage-grid">
+        ${group.areas.map((area) => renderWorkshopTile(area, area.entries)).join('')}
       </div>
     </section>
-  `).join('');
+  `).join('') : '<p class="muted">Keine laufenden Werkstattauftraege vorhanden.</p>';
 }
-
 function renderWorkshopListPage() {
   const entries = [...state.werkstatt].sort((a, b) => {
     const nameCompare = String(a.werkstatt_name || '').localeCompare(String(b.werkstatt_name || ''));

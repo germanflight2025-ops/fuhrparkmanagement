@@ -434,3 +434,100 @@ img.damage-preview { width: 84px; height: 60px; object-fit: cover; border-radius
     grid-template-columns: 1fr;
   }
 }
+
+.workshop-summary-grid { display: none; }
+.workshop-board-stage {
+  gap: 20px;
+}
+.workshop-board-stage-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 18px;
+}
+.workshop-board-column {
+  min-height: auto;
+  padding: 0;
+  background: transparent;
+  border: 0;
+  box-shadow: none;
+  gap: 12px;
+}
+.workshop-board-column-head {
+  padding: 0 4px;
+}
+.workshop-board-column .workshop-area-title {
+  font-size: 22px;
+}
+.workshop-board-rows {
+  display: grid;
+  gap: 10px;
+}
+.workshop-board-row {
+  display: grid;
+  grid-template-columns: 1fr 110px;
+  gap: 8px;
+  align-items: stretch;
+}
+.workshop-board-row-main {
+  display: grid;
+  grid-template-columns: 110px minmax(0, 1fr) 56px;
+  gap: 0;
+  border-radius: 10px;
+  overflow: hidden;
+}
+.workshop-board-code,
+.workshop-board-problem,
+.workshop-board-symbol {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 52px;
+  font-weight: 700;
+}
+.workshop-board-code,
+.workshop-board-problem {
+  background: rgba(239, 68, 68, 0.72);
+  color: #fff5f5;
+}
+.workshop-board-problem {
+  justify-content: flex-start;
+  padding: 0 14px;
+}
+.workshop-board-symbol {
+  background: rgba(255, 228, 230, 0.92);
+  color: #ef4444;
+  font-size: 22px;
+}
+.workshop-board-symbol.is-ok {
+  color: #059669;
+}
+.workshop-board-row-date {
+  display: grid;
+  place-items: center;
+  align-content: center;
+  gap: 4px;
+  min-height: 52px;
+  border-radius: 10px;
+  background: #14b8a6;
+  color: #effffc;
+  text-align: center;
+}
+.workshop-board-row-date span {
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  opacity: 0.9;
+}
+.workshop-board-row-date strong {
+  font-size: 14px;
+}
+@media (max-width: 1280px) {
+  .workshop-board-stage-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+@media (max-width: 920px) {
+  .workshop-board-stage-grid {
+    grid-template-columns: 1fr;
+  }
+}
