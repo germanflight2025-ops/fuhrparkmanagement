@@ -169,6 +169,10 @@ function activeLocationId() {
 }
 
 
+function workshopAreaDisplayName(standortId, slot) {
+  return (state.workshopBereiche || []).find((item) => Number(item.standort_id) === Number(standortId) && Number(item.slot) === Number(slot))?.name || `Werkstatt ${slot}`;
+}
+
 function currentVehicleDraft() {
   if (!state.editVehicleId) {
     return {
@@ -218,7 +222,7 @@ function currentWorkshopDraft() {
     return {
       id: '',
       fahrzeug_id: state.fahrzeuge[0]?.id || '',
-      werkstatt_name: '',
+      werkstatt_name: workshopAreaDisplayName(activeLocationId(), 1),
       positionsnummer: '',
       problem: '',
       pruefzeichen: 'nein',
@@ -233,7 +237,7 @@ function currentWorkshopDraft() {
   return {
     id: row?.id || '',
     fahrzeug_id: row?.fahrzeug_id || state.fahrzeuge[0]?.id || '',
-    werkstatt_name: row?.werkstatt_name || '',
+    werkstatt_name: row?.werkstatt_name || workshopAreaDisplayName(row?.standort_id, row?.workshop_slot || 1),
     positionsnummer: row?.positionsnummer || '',
     problem: row?.problem || '',
     pruefzeichen: row?.pruefzeichen || 'nein',
@@ -354,7 +358,7 @@ function renderForms() {
       <label>Werkstatt Bereich<select name="workshop_slot">
         ${(state.meta.workshopSlots || [1, 2, 3, 4, 5, 6, 7, 8, 9]).map((slot) => `<option value="${slot}" ${String(draftWorkshop.workshop_slot) === String(slot) ? 'selected' : ''}>Werkstatt ${slot}</option>`).join('')}
       </select></label>
-      <label>Werkstattname<input name="werkstatt_name" required placeholder="z. B. Iveco oder Senger/Ford" value="${draftWorkshop.werkstatt_name}"></label>
+      <label>Werkstattname<input id="workshopAreaNamePreview" name="werkstatt_name" value="${workshopAreaDisplayName(activeLocationId(), Number(draftWorkshop.workshop_slot || 1))}" readonly></label>
       <label>Symbol<select name="pruefzeichen"><option value="nein" ${draftWorkshop.pruefzeichen === 'nein' ? 'selected' : ''}>Nein</option><option value="ok" ${draftWorkshop.pruefzeichen === 'ok' ? 'selected' : ''}>OK</option></select></label>
     </div>
     <div class="three-col">
@@ -799,7 +803,8 @@ async function handleWorkshopSubmit(event) {
   try {
     const isEditing = Boolean(state.editWorkshopId);
     const payload = Object.fromEntries(new FormData(event.target));
-    if (!payload.fahrzeug_id || !payload.werkstatt_name || !payload.datum_von) throw new Error('Fahrzeug, Werkstattname und Von Datum sind Pflichtfelder.');
+    payload.werkstatt_name = workshopAreaDisplayName(activeLocationId(), Number(payload.workshop_slot || 1));
+    if (!payload.fahrzeug_id || !payload.datum_von) throw new Error('Fahrzeug und Von Datum sind Pflichtfelder.');
     if (isEditing) {
       await api(`/api/werkstatt/${state.editWorkshopId}`, { method: 'PUT', body: JSON.stringify(payload) });
       state.editWorkshopId = null;
@@ -957,6 +962,8 @@ async function bindInlineActions() {
       if (!input || !node.dataset.id) return;
       await api(`/api/werkstatt-bereiche/${node.dataset.id}`, { method: 'PUT', body: JSON.stringify({ name: input.value }) });
       await refreshApp();
+      renderForms();
+      bindDynamicForms();
     };
   });
   document.querySelectorAll('[data-action="damage-status"]').forEach((node) => {
@@ -1025,6 +1032,13 @@ function bindDynamicForms() {
   if (cancelVehicleButton) cancelVehicleButton.onclick = resetVehicleForm;
   const cancelWorkshopButton = document.querySelector('[data-action="workshop-cancel"]');
   if (cancelWorkshopButton) cancelWorkshopButton.onclick = resetWorkshopForm;
+  const workshopSlotSelect = document.querySelector('#workshopForm select[name="workshop_slot"]');
+  const workshopNamePreview = document.getElementById('workshopAreaNamePreview');
+  if (workshopSlotSelect && workshopNamePreview) {
+    workshopSlotSelect.onchange = () => {
+      workshopNamePreview.value = workshopAreaDisplayName(activeLocationId(), Number(workshopSlotSelect.value || 1));
+    };
+  }
   const cancelUserButton = document.querySelector('[data-action="user-cancel"]');
   if (cancelUserButton) cancelUserButton.onclick = resetUserForm;
 }

@@ -128,16 +128,20 @@ function migrateData(data) {
     status: normalizeStatus({ verfuegbar: 'aktiv', ausser_betrieb: 'nicht_einsatzbereit' }[item.status] || item.status, FAHRZEUG_STATUS, 'aktiv'),
     created_at: item.created_at || nowIso()
   }));
-  data.werkstatt = (data.werkstatt || []).map((item) => ({
-    ...item,
-    workshop_slot: Number(item.workshop_slot) || 1,
-    werkstatt_name: item.werkstatt_name || `Werkstatt ${Number(item.workshop_slot) || 1}`,
-    positionsnummer: item.positionsnummer || '',
-    problem: item.problem || item.beschreibung || '',
-    pruefzeichen: normalizeStatus(({ x: 'nein', nein: 'nein', ok: 'ok' }[item.pruefzeichen] || item.pruefzeichen || 'nein'), PRUEFZEICHEN, 'nein'),
-    status_datum: item.status_datum || item.datum_bis || item.datum_von || '',
-    status: normalizeStatus(item.status, WERKSTATT_STATUS, 'offen')
-  }));
+  data.werkstatt = (data.werkstatt || []).map((item) => {
+    const workshop_slot = Number(item.workshop_slot) || 1;
+    const vehicle = (data.fahrzeuge || []).find((entry) => entry.id === item.fahrzeug_id);
+    return {
+      ...item,
+      workshop_slot,
+      werkstatt_name: workshopAreaName(data, vehicle?.standort_id, workshop_slot),
+      positionsnummer: item.positionsnummer || '',
+      problem: item.problem || item.beschreibung || '',
+      pruefzeichen: normalizeStatus(({ x: 'nein', nein: 'nein', ok: 'ok' }[item.pruefzeichen] || item.pruefzeichen || 'nein'), PRUEFZEICHEN, 'nein'),
+      status_datum: item.status_datum || item.datum_bis || item.datum_von || '',
+      status: normalizeStatus(item.status, WERKSTATT_STATUS, 'offen')
+    };
+  });
   data.schaeden = (data.schaeden || []).map((item) => ({
     ...item,
     fahrer_name: item.fahrer_name || '',
@@ -437,7 +441,7 @@ app.post('/api/werkstatt', authRequired, requireRoles('hauptadmin', 'admin'), (r
     id: nextId(data.werkstatt),
     fahrzeug_id: vehicle.id,
     workshop_slot: Math.min(Math.max(Number(req.body.workshop_slot) || 1, 1), 9),
-    werkstatt_name: req.body.werkstatt_name,
+    werkstatt_name: workshopAreaName(data, vehicle.standort_id, Math.min(Math.max(Number(req.body.workshop_slot) || 1, 1), 9)),
     positionsnummer: String(req.body.positionsnummer || '').trim() || nextWorkshopNumber(data.werkstatt),
     problem: req.body.problem || '',
     pruefzeichen: normalizeStatus(({ x: 'nein', nein: 'nein', ok: 'ok' }[req.body.pruefzeichen] || req.body.pruefzeichen || 'nein'), PRUEFZEICHEN, 'nein'),
