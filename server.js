@@ -29,6 +29,7 @@ const CHECKPOINTS = [
   'Sicherheitsgurte', 'Heizung', 'Aufbauten', 'Abgasanlage', 'Warnweste', 'Verbandskasten', 'Ladungssicherung', 'Schloesser', 'Einbauten', 'Betriebsanleitung'
 ];
 const PRUEFZEICHEN = ['nein', 'ok'];
+const WORKSHOP_SLOTS = Array.from({ length: 9 }, (_, index) => index + 1);
 
 function nextId(items) {
   return items.length ? Math.max(...items.map((item) => item.id)) + 1 : 1;
@@ -54,6 +55,23 @@ function findLocationId(source, name) {
 function normalizeStatus(value, allowed, fallback) {
   return allowed.includes(value) ? value : fallback;
 }
+function createWorkshopAreas(standorte, existing = []) {
+  const now = nowIso();
+  const rows = [];
+  for (const standort of standorte) {
+    for (const slot of WORKSHOP_SLOTS) {
+      const match = existing.find((item) => Number(item.standort_id) === Number(standort.id) && Number(item.slot) === slot);
+      rows.push({
+        id: match?.id || rows.length + 1,
+        standort_id: standort.id,
+        slot,
+        name: match?.name || Werkstatt ,
+        created_at: match?.created_at || now
+      });
+    }
+  }
+  return rows;
+}
 
 function seedData() {
   const standorte = STANDORTE.map((name, index) => ({ id: index + 1, name, created_at: nowIso() }));
@@ -71,9 +89,10 @@ function seedData() {
       { id: 4, kennzeichen: 'B-FM-4004', fahrzeug: 'Opel Vivaro', standort_id: findLocationId(standorte, 'Berlin'), status: 'aktiv', hu_datum: '2026-09-15', uvv_datum: '2026-06-01', created_at: nowIso() },
       { id: 5, kennzeichen: 'MA-FM-5005', fahrzeug: 'Renault Master', standort_id: findLocationId(standorte, 'Mannheim'), status: 'nicht_einsatzbereit', hu_datum: '2026-03-21', uvv_datum: '2026-03-18', created_at: nowIso() }
     ],
+    werkstatt_bereiche: createWorkshopAreas(standorte),
     werkstatt: [
-      { id: 1, fahrzeug_id: 2, werkstatt_name: 'Iveco', positionsnummer: '675', problem: 'Airbag', pruefzeichen: 'nein', status_datum: '2026-03-03', datum_von: '2026-03-10', datum_bis: '2026-03-14', tage: 4, beschreibung: 'Bremsenpruefung und Oelwechsel', status: 'in_bearbeitung', created_at: nowIso() },
-      { id: 2, fahrzeug_id: 3, werkstatt_name: 'Senger / Ford', positionsnummer: '1548', problem: 'Unfall', pruefzeichen: 'x', status_datum: '2025-12-29', datum_von: '2026-03-09', datum_bis: '', tage: 0, beschreibung: 'Schadenaufnahme', status: 'werkstatt', created_at: nowIso() }
+      { id: 1, fahrzeug_id: 2, workshop_slot: 1, werkstatt_name: 'Werkstatt 1', positionsnummer: '675', problem: 'Airbag', pruefzeichen: 'nein', status_datum: '2026-03-03', datum_von: '2026-03-10', datum_bis: '2026-03-14', tage: 4, beschreibung: 'Bremsenpruefung und Oelwechsel', status: 'in_bearbeitung', created_at: nowIso() },
+      { id: 2, fahrzeug_id: 3, workshop_slot: 2, werkstatt_name: 'Werkstatt 2', positionsnummer: '1548', problem: 'Unfall', pruefzeichen: 'x', status_datum: '2025-12-29', datum_von: '2026-03-09', datum_bis: '', tage: 0, beschreibung: 'Schadenaufnahme', status: 'werkstatt', created_at: nowIso() }
     ],
     schaeden: [
       { id: 1, fahrzeug_id: 3, fahrer_name: 'Michael Weber', fahrer_telefon: '01701234567', beschreibung: 'Frontschaden nach Parkrempler', unfallgegner_name: 'Max Mustermann', unfallgegner_kennzeichen: 'M-AB-1234', versicherung: 'Allianz', telefon: '01701234567', foto: '', datum: '2026-03-09', status: 'in_pruefung', created_by: 1, created_at: nowIso() }
@@ -102,6 +121,7 @@ function migrateData(data) {
     changed = true;
   }
   data.standorte = data.standorte.map((item, index) => ({ id: index + 1, name: sanitizeLocationName(item.name || STANDORTE[index]), created_at: item.created_at || nowIso() }));
+  data.workshop_bereiche = createWorkshopAreas(data.standorte, data.workshop_bereiche || []);
   data.benutzer = (data.benutzer || []).map((item) => ({ ...item, benutzername: item.benutzername || String(item.email || item.name || '').split('@')[0].trim().toLowerCase().replace(/\s+/g, ''), standort_id: item.rolle === 'hauptadmin' ? (item.standort_id || findLocationId(data, 'Carlswerk')) : item.standort_id, rolle: ['hauptadmin', 'admin', 'benutzer'].includes(item.rolle) ? item.rolle : 'benutzer', aktiv: Number(item.aktiv) ? 1 : 0 }));
   data.fahrzeuge = (data.fahrzeuge || []).map((item) => ({
     ...item,
@@ -110,7 +130,8 @@ function migrateData(data) {
   }));
   data.werkstatt = (data.werkstatt || []).map((item) => ({
     ...item,
-    werkstatt_name: item.werkstatt_name || 'Werkstatt',
+    workshop_slot: Number(item.workshop_slot) || 1,
+    werkstatt_name: item.werkstatt_name || Werkstatt ,
     positionsnummer: item.positionsnummer || '',
     problem: item.problem || item.beschreibung || '',
     pruefzeichen: normalizeStatus(({ x: 'nein', nein: 'nein', ok: 'ok' }[item.pruefzeichen] || item.pruefzeichen || 'nein'), PRUEFZEICHEN, 'nein'),
@@ -256,6 +277,7 @@ app.get('/api/meta', authRequired, (req, res) => {
     standorte: data.standorte,
     fahrzeugStatus: FAHRZEUG_STATUS,
     werkstattStatus: WERKSTATT_STATUS,
+    workshopSlots: WORKSHOP_SLOTS,
     schadenStatus: SCHADEN_STATUS,
     pruefzeichen: PRUEFZEICHEN,
     uvvCheckpoints: CHECKPOINTS,
@@ -392,6 +414,20 @@ app.get('/api/werkstatt', authRequired, (req, res) => {
     .map((item) => ({ ...item, kennzeichen: item.vehicle.kennzeichen, fahrzeug: item.vehicle.fahrzeug, standort: locationName(data, item.vehicle.standort_id) }));
   res.json(rows);
 });
+app.get('/api/werkstatt-bereiche', authRequired, requireRoles('hauptadmin', 'admin'), (req, res) => {
+  const data = readDb();
+  const rows = filterByStandort(data, data.workshop_bereiche || [], req.user, req, (item) => item.standort_id);
+  res.json(rows);
+});
+app.put('/api/werkstatt-bereiche/:id', authRequired, requireRoles('hauptadmin', 'admin'), (req, res) => {
+  const data = readDb();
+  const row = (data.workshop_bereiche || []).find((item) => item.id === Number(req.params.id));
+  if (!row) return res.status(404).json({ error: 'Werkstattbereich nicht gefunden.' });
+  if (req.user.rolle !== 'hauptadmin' && row.standort_id !== req.user.standort_id) return res.status(403).json({ error: 'Kein Zugriff auf diesen Werkstattbereich.' });
+  row.name = String(req.body.name || '').trim() || Werkstatt ;
+  writeDb(data);
+  res.json(row);
+});
 app.post('/api/werkstatt', authRequired, requireRoles('hauptadmin', 'admin'), (req, res) => {
   const data = readDb();
   const vehicle = data.fahrzeuge.find((item) => item.id === Number(req.body.fahrzeug_id));
@@ -400,6 +436,7 @@ app.post('/api/werkstatt', authRequired, requireRoles('hauptadmin', 'admin'), (r
   const row = {
     id: nextId(data.werkstatt),
     fahrzeug_id: vehicle.id,
+    workshop_slot: Math.min(Math.max(Number(req.body.workshop_slot) || 1, 1), 9),
     werkstatt_name: req.body.werkstatt_name,
     positionsnummer: String(req.body.positionsnummer || '').trim() || nextWorkshopNumber(data.werkstatt),
     problem: req.body.problem || '',
@@ -424,6 +461,7 @@ app.put('/api/werkstatt/:id', authRequired, requireRoles('hauptadmin', 'admin'),
   const vehicle = data.fahrzeuge.find((item) => item.id === row.fahrzeug_id);
   if (!vehicle || (!canAccessVehicle(req.user, vehicle) && req.user.rolle !== 'hauptadmin')) return res.status(403).json({ error: 'Kein Zugriff auf diesen Auftrag.' });
   if (req.body.status) assertAllowedStatus(req.body.status, WERKSTATT_STATUS);
+  row.workshop_slot = Math.min(Math.max(Number(req.body.workshop_slot) || row.workshop_slot || 1, 1), 9);
   row.werkstatt_name = req.body.werkstatt_name || row.werkstatt_name;
   row.positionsnummer = req.body.positionsnummer ?? row.positionsnummer;
   row.problem = req.body.problem ?? row.problem;
@@ -790,6 +828,9 @@ app.use((error, req, res, next) => {
 const migrated = readDb();
 writeDb(migrated);
 app.listen(PORT, () => console.log(`Fuhrparkmanagement laeuft auf http://localhost:${PORT}`));
+
+
+
 
 
 

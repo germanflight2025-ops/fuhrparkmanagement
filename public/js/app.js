@@ -349,18 +349,24 @@ function renderForms() {
       ${isEditingWorkshop ? '<button type="button" class="secondary" data-action="workshop-cancel">Abbrechen</button>' : ''}
     </div>
     <label>Fahrzeug<select name="fahrzeug_id">${state.fahrzeuge.map((f) => `<option value="${f.id}" ${String(draftWorkshop.fahrzeug_id) === String(f.id) ? 'selected' : ''}>${f.kennzeichen} - ${f.fahrzeug}</option>`).join('')}</select></label>
-    <label>Werkstattname<input name="werkstatt_name" required placeholder="z. B. Iveco oder Senger/Ford" value="${draftWorkshop.werkstatt_name}"></label>
+
     <div class="three-col">
-      <label>Nummer / Feld<input name="positionsnummer" placeholder="leer = automatische Nummer" value="${draftWorkshop.positionsnummer}"></label>
-      <label>Fehler / Thema<input name="problem" placeholder="z. B. AdBlue Fehler" value="${draftWorkshop.problem}"></label>
+      <label>Werkstatt Bereich<select name="workshop_slot">
+        ${(state.meta.workshopSlots || [1, 2, 3, 4, 5, 6, 7, 8, 9]).map((slot) => `<option value="${slot}" ${String(draftWorkshop.workshop_slot) === String(slot) ? 'selected' : ''}>Werkstatt ${slot}</option>`).join('')}
+      </select></label>
+      <label>Werkstattname<input name="werkstatt_name" required placeholder="z. B. Iveco oder Senger/Ford" value="${draftWorkshop.werkstatt_name}"></label>
       <label>Symbol<select name="pruefzeichen"><option value="nein" ${draftWorkshop.pruefzeichen === 'nein' ? 'selected' : ''}>Nein</option><option value="ok" ${draftWorkshop.pruefzeichen === 'ok' ? 'selected' : ''}>OK</option></select></label>
     </div>
     <div class="three-col">
+      <label>Nummer / Feld<input name="positionsnummer" placeholder="leer = automatische Nummer" value="${draftWorkshop.positionsnummer}"></label>
+      <label>Fehler / Thema<input name="problem" placeholder="z. B. AdBlue Fehler" value="${draftWorkshop.problem}"></label>
       <label>Status<select name="status">${optionsHtml(state.meta.werkstattStatus, draftWorkshop.status)}</select></label>
+    </div>
+    <div class="three-col">
       <label>Status Datum<input name="status_datum" type="date" value="${draftWorkshop.status_datum}"></label>
       <label>Von Datum<input name="datum_von" type="date" required value="${draftWorkshop.datum_von}"></label>
+      <label>Bis Datum<input name="datum_bis" type="date" value="${draftWorkshop.datum_bis}"></label>
     </div>
-    <label>Bis Datum<input name="datum_bis" type="date" value="${draftWorkshop.datum_bis}"></label>
     <label>Beschreibung<textarea name="beschreibung" rows="4" placeholder="Was wird gemacht?">${draftWorkshop.beschreibung}</textarea></label>
     <p id="workshopFormMessage" class="muted">${isEditingWorkshop ? 'Hier kannst du den Werkstattauftrag bearbeiten.' : 'Hier kannst du einen Werkstattauftrag anlegen.'}</p>
     <button type="submit">${isEditingWorkshop ? 'Aenderungen speichern' : 'Speichern'}</button>`;
@@ -489,74 +495,66 @@ function renderDashboard() {
   el('reminders').innerHTML = data.reminders.length ? data.reminders.map((item) => `<div><strong>${item.kennzeichen}</strong> - ${item.fahrzeug}<br><span class="badge warn">HU ${item.hu_in_tagen} Tage</span> <span class="badge warn">UVV ${item.uvv_in_tagen} Tage</span></div>`).join('') : "<p class=\"muted\">Keine kurzfristigen Faelligkeiten.</p>";
 }
 
+function currentWorkshopAreas() {
+  const activeId = Number(activeLocationId() || 0);
+  const source = (state.workshopBereiche || []).filter((item) => Number(item.standort_id) === activeId);
+  const slots = state.meta.workshopSlots || [1, 2, 3, 4, 5, 6, 7, 8, 9];
+  return slots.map((slot) => source.find((item) => Number(item.slot) === Number(slot)) || { id: '', slot, name: `Werkstatt ${slot}`, standort_id: activeId });
+}
+
 function renderWorkshopBoard() {
-  const grouped = state.werkstatt.reduce((acc, item) => {
-    const key = item.werkstatt_name || "Ohne Werkstattname";
-    acc[key] = acc[key] || [];
-    acc[key].push(item);
-    return acc;
-  }, {});
-  const names = Object.keys(grouped).sort((a, b) => a.localeCompare(b));
+  const slots = currentWorkshopAreas();
   const totalDays = state.werkstatt.reduce((sum, item) => sum + Number(item.tage || 0), 0);
   const summaryCards = [
-    ["Gesamt", state.werkstatt.length],
-    ["Offen", state.werkstatt.filter((item) => item.status === "offen").length],
-    ["In Bearbeitung", state.werkstatt.filter((item) => item.status === "in_bearbeitung").length],
-    ["Abgeschlossen", state.werkstatt.filter((item) => item.status === "abgeschlossen").length],
-    ["Tage gesamt", totalDays]
+    ['Gesamt', state.werkstatt.length],
+    ['Offen', state.werkstatt.filter((item) => item.status === 'offen').length],
+    ['In Bearbeitung', state.werkstatt.filter((item) => item.status === 'in_bearbeitung').length],
+    ['Abgeschlossen', state.werkstatt.filter((item) => item.status === 'abgeschlossen').length],
+    ['Tage gesamt', totalDays]
   ];
-  if (el("workshopSummary")) {
-    el("workshopSummary").innerHTML = summaryCards.map(([label, value]) => `<div class="mini-kpi mini-kpi-workshop"><span>${label}</span><strong>${value}</strong></div>`).join("");
+  if (el('workshopSummary')) {
+    el('workshopSummary').innerHTML = summaryCards.map(([label, value]) => `<div class="mini-kpi mini-kpi-workshop"><span>${label}</span><strong>${value}</strong></div>`).join('');
   }
-  el("workshopBoard").innerHTML = names.length ? names.map((name) => {
-    const entries = grouped[name].sort((a, b) => String(b.status_datum || b.datum_von || "").localeCompare(String(a.status_datum || a.datum_von || "")));
+  el('workshopBoard').innerHTML = slots.map((area) => {
+    const entries = state.werkstatt
+      .filter((item) => Number(item.workshop_slot || 1) === Number(area.slot))
+      .sort((a, b) => String(b.status_datum || b.datum_von || '').localeCompare(String(a.status_datum || a.datum_von || '')));
     const counts = {
-      offen: entries.filter((item) => item.status === "offen").length,
-      bearbeitung: entries.filter((item) => item.status === "in_bearbeitung").length,
-      abgeschlossen: entries.filter((item) => item.status === "abgeschlossen").length,
+      offen: entries.filter((item) => item.status === 'offen').length,
+      bearbeitung: entries.filter((item) => item.status === 'in_bearbeitung').length,
+      abgeschlossen: entries.filter((item) => item.status === 'abgeschlossen').length,
       tage: entries.reduce((sum, item) => sum + Number(item.tage || 0), 0)
     };
     return `
-      <section class="board-group board-group-large board-group-clean">
-        <div class="board-group-header board-group-simple">
-          <div class="board-group-title">
-            <h4>${name}</h4>
-            <p class="muted">${entries.length} Auftrag${entries.length === 1 ? "" : "e"} | ${counts.tage} Tage gesamt</p>
+      <section class="workshop-tile">
+        <div class="workshop-tile-head">
+          <div>
+            <span class="workshop-tile-kicker">Werkstatt ${area.slot}</span>
+            <input class="workshop-area-input" data-action="workshop-area-name" data-id="${area.id}" value="${area.name || `Werkstatt ${area.slot}`}" placeholder="Werkstattname">
           </div>
-          <div class="board-status-strip board-status-strip-simple">
-            <span class="status-chip">Offen <strong>${counts.offen}</strong></span>
-            <span class="status-chip status-chip-warn">Bearbeitung <strong>${counts.bearbeitung}</strong></span>
-            <span class="status-chip status-chip-ok">Abgeschlossen <strong>${counts.abgeschlossen}</strong></span>
-          </div>
+          <button class="icon-btn" data-action="workshop-area-save" data-id="${area.id}" title="Werkstattname speichern">&#10010;</button>
         </div>
-        <div class="board-list board-list-large">
-          ${entries.map((item) => `
-            <article class="board-item board-item-large board-item-clean">
-              <div class="board-item-main">
-                <div class="board-code board-code-large">${item.positionsnummer || "-"}</div>
-                <div class="board-meta board-meta-large">
-                  <div class="board-meta-line">
-                    <strong>${item.kennzeichen || "-"}</strong>
-                    <span class="badge ${badgeClass(item.status).replace("badge ", "")}">${item.status}</span>
-                  </div>
-                  <span>${item.problem || item.beschreibung || "Kein Problemtext"}</span>
-                </div>
+        <div class="workshop-tile-stats">
+          <span>${entries.length} Auftraege</span>
+          <span>${counts.offen} offen</span>
+          <span>${counts.bearbeitung} Bearbeitung</span>
+          <span>${counts.abgeschlossen} abgeschlossen</span>
+          <span>${counts.tage} Tage gesamt</span>
+        </div>
+        <div class="workshop-tile-list">
+          ${entries.length ? entries.map((item) => `
+            <article class="workshop-tile-entry">
+              <div class="workshop-tile-entry-head">
+                <strong>${item.kennzeichen || '-'}</strong>
+                <span class="badge ${badgeClass(item.status).replace('badge ', '')}">${item.status}</span>
               </div>
-              <div class="board-item-grid">
-                <label class="board-field"><span>Pruefzeichen</span><select data-action="workshop-sign" data-id="${item.id}"><option value="nein" ${item.pruefzeichen === "nein" ? "selected" : ""}>Nein</option><option value="ok" ${item.pruefzeichen === "ok" ? "selected" : ""}>OK</option></select></label>
-                <label class="board-field"><span>Statusdatum</span><input data-action="workshop-status-date" data-id="${item.id}" type="date" value="${item.status_datum || ""}"></label>
-                <label class="board-field"><span>Von Datum</span><input data-action="workshop-date-from" data-id="${item.id}" type="date" value="${item.datum_von || ""}"></label>
-                <label class="board-field"><span>Bis Datum</span><input data-action="workshop-date-to" data-id="${item.id}" type="date" value="${item.datum_bis || ""}"></label>
-                <div class="board-field board-field-value"><span>Tage</span><strong>${item.tage ?? 0}</strong></div>
-                <div class="board-field board-field-value"><span>Zeitraum</span><strong>${item.datum_von || "-"} bis ${item.datum_bis || "offen"}</strong></div>
-              </div>
-              <div class="board-item-actions">
-                <button data-action="workshop-save" data-id="${item.id}">Speichern</button>
-              </div>
-            </article>`).join("")}
+              <div class="workshop-tile-entry-meta">${item.problem || item.beschreibung || 'Kein Problemtext'}</div>
+              <div class="workshop-tile-entry-meta">Nr. ${item.positionsnummer || '-'} | ${item.datum_von || '-'} bis ${item.datum_bis || 'offen'} | ${item.tage || 0} Tage</div>
+            </article>
+          `).join('') : '<p class="muted">Noch keine Eintraege.</p>'}
         </div>
       </section>`;
-  }).join("") : '<p class="muted">Noch keine Werkstattbereiche vorhanden.</p>';
+  }).join('');
 }
 
 function renderLists() {
@@ -574,7 +572,8 @@ function renderLists() {
   ]);
 
   el('workshopTable').innerHTML = renderTable(state.werkstatt, [
-    { key: 'werkstatt_name', label: 'Werkstatt', render: (v, row) => `${v || '-'}${String(state.editWorkshopId) === String(row.id) ? '<br><span class="muted">Wird gerade bearbeitet</span>' : ''}` },
+    { key: 'workshop_slot', label: 'Bereich', render: (v) => `Werkstatt ${v || 1}` },
+    { key: 'werkstatt_name', label: 'Werkstattname', render: (v, row) => `${v || '-'}${String(state.editWorkshopId) === String(row.id) ? '<br><span class="muted">Wird gerade bearbeitet</span>' : ''}` },
     { key: 'kennzeichen', label: 'Fahrzeug' },
     { key: 'positionsnummer', label: 'Nr.' },
     { key: 'problem', label: 'Problem' },
@@ -660,6 +659,7 @@ async function loadData() {
     state.dashboard = null;
     state.fahrzeuge = [];
     state.werkstatt = [];
+    state.workshopBereiche = [];
     state.schaeden = [];
     state.uvv = [];
     state.benutzer = [];
@@ -673,15 +673,17 @@ async function loadData() {
   }
 
   const suffix = querySuffix();
-  const [fahrzeuge, werkstatt, schaeden, uvv, dashboard] = await Promise.all([
+  const [fahrzeuge, werkstatt, workshopBereiche, schaeden, uvv, dashboard] = await Promise.all([
     api(`/api/fahrzeuge${suffix}`),
     api(`/api/werkstatt${suffix}`),
+    api(`/api/werkstatt-bereiche${suffix}`),
     api(`/api/schaeden${suffix}`),
     api(`/api/uvv${suffix}`),
     api(`/api/dashboard${suffix}`)
   ]);
   state.fahrzeuge = fahrzeuge;
   state.werkstatt = werkstatt;
+  state.workshopBereiche = workshopBereiche;
   state.schaeden = schaeden;
   state.uvv = uvv;
   state.dashboard = dashboard;
@@ -914,6 +916,14 @@ async function bindInlineActions() {
   document.querySelectorAll('[data-action="workshop-delete"]').forEach((node) => {
     node.onclick = async () => {
       await api(`/api/werkstatt/${node.dataset.id}`, { method: 'DELETE' });
+      await refreshApp();
+    };
+  });
+  document.querySelectorAll('[data-action="workshop-area-save"]').forEach((node) => {
+    node.onclick = async () => {
+      const input = document.querySelector(`[data-action="workshop-area-name"][data-id="${node.dataset.id}"]`);
+      if (!input || !node.dataset.id) return;
+      await api(`/api/werkstatt-bereiche/${node.dataset.id}`, { method: 'PUT', body: JSON.stringify({ name: input.value }) });
       await refreshApp();
     };
   });
