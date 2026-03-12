@@ -131,7 +131,7 @@ function migrateData(data) {
   data.werkstatt = (data.werkstatt || []).map((item) => ({
     ...item,
     workshop_slot: Number(item.workshop_slot) || 1,
-    werkstatt_name: item.werkstatt_name || Werkstatt ,
+    werkstatt_name: item.werkstatt_name || `Werkstatt ${Number(item.workshop_slot) || 1}`,
     positionsnummer: item.positionsnummer || '',
     problem: item.problem || item.beschreibung || '',
     pruefzeichen: normalizeStatus(({ x: 'nein', nein: 'nein', ok: 'ok' }[item.pruefzeichen] || item.pruefzeichen || 'nein'), PRUEFZEICHEN, 'nein'),
@@ -424,7 +424,7 @@ app.put('/api/werkstatt-bereiche/:id', authRequired, requireRoles('hauptadmin', 
   const row = (data.workshop_bereiche || []).find((item) => item.id === Number(req.params.id));
   if (!row) return res.status(404).json({ error: 'Werkstattbereich nicht gefunden.' });
   if (req.user.rolle !== 'hauptadmin' && row.standort_id !== req.user.standort_id) return res.status(403).json({ error: 'Kein Zugriff auf diesen Werkstattbereich.' });
-  row.name = String(req.body.name || '').trim() || Werkstatt ;
+  row.name = String(req.body.name || '').trim() || `Werkstatt ${row.slot}`;
   writeDb(data);
   res.json(row);
 });
@@ -828,6 +828,7 @@ app.use((error, req, res, next) => {
 const migrated = readDb();
 writeDb(migrated);
 app.listen(PORT, () => console.log(`Fuhrparkmanagement laeuft auf http://localhost:${PORT}`));
+
 
 
 
