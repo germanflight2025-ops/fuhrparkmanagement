@@ -531,3 +531,16 @@ img.damage-preview { width: 84px; height: 60px; object-fit: cover; border-radius
     grid-template-columns: 1fr;
   }
 }
+.kpi-live-update {
+  animation: kpiPulse 1.8s ease;
+}
+.kpi-live-update .mini-kpi,
+.kpi-live-update .stat-card,
+.kpi-live-update .compact-item {
+  box-shadow: 0 0 0 1px rgba(96,165,250,0.35), 0 0 22px rgba(59,130,246,0.18);
+}
+@keyframes kpiPulse {
+  0% { transform: translateY(0); opacity: 0.92; }
+  35% { transform: translateY(-2px); opacity: 1; }
+  100% { transform: translateY(0); opacity: 1; }
+}

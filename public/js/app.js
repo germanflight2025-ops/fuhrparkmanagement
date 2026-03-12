@@ -453,6 +453,32 @@ function renderForms() {
     <button type="submit">${isEditingUser ? 'Aenderungen speichern' : 'Benutzer speichern'}</button>`;
 }
 
+function dashboardSignature(data) {
+  return JSON.stringify({
+    counts: data.counts || {},
+    fahrzeugKpis: data.fahrzeugKpis || {},
+    werkstattKpis: data.werkstattKpis || {},
+    schadenKpis: data.schadenKpis || {}
+  });
+}
+
+function flashKpiPanels() {
+  if (state.kpiFlashTimer) clearTimeout(state.kpiFlashTimer);
+  ['stats', 'fahrzeugKpis', 'werkstattKpis', 'schadenKpis'].forEach((id) => {
+    const node = el(id);
+    if (!node) return;
+    node.classList.remove('kpi-live-update');
+    void node.offsetWidth;
+    node.classList.add('kpi-live-update');
+  });
+  state.kpiFlashTimer = setTimeout(() => {
+    ['stats', 'fahrzeugKpis', 'werkstattKpis', 'schadenKpis'].forEach((id) => {
+      const node = el(id);
+      if (node) node.classList.remove('kpi-live-update');
+    });
+  }, 1800);
+}
+
 function renderDashboard() {
   const data = state.dashboard || {
     counts: { fahrzeuge: 0, werkstatt: 0, schaeden: 0, uvvFaellig: 0, huFaellig: 0 },
