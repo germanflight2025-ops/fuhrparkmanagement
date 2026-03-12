@@ -12,7 +12,9 @@ const app = express();
 const PORT = process.env.PORT || 3000;
 const uploadsDir = path.join(__dirname, 'public', 'uploads');
 const dataDir = path.join(__dirname, 'data');
-const dataFile = path.join(dataDir, 'db.json');
+const runtimeDataDir = path.join(dataDir, 'runtime');
+const seedFile = path.join(dataDir, 'seed.json');
+const dataFile = path.join(runtimeDataDir, 'db.json');
 const pgSchemaFile = path.join(__dirname, 'db', 'postgres-schema.sql');
 const usePostgres = Boolean(process.env.DATABASE_URL);
 const pgPool = usePostgres ? new Pool({
@@ -24,6 +26,7 @@ let currentData = null;
 
 if (!fs.existsSync(uploadsDir)) fs.mkdirSync(uploadsDir, { recursive: true });
 if (!fs.existsSync(dataDir)) fs.mkdirSync(dataDir, { recursive: true });
+if (!fs.existsSync(runtimeDataDir)) fs.mkdirSync(runtimeDataDir, { recursive: true });
 
 const STANDORTE = [
   'Frankfurt', 'Koeln', 'Muenchen', 'Berlin', 'Mannheim', 'Hamburg', 'Stuttgart', 'Duesseldorf', 'Dortmund', 'Essen',
@@ -113,9 +116,16 @@ function seedData() {
   };
 }
 
+function ensureSeedFile() {
+  if (!fs.existsSync(seedFile)) {
+    fs.writeFileSync(seedFile, JSON.stringify(seedData(), null, 2), 'utf8');
+  }
+}
+
 function ensureDataFile() {
+  ensureSeedFile();
   if (!fs.existsSync(dataFile)) {
-    const seeded = seedData();
+    const seeded = JSON.parse(fs.readFileSync(seedFile, 'utf8'));
     currentData = cloneData(seeded);
     fs.writeFileSync(dataFile, JSON.stringify(seeded, null, 2), 'utf8');
   }

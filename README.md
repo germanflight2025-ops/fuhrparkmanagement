@@ -3,7 +3,7 @@
 Lauffaehige MVP-Webanwendung mit:
 
 - Node.js + Express
-- JSON-Datenhaltung fuer schnelle lokale Nutzung und Demo-Betrieb
+- PostgreSQL-vorbereitete Laufzeit mit lokaler Runtime-Datei fuer Demo und Entwicklung
 - Rollenlogik fuer Hauptadmin, Admin und Benutzer
 - Standortfilter im Backend
 - Fahrzeuge, Werkstatt, Schaeden, UVV
@@ -40,18 +40,19 @@ Alternativ kann Render die Datei `render.yaml` direkt verwenden.
 
 ## Wichtiger Hinweis zu Render
 
-Diese Version speichert Daten aktuell in `data/db.json`. Das ist fuer eine Demo gut, aber auf kostenlosen Hostern nicht dauerhaft sicher. Nach einem neuen Deploy oder Server-Neustart koennen lokale Dateien verloren gehen. Fuer echten Dauerbetrieb sollte spaeter auf PostgreSQL umgestellt werden.
+Diese Version trennt jetzt feste Seed-Daten in `data/seed.json` von der lokalen Runtime-Datei `data/runtime/db.json`. Das ist fuer eine Demo gut, aber auf kostenlosen Hostern nicht dauerhaft sicher. Nach einem neuen Deploy oder Server-Neustart koennen lokale Dateien verloren gehen. Fuer echten Dauerbetrieb sollte spaeter auf PostgreSQL umgestellt werden.
 
 ## Wichtige Dateien fuer Hosting
 
 - `server.js`
 - `package.json`
 - `render.yaml`
-- `data/db.json`
+- `data/seed.json`
+- `data/runtime/db.json` (lokal erzeugt)
 
 ## PostgreSQL Vorbereitung
 
-Diese Projektversion bleibt aktuell weiter auf `data/db.json` lauffaehig, ist aber jetzt fuer den naechsten Schritt Richtung Firmenbetrieb vorbereitet.
+Diese Projektversion nutzt lokal jetzt `data/runtime/db.json` als Laufzeitdatei und ist fuer den naechsten Schritt Richtung Firmenbetrieb vorbereitet.
 
 Neu im Projekt:
 
@@ -73,4 +74,4 @@ Neu im Projekt:
 
 ### Wichtiger Hinweis
 
-Die App liest aktuell zur Laufzeit noch aus der JSON-Datei. Mit den neuen Dateien ist jetzt aber der technische Unterbau fuer die saubere Umstellung vorbereitet, ohne die laufende Demo-Version zu riskieren.
+Die App nutzt lokal jetzt eine getrennte Runtime-Datei und kann mit gesetzter `DATABASE_URL` beim Start aus PostgreSQL bootstrappen. `data/seed.json` bleibt dabei die feste Projektbasis.

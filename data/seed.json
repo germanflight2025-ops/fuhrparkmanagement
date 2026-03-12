@@ -1,0 +1,2640 @@
+{
+  "standorte": [
+    {
+      "id": 1,
+      "name": "Frankfurt",
+      "created_at": "2026-03-12T21:55:05.364Z"
+    },
+    {
+      "id": 2,
+      "name": "Koeln",
+      "created_at": "2026-03-12T21:55:05.364Z"
+    },
+    {
+      "id": 3,
+      "name": "Muenchen",
+      "created_at": "2026-03-12T21:55:05.364Z"
+    },
+    {
+      "id": 4,
+      "name": "Berlin",
+      "created_at": "2026-03-12T21:55:05.364Z"
+    },
+    {
+      "id": 5,
+      "name": "Mannheim",
+      "created_at": "2026-03-12T21:55:05.364Z"
+    },
+    {
+      "id": 6,
+      "name": "Hamburg",
+      "created_at": "2026-03-12T21:55:05.364Z"
+    },
+    {
+      "id": 7,
+      "name": "Stuttgart",
+      "created_at": "2026-03-12T21:55:05.364Z"
+    },
+    {
+      "id": 8,
+      "name": "Duesseldorf",
+      "created_at": "2026-03-12T21:55:05.364Z"
+    },
+    {
+      "id": 9,
+      "name": "Dortmund",
+      "created_at": "2026-03-12T21:55:05.364Z"
+    },
+    {
+      "id": 10,
+      "name": "Essen",
+      "created_at": "2026-03-12T21:55:05.364Z"
+    },
+    {
+      "id": 11,
+      "name": "Leipzig",
+      "created_at": "2026-03-12T21:55:05.364Z"
+    },
+    {
+      "id": 12,
+      "name": "Bremen",
+      "created_at": "2026-03-12T21:55:05.364Z"
+    },
+    {
+      "id": 13,
+      "name": "Dresden",
+      "created_at": "2026-03-12T21:55:05.364Z"
+    },
+    {
+      "id": 14,
+      "name": "Hannover",
+      "created_at": "2026-03-12T21:55:05.364Z"
+    },
+    {
+      "id": 15,
+      "name": "Nuernberg",
+      "created_at": "2026-03-12T21:55:05.364Z"
+    },
+    {
+      "id": 16,
+      "name": "Duisburg",
+      "created_at": "2026-03-12T21:55:05.364Z"
+    },
+    {
+      "id": 17,
+      "name": "Bochum",
+      "created_at": "2026-03-12T21:55:05.364Z"
+    },
+    {
+      "id": 18,
+      "name": "Wuppertal",
+      "created_at": "2026-03-12T21:55:05.364Z"
+    },
+    {
+      "id": 19,
+      "name": "Bielefeld",
+      "created_at": "2026-03-12T21:55:05.364Z"
+    },
+    {
+      "id": 20,
+      "name": "Bonn",
+      "created_at": "2026-03-12T21:55:05.364Z"
+    },
+    {
+      "id": 21,
+      "name": "Carlswerk",
+      "created_at": "2026-03-12T21:55:05.364Z"
+    }
+  ],
+  "benutzer": [
+    {
+      "id": 1,
+      "benutzername": "admin",
+      "name": "Michael Weber",
+      "email": "admin@fuhrpark.local",
+      "passwort_hash": "$2a$10$o63nuG0Mr2YuukMepHMZiOcGeiNQUkrXl5UsIkbQ0CL2pETfT4LM2",
+      "rolle": "hauptadmin",
+      "standort_id": 21,
+      "aktiv": 1,
+      "created_at": "2026-03-11T13:39:00.665Z"
+    },
+    {
+      "id": 2,
+      "benutzername": "frankfurt",
+      "name": "Admin Frankfurt Bearbeitet",
+      "email": "frankfurt@fuhrpark.local",
+      "passwort_hash": "$2a$10$Sm9n2pc5LDtS7vQOH6ECnOUH3Ku4weXAQR1NsJvdsncPRtJGqrNxe",
+      "rolle": "admin",
+      "standort_id": 1,
+      "aktiv": 1,
+      "created_at": "2026-03-11T13:39:00.718Z"
+    },
+    {
+      "id": 3,
+      "benutzername": "user",
+      "name": "Benutzer Frankfurt",
+      "email": "user@fuhrpark.local",
+      "passwort_hash": "$2a$10$ZzBPS301DMokowOwjQVQ..5mQsprjOWloh5LpnNeaFFlpg44Ow1Vm",
+      "rolle": "benutzer",
+      "standort_id": 1,
+      "aktiv": 1,
+      "created_at": "2026-03-11T13:39:00.771Z"
+    },
+    {
+      "id": 4,
+      "benutzername": "germanflight2025",
+      "name": "michael weber",
+      "email": "germanflight2025@gmail.com",
+      "passwort_hash": "$2a$10$bQnvGNr9gunI/kUPX2C2LeVjo54uzYb449EC5gK.220DFgoP6TRS2",
+      "rolle": "benutzer",
+      "standort_id": 1,
+      "aktiv": 1,
+      "created_at": "2026-03-11T15:38:21.629Z"
+    }
+  ],
+  "fahrzeuge": [
+    {
+      "id": 2,
+      "kennzeichen": "K-FM-2002",
+      "fahrzeug": "Mercedes Sprinter",
+      "standort_id": 2,
+      "status": "aktiv",
+      "hu_datum": "2026-04-15",
+      "uvv_datum": "2026-04-02",
+      "fahrzeugschein_pdf": "",
+      "created_at": "2026-03-11T13:39:00.771Z"
+    },
+    {
+      "id": 3,
+      "kennzeichen": "M-FM-3003",
+      "fahrzeug": "Ford Transit",
+      "standort_id": 3,
+      "status": "schaden",
+      "hu_datum": "2026-03-26",
+      "uvv_datum": "2026-03-23",
+      "fahrzeugschein_pdf": "",
+      "created_at": "2026-03-11T13:39:00.771Z"
+    },
+    {
+      "id": 4,
+      "kennzeichen": "B-FM-4004",
+      "fahrzeug": "Opel Vivaro",
+      "standort_id": 4,
+      "status": "aktiv",
+      "hu_datum": "2026-09-12",
+      "uvv_datum": "2026-05-29",
+      "fahrzeugschein_pdf": "",
+      "created_at": "2026-03-11T13:39:00.771Z"
+    },
+    {
+      "id": 5,
+      "kennzeichen": "MA-FM-5005",
+      "fahrzeug": "Renault Master",
+      "standort_id": 5,
+      "status": "aktiv",
+      "hu_datum": "2026-03-18",
+      "uvv_datum": "2026-03-15",
+      "fahrzeugschein_pdf": "",
+      "created_at": "2026-03-11T13:39:00.771Z"
+    },
+    {
+      "id": 6,
+      "kennzeichen": "K-EC 149",
+      "fahrzeug": "Iveco",
+      "standort_id": 1,
+      "status": "aktiv",
+      "hu_datum": "2027-05-29",
+      "uvv_datum": "2025-03-29",
+      "fahrzeugschein_pdf": "",
+      "created_at": "2026-03-11T15:15:13.619Z"
+    },
+    {
+      "id": 7,
+      "kennzeichen": "K-EC 197",
+      "fahrzeug": "Iveco",
+      "standort_id": 1,
+      "status": "aktiv",
+      "hu_datum": "2026-11-28",
+      "uvv_datum": "2026-11-28",
+      "fahrzeugschein_pdf": "",
+      "created_at": "2026-03-11T16:30:02.015Z"
+    },
+    {
+      "id": 8,
+      "kennzeichen": "K-EC 269",
+      "fahrzeug": "Iveco",
+      "standort_id": 1,
+      "status": "aktiv",
+      "hu_datum": "2026-12-29",
+      "uvv_datum": "2023-12-29",
+      "fahrzeugschein_pdf": "",
+      "created_at": "2026-03-11T16:30:02.015Z"
+    },
+    {
+      "id": 9,
+      "kennzeichen": "K-EC 446",
+      "fahrzeug": "Iveco",
+      "standort_id": 1,
+      "status": "aktiv",
+      "hu_datum": "2026-11-28",
+      "uvv_datum": "2026-11-28",
+      "fahrzeugschein_pdf": "",
+      "created_at": "2026-03-11T16:30:02.015Z"
+    },
+    {
+      "id": 10,
+      "kennzeichen": "K-EC 447",
+      "fahrzeug": "Iveco",
+      "standort_id": 1,
+      "status": "aktiv",
+      "hu_datum": "2026-11-28",
+      "uvv_datum": "2026-11-28",
+      "fahrzeugschein_pdf": "",
+      "created_at": "2026-03-11T16:30:02.015Z"
+    },
+    {
+      "id": 11,
+      "kennzeichen": "K-EC 451",
+      "fahrzeug": "Iveco",
+      "standort_id": 1,
+      "status": "aktiv",
+      "hu_datum": "2027-01-29",
+      "uvv_datum": "2027-01-29",
+      "fahrzeugschein_pdf": "",
+      "created_at": "2026-03-11T16:30:02.015Z"
+    },
+    {
+      "id": 12,
+      "kennzeichen": "K-EC 467",
+      "fahrzeug": "Iveco",
+      "standort_id": 1,
+      "status": "aktiv",
+      "hu_datum": "2027-01-29",
+      "uvv_datum": "2024-10-29",
+      "fahrzeugschein_pdf": "",
+      "created_at": "2026-03-11T16:30:02.015Z"
+    },
+    {
+      "id": 13,
+      "kennzeichen": "K-EC 537",
+      "fahrzeug": "Iveco",
+      "standort_id": 1,
+      "status": "aktiv",
+      "hu_datum": "2026-11-28",
+      "uvv_datum": "2026-11-28",
+      "fahrzeugschein_pdf": "",
+      "created_at": "2026-03-11T16:30:02.015Z"
+    },
+    {
+      "id": 14,
+      "kennzeichen": "K-EC 539",
+      "fahrzeug": "Iveco",
+      "standort_id": 1,
+      "status": "aktiv",
+      "hu_datum": "2026-11-28",
+      "uvv_datum": "2026-11-28",
+      "fahrzeugschein_pdf": "",
+      "created_at": "2026-03-11T16:30:02.015Z"
+    },
+    {
+      "id": 15,
+      "kennzeichen": "K-EC 557",
+      "fahrzeug": "Iveco",
+      "standort_id": 1,
+      "status": "aktiv",
+      "hu_datum": "2026-11-28",
+      "uvv_datum": "2026-11-28",
+      "fahrzeugschein_pdf": "",
+      "created_at": "2026-03-11T16:30:02.015Z"
+    },
+    {
+      "id": 16,
+      "kennzeichen": "K-EC 533",
+      "fahrzeug": "Iveco",
+      "standort_id": 1,
+      "status": "aktiv",
+      "hu_datum": "2026-11-28",
+      "uvv_datum": "2026-11-28",
+      "fahrzeugschein_pdf": "",
+      "created_at": "2026-03-11T16:30:02.016Z"
+    },
+    {
+      "id": 17,
+      "kennzeichen": "K-EC 558",
+      "fahrzeug": "Iveco",
+      "standort_id": 1,
+      "status": "aktiv",
+      "hu_datum": "2026-12-29",
+      "uvv_datum": "2026-12-29",
+      "fahrzeugschein_pdf": "",
+      "created_at": "2026-03-11T16:30:02.016Z"
+    },
+    {
+      "id": 18,
+      "kennzeichen": "K-EC 578",
+      "fahrzeug": "Iveco",
+      "standort_id": 1,
+      "status": "aktiv",
+      "hu_datum": "2026-11-28",
+      "uvv_datum": "2026-11-28",
+      "fahrzeugschein_pdf": "",
+      "created_at": "2026-03-11T16:30:02.016Z"
+    },
+    {
+      "id": 19,
+      "kennzeichen": "K-EC 598",
+      "fahrzeug": "Iveco",
+      "standort_id": 1,
+      "status": "aktiv",
+      "hu_datum": "2027-01-29",
+      "uvv_datum": "2027-01-29",
+      "fahrzeugschein_pdf": "",
+      "created_at": "2026-03-11T16:30:02.016Z"
+    },
+    {
+      "id": 20,
+      "kennzeichen": "K-EC 605",
+      "fahrzeug": "Iveco",
+      "standort_id": 1,
+      "status": "aktiv",
+      "hu_datum": "2026-11-28",
+      "uvv_datum": "2026-11-28",
+      "fahrzeugschein_pdf": "",
+      "created_at": "2026-03-11T16:30:02.016Z"
+    },
+    {
+      "id": 21,
+      "kennzeichen": "K-EC 607",
+      "fahrzeug": "Iveco",
+      "standort_id": 1,
+      "status": "aktiv",
+      "hu_datum": "2027-07-29",
+      "uvv_datum": "2024-09-28",
+      "fahrzeugschein_pdf": "",
+      "created_at": "2026-03-11T16:30:02.016Z"
+    },
+    {
+      "id": 22,
+      "kennzeichen": "K-EC 608",
+      "fahrzeug": "Iveco",
+      "standort_id": 1,
+      "status": "aktiv",
+      "hu_datum": "2026-11-28",
+      "uvv_datum": "2026-11-28",
+      "fahrzeugschein_pdf": "",
+      "created_at": "2026-03-11T16:30:02.016Z"
+    },
+    {
+      "id": 23,
+      "kennzeichen": "K-EC 612",
+      "fahrzeug": "Iveco",
+      "standort_id": 1,
+      "status": "aktiv",
+      "hu_datum": "2026-12-29",
+      "uvv_datum": "2024-09-28",
+      "fahrzeugschein_pdf": "",
+      "created_at": "2026-03-11T16:30:02.016Z"
+    },
+    {
+      "id": 24,
+      "kennzeichen": "K-EC 619",
+      "fahrzeug": "Iveco",
+      "standort_id": 1,
+      "status": "aktiv",
+      "hu_datum": "2026-12-29",
+      "uvv_datum": "2024-10-29",
+      "fahrzeugschein_pdf": "",
+      "created_at": "2026-03-11T16:30:02.016Z"
+    },
+    {
+      "id": 25,
+      "kennzeichen": "K-EC 629",
+      "fahrzeug": "Iveco",
+      "standort_id": 1,
+      "status": "aktiv",
+      "hu_datum": "2026-11-28",
+      "uvv_datum": "2026-11-28",
+      "fahrzeugschein_pdf": "",
+      "created_at": "2026-03-11T16:30:02.016Z"
+    },
+    {
+      "id": 26,
+      "kennzeichen": "K-EC 636",
+      "fahrzeug": "Iveco",
+      "standort_id": 1,
+      "status": "aktiv",
+      "hu_datum": "2027-01-29",
+      "uvv_datum": "2023-12-29",
+      "fahrzeugschein_pdf": "",
+      "created_at": "2026-03-11T16:30:02.016Z"
+    },
+    {
+      "id": 27,
+      "kennzeichen": "K-EC 644",
+      "fahrzeug": "Iveco",
+      "standort_id": 1,
+      "status": "aktiv",
+      "hu_datum": "2027-03-29",
+      "uvv_datum": "2023-12-29",
+      "fahrzeugschein_pdf": "",
+      "created_at": "2026-03-11T16:30:02.016Z"
+    },
+    {
+      "id": 28,
+      "kennzeichen": "K-EC 647",
+      "fahrzeug": "Iveco",
+      "standort_id": 1,
+      "status": "aktiv",
+      "hu_datum": "2027-03-29",
+      "uvv_datum": "2023-12-29",
+      "fahrzeugschein_pdf": "",
+      "created_at": "2026-03-11T16:30:02.016Z"
+    },
+    {
+      "id": 29,
+      "kennzeichen": "K-EC 648",
+      "fahrzeug": "Iveco",
+      "standort_id": 1,
+      "status": "aktiv",
+      "hu_datum": "2026-11-28",
+      "uvv_datum": "2026-11-28",
+      "fahrzeugschein_pdf": "",
+      "created_at": "2026-03-11T16:30:02.016Z"
+    },
+    {
+      "id": 30,
+      "kennzeichen": "K-EC 662",
+      "fahrzeug": "Iveco",
+      "standort_id": 1,
+      "status": "aktiv",
+      "hu_datum": "2026-12-29",
+      "uvv_datum": "2026-12-29",
+      "fahrzeugschein_pdf": "",
+      "created_at": "2026-03-11T16:30:02.016Z"
+    },
+    {
+      "id": 31,
+      "kennzeichen": "K-EC 675",
+      "fahrzeug": "Iveco",
+      "standort_id": 1,
+      "status": "aktiv",
+      "hu_datum": "2026-12-29",
+      "uvv_datum": "2026-12-29",
+      "fahrzeugschein_pdf": "",
+      "created_at": "2026-03-11T16:30:02.016Z"
+    },
+    {
+      "id": 32,
+      "kennzeichen": "K-EC 685",
+      "fahrzeug": "Iveco",
+      "standort_id": 1,
+      "status": "aktiv",
+      "hu_datum": "2026-12-29",
+      "uvv_datum": "2026-12-29",
+      "fahrzeugschein_pdf": "",
+      "created_at": "2026-03-11T16:30:02.016Z"
+    },
+    {
+      "id": 33,
+      "kennzeichen": "K-EC 686",
+      "fahrzeug": "Iveco",
+      "standort_id": 1,
+      "status": "aktiv",
+      "hu_datum": "2026-12-29",
+      "uvv_datum": "2026-12-29",
+      "fahrzeugschein_pdf": "",
+      "created_at": "2026-03-11T16:30:02.016Z"
+    },
+    {
+      "id": 34,
+      "kennzeichen": "K-EC 724",
+      "fahrzeug": "Iveco",
+      "standort_id": 1,
+      "status": "aktiv",
+      "hu_datum": "2027-03-29",
+      "uvv_datum": "2023-12-29",
+      "fahrzeugschein_pdf": "",
+      "created_at": "2026-03-11T16:30:02.016Z"
+    },
+    {
+      "id": 35,
+      "kennzeichen": "K-EC 726",
+      "fahrzeug": "Iveco",
+      "standort_id": 1,
+      "status": "aktiv",
+      "hu_datum": "2026-11-28",
+      "uvv_datum": "2026-11-28",
+      "fahrzeugschein_pdf": "",
+      "created_at": "2026-03-11T16:30:02.016Z"
+    },
+    {
+      "id": 36,
+      "kennzeichen": "K-EC 734",
+      "fahrzeug": "Iveco",
+      "standort_id": 1,
+      "status": "aktiv",
+      "hu_datum": "2026-11-28",
+      "uvv_datum": "2026-11-28",
+      "fahrzeugschein_pdf": "",
+      "created_at": "2026-03-11T16:30:02.016Z"
+    },
+    {
+      "id": 37,
+      "kennzeichen": "K-EC 760",
+      "fahrzeug": "Iveco",
+      "standort_id": 1,
+      "status": "aktiv",
+      "hu_datum": "2026-11-28",
+      "uvv_datum": "2026-11-28",
+      "fahrzeugschein_pdf": "",
+      "created_at": "2026-03-11T16:30:02.016Z"
+    },
+    {
+      "id": 38,
+      "kennzeichen": "K-EC 776",
+      "fahrzeug": "Iveco",
+      "standort_id": 1,
+      "status": "aktiv",
+      "hu_datum": "2027-01-29",
+      "uvv_datum": "2027-01-29",
+      "fahrzeugschein_pdf": "",
+      "created_at": "2026-03-11T16:30:02.016Z"
+    },
+    {
+      "id": 39,
+      "kennzeichen": "K-EC 778",
+      "fahrzeug": "Iveco",
+      "standort_id": 1,
+      "status": "aktiv",
+      "hu_datum": "2027-01-29",
+      "uvv_datum": "2027-01-29",
+      "fahrzeugschein_pdf": "",
+      "created_at": "2026-03-11T16:30:02.016Z"
+    },
+    {
+      "id": 40,
+      "kennzeichen": "K-EC 787",
+      "fahrzeug": "Iveco",
+      "standort_id": 1,
+      "status": "aktiv",
+      "hu_datum": null,
+      "uvv_datum": "2023-12-29",
+      "fahrzeugschein_pdf": "",
+      "created_at": "2026-03-11T16:30:02.016Z"
+    },
+    {
+      "id": 41,
+      "kennzeichen": "K-EC 797",
+      "fahrzeug": "Iveco",
+      "standort_id": 1,
+      "status": "aktiv",
+      "hu_datum": "2026-11-28",
+      "uvv_datum": "2026-11-28",
+      "fahrzeugschein_pdf": "",
+      "created_at": "2026-03-11T16:30:02.016Z"
+    },
+    {
+      "id": 42,
+      "kennzeichen": "K-EC 801",
+      "fahrzeug": "Iveco",
+      "standort_id": 1,
+      "status": "aktiv",
+      "hu_datum": "2026-12-29",
+      "uvv_datum": "2026-12-29",
+      "fahrzeugschein_pdf": "",
+      "created_at": "2026-03-11T16:30:02.016Z"
+    },
+    {
+      "id": 43,
+      "kennzeichen": "K-EC 804",
+      "fahrzeug": "Iveco",
+      "standort_id": 1,
+      "status": "aktiv",
+      "hu_datum": "2026-11-28",
+      "uvv_datum": "2026-11-28",
+      "fahrzeugschein_pdf": "",
+      "created_at": "2026-03-11T16:30:02.016Z"
+    },
+    {
+      "id": 44,
+      "kennzeichen": "K-EC 1543",
+      "fahrzeug": "Iveco",
+      "standort_id": 1,
+      "status": "aktiv",
+      "hu_datum": "2027-02-26",
+      "uvv_datum": "2027-02-26",
+      "fahrzeugschein_pdf": "",
+      "created_at": "2026-03-11T16:30:02.016Z"
+    },
+    {
+      "id": 45,
+      "kennzeichen": "K-EC 1544",
+      "fahrzeug": "Iveco",
+      "standort_id": 1,
+      "status": "aktiv",
+      "hu_datum": "2027-02-26",
+      "uvv_datum": "2024-12-12",
+      "fahrzeugschein_pdf": "",
+      "created_at": "2026-03-11T16:30:02.016Z"
+    },
+    {
+      "id": 46,
+      "kennzeichen": "K-EC 1545",
+      "fahrzeug": "Iveco",
+      "standort_id": 1,
+      "status": "aktiv",
+      "hu_datum": "2027-02-26",
+      "uvv_datum": "2024-12-12",
+      "fahrzeugschein_pdf": "",
+      "created_at": "2026-03-11T16:30:02.016Z"
+    },
+    {
+      "id": 47,
+      "kennzeichen": "K-EC 1546",
+      "fahrzeug": "Iveco",
+      "standort_id": 1,
+      "status": "aktiv",
+      "hu_datum": "2027-01-29",
+      "uvv_datum": "2027-01-29",
+      "fahrzeugschein_pdf": "",
+      "created_at": "2026-03-11T16:30:02.016Z"
+    },
+    {
+      "id": 48,
+      "kennzeichen": "K-EC 1547",
+      "fahrzeug": "Iveco",
+      "standort_id": 1,
+      "status": "aktiv",
+      "hu_datum": "2027-01-29",
+      "uvv_datum": "2024-12-29",
+      "fahrzeugschein_pdf": "",
+      "created_at": "2026-03-11T16:30:02.016Z"
+    },
+    {
+      "id": 49,
+      "kennzeichen": "K-EC 1548",
+      "fahrzeug": "Iveco",
+      "standort_id": 1,
+      "status": "aktiv",
+      "hu_datum": "2027-03-29",
+      "uvv_datum": "2024-12-12",
+      "fahrzeugschein_pdf": "",
+      "created_at": "2026-03-11T16:30:02.016Z"
+    },
+    {
+      "id": 50,
+      "kennzeichen": "K-EC 1549",
+      "fahrzeug": "Iveco",
+      "standort_id": 1,
+      "status": "aktiv",
+      "hu_datum": "2027-03-29",
+      "uvv_datum": "2024-12-12",
+      "fahrzeugschein_pdf": "",
+      "created_at": "2026-03-11T16:30:02.016Z"
+    },
+    {
+      "id": 51,
+      "kennzeichen": "K-EC 1551",
+      "fahrzeug": "Iveco",
+      "standort_id": 1,
+      "status": "aktiv",
+      "hu_datum": "2027-03-29",
+      "uvv_datum": "2024-12-12",
+      "fahrzeugschein_pdf": "",
+      "created_at": "2026-03-11T16:30:02.016Z"
+    },
+    {
+      "id": 52,
+      "kennzeichen": "K-EC 1552",
+      "fahrzeug": "Iveco",
+      "standort_id": 1,
+      "status": "aktiv",
+      "hu_datum": "2027-01-29",
+      "uvv_datum": "2024-12-12",
+      "fahrzeugschein_pdf": "",
+      "created_at": "2026-03-11T16:30:02.016Z"
+    },
+    {
+      "id": 53,
+      "kennzeichen": "K-EC 1553",
+      "fahrzeug": "Iveco",
+      "standort_id": 1,
+      "status": "aktiv",
+      "hu_datum": "2027-05-29",
+      "uvv_datum": "2024-03-29",
+      "fahrzeugschein_pdf": "",
+      "created_at": "2026-03-11T16:30:02.016Z"
+    },
+    {
+      "id": 54,
+      "kennzeichen": "K-EC 1554",
+      "fahrzeug": "Iveco",
+      "standort_id": 1,
+      "status": "aktiv",
+      "hu_datum": "2027-02-26",
+      "uvv_datum": "2027-02-26",
+      "fahrzeugschein_pdf": "",
+      "created_at": "2026-03-11T16:30:02.016Z"
+    },
+    {
+      "id": 55,
+      "kennzeichen": "K-EC 1555",
+      "fahrzeug": "Iveco",
+      "standort_id": 1,
+      "status": "aktiv",
+      "hu_datum": "2027-01-29",
+      "uvv_datum": "2027-01-29",
+      "fahrzeugschein_pdf": "",
+      "created_at": "2026-03-11T16:30:02.016Z"
+    },
+    {
+      "id": 56,
+      "kennzeichen": "K-EC 1556",
+      "fahrzeug": "Iveco",
+      "standort_id": 1,
+      "status": "aktiv",
+      "hu_datum": "2027-03-29",
+      "uvv_datum": "2023-12-29",
+      "fahrzeugschein_pdf": "",
+      "created_at": "2026-03-11T16:30:02.016Z"
+    },
+    {
+      "id": 57,
+      "kennzeichen": "K-EC 1557",
+      "fahrzeug": "Iveco",
+      "standort_id": 1,
+      "status": "aktiv",
+      "hu_datum": "2027-03-29",
+      "uvv_datum": "2024-12-12",
+      "fahrzeugschein_pdf": "",
+      "created_at": "2026-03-11T16:30:02.016Z"
+    },
+    {
+      "id": 58,
+      "kennzeichen": "K-EC 1558",
+      "fahrzeug": "Iveco",
+      "standort_id": 1,
+      "status": "aktiv",
+      "hu_datum": "2027-03-29",
+      "uvv_datum": "2024-12-12",
+      "fahrzeugschein_pdf": "",
+      "created_at": "2026-03-11T16:30:02.016Z"
+    },
+    {
+      "id": 59,
+      "kennzeichen": "K-EC 1559",
+      "fahrzeug": "Iveco",
+      "standort_id": 1,
+      "status": "aktiv",
+      "hu_datum": "2027-01-29",
+      "uvv_datum": "2027-01-29",
+      "fahrzeugschein_pdf": "",
+      "created_at": "2026-03-11T16:30:02.016Z"
+    },
+    {
+      "id": 60,
+      "kennzeichen": "K-EC 9549",
+      "fahrzeug": "Iveco",
+      "standort_id": 1,
+      "status": "aktiv",
+      "hu_datum": "2026-05-29",
+      "uvv_datum": null,
+      "fahrzeugschein_pdf": "",
+      "created_at": "2026-03-11T16:30:02.016Z"
+    },
+    {
+      "id": 61,
+      "kennzeichen": "K-EC 9589",
+      "fahrzeug": "Iveco",
+      "standort_id": 1,
+      "status": "aktiv",
+      "hu_datum": "2026-05-29",
+      "uvv_datum": null,
+      "fahrzeugschein_pdf": "",
+      "created_at": "2026-03-11T16:30:02.016Z"
+    },
+    {
+      "id": 62,
+      "kennzeichen": "K-EC 9588",
+      "fahrzeug": "Iveco",
+      "standort_id": 1,
+      "status": "aktiv",
+      "hu_datum": "2026-05-29",
+      "uvv_datum": null,
+      "fahrzeugschein_pdf": "",
+      "created_at": "2026-03-11T16:30:02.016Z"
+    },
+    {
+      "id": 63,
+      "kennzeichen": "K-EC 9710",
+      "fahrzeug": "Iveco",
+      "standort_id": 1,
+      "status": "aktiv",
+      "hu_datum": "2027-10-29",
+      "uvv_datum": null,
+      "fahrzeugschein_pdf": "",
+      "created_at": "2026-03-11T16:30:02.016Z"
+    },
+    {
+      "id": 64,
+      "kennzeichen": "K-EC 9598",
+      "fahrzeug": "Iveco",
+      "standort_id": 1,
+      "status": "aktiv",
+      "hu_datum": "2026-05-29",
+      "uvv_datum": null,
+      "fahrzeugschein_pdf": "",
+      "created_at": "2026-03-11T16:30:02.016Z"
+    },
+    {
+      "id": 65,
+      "kennzeichen": "K-EC 9595",
+      "fahrzeug": "Iveco",
+      "standort_id": 1,
+      "status": "aktiv",
+      "hu_datum": "2026-05-29",
+      "uvv_datum": null,
+      "fahrzeugschein_pdf": "",
+      "created_at": "2026-03-11T16:30:02.016Z"
+    },
+    {
+      "id": 66,
+      "kennzeichen": "K-EC 9011",
+      "fahrzeug": "Ford",
+      "standort_id": 1,
+      "status": "aktiv",
+      "hu_datum": "2026-02-26",
+      "uvv_datum": "2026-02-26",
+      "fahrzeugschein_pdf": "",
+      "created_at": "2026-03-11T16:30:02.016Z"
+    },
+    {
+      "id": 67,
+      "kennzeichen": "K-EC 9033",
+      "fahrzeug": "Ford",
+      "standort_id": 1,
+      "status": "aktiv",
+      "hu_datum": "2026-04-28",
+      "uvv_datum": null,
+      "fahrzeugschein_pdf": "",
+      "created_at": "2026-03-11T16:30:02.016Z"
+    },
+    {
+      "id": 68,
+      "kennzeichen": "K-EC 9022",
+      "fahrzeug": "Ford",
+      "standort_id": 1,
+      "status": "aktiv",
+      "hu_datum": "2026-03-29",
+      "uvv_datum": null,
+      "fahrzeugschein_pdf": "",
+      "created_at": "2026-03-11T16:30:02.016Z"
+    },
+    {
+      "id": 69,
+      "kennzeichen": "K-EC 9044",
+      "fahrzeug": "Ford",
+      "standort_id": 1,
+      "status": "aktiv",
+      "hu_datum": "2026-02-26",
+      "uvv_datum": "2026-02-26",
+      "fahrzeugschein_pdf": "",
+      "created_at": "2026-03-11T16:30:02.016Z"
+    },
+    {
+      "id": 70,
+      "kennzeichen": "K-EC 9055",
+      "fahrzeug": "Ford",
+      "standort_id": 1,
+      "status": "aktiv",
+      "hu_datum": "2026-04-28",
+      "uvv_datum": null,
+      "fahrzeugschein_pdf": "",
+      "created_at": "2026-03-11T16:30:02.016Z"
+    },
+    {
+      "id": 71,
+      "kennzeichen": "K-EC 9066",
+      "fahrzeug": "Ford",
+      "standort_id": 1,
+      "status": "aktiv",
+      "hu_datum": "2026-04-28",
+      "uvv_datum": null,
+      "fahrzeugschein_pdf": "",
+      "created_at": "2026-03-11T16:30:02.016Z"
+    },
+    {
+      "id": 72,
+      "kennzeichen": "K-EC 9077",
+      "fahrzeug": "Ford",
+      "standort_id": 1,
+      "status": "aktiv",
+      "hu_datum": "2026-02-26",
+      "uvv_datum": null,
+      "fahrzeugschein_pdf": "",
+      "created_at": "2026-03-11T16:30:02.016Z"
+    },
+    {
+      "id": 73,
+      "kennzeichen": "K-EC 9080",
+      "fahrzeug": "Ford",
+      "standort_id": 1,
+      "status": "aktiv",
+      "hu_datum": "2026-04-28",
+      "uvv_datum": null,
+      "fahrzeugschein_pdf": "",
+      "created_at": "2026-03-11T16:30:02.016Z"
+    },
+    {
+      "id": 74,
+      "kennzeichen": "K-EC 9088",
+      "fahrzeug": "Ford",
+      "standort_id": 1,
+      "status": "aktiv",
+      "hu_datum": "2026-04-28",
+      "uvv_datum": null,
+      "fahrzeugschein_pdf": "",
+      "created_at": "2026-03-11T16:30:02.016Z"
+    },
+    {
+      "id": 75,
+      "kennzeichen": "K-EC 9099",
+      "fahrzeug": "Ford",
+      "standort_id": 1,
+      "status": "aktiv",
+      "hu_datum": "2027-02-26",
+      "uvv_datum": "2027-02-26",
+      "fahrzeugschein_pdf": "",
+      "created_at": "2026-03-11T16:30:02.016Z"
+    },
+    {
+      "id": 76,
+      "kennzeichen": "F-NEW-6006",
+      "fahrzeug": "Iveco Daily",
+      "standort_id": 1,
+      "status": "aktiv",
+      "hu_datum": "2026-05-12",
+      "uvv_datum": "2026-04-27",
+      "fahrzeugschein_pdf": "",
+      "created_at": "2026-03-11T17:56:50.266Z"
+    }
+  ],
+  "workshop_bereiche": [
+    {
+      "id": 1,
+      "standort_id": 1,
+      "slot": 1,
+      "name": "Werkstatt 1",
+      "created_at": "2026-03-12T21:55:05.364Z"
+    },
+    {
+      "id": 2,
+      "standort_id": 1,
+      "slot": 2,
+      "name": "Werkstatt 2",
+      "created_at": "2026-03-12T21:55:05.364Z"
+    },
+    {
+      "id": 3,
+      "standort_id": 1,
+      "slot": 3,
+      "name": "Werkstatt 3",
+      "created_at": "2026-03-12T21:55:05.364Z"
+    },
+    {
+      "id": 4,
+      "standort_id": 1,
+      "slot": 4,
+      "name": "Werkstatt 4",
+      "created_at": "2026-03-12T21:55:05.364Z"
+    },
+    {
+      "id": 5,
+      "standort_id": 1,
+      "slot": 5,
+      "name": "Werkstatt 5",
+      "created_at": "2026-03-12T21:55:05.364Z"
+    },
+    {
+      "id": 6,
+      "standort_id": 1,
+      "slot": 6,
+      "name": "Werkstatt 6",
+      "created_at": "2026-03-12T21:55:05.364Z"
+    },
+    {
+      "id": 7,
+      "standort_id": 1,
+      "slot": 7,
+      "name": "Werkstatt 7",
+      "created_at": "2026-03-12T21:55:05.364Z"
+    },
+    {
+      "id": 8,
+      "standort_id": 1,
+      "slot": 8,
+      "name": "Werkstatt 8",
+      "created_at": "2026-03-12T21:55:05.364Z"
+    },
+    {
+      "id": 9,
+      "standort_id": 1,
+      "slot": 9,
+      "name": "Werkstatt 9",
+      "created_at": "2026-03-12T21:55:05.364Z"
+    },
+    {
+      "id": 10,
+      "standort_id": 2,
+      "slot": 1,
+      "name": "Werkstatt 1",
+      "created_at": "2026-03-12T21:55:05.364Z"
+    },
+    {
+      "id": 11,
+      "standort_id": 2,
+      "slot": 2,
+      "name": "Werkstatt 2",
+      "created_at": "2026-03-12T21:55:05.364Z"
+    },
+    {
+      "id": 12,
+      "standort_id": 2,
+      "slot": 3,
+      "name": "Werkstatt 3",
+      "created_at": "2026-03-12T21:55:05.364Z"
+    },
+    {
+      "id": 13,
+      "standort_id": 2,
+      "slot": 4,
+      "name": "Werkstatt 4",
+      "created_at": "2026-03-12T21:55:05.364Z"
+    },
+    {
+      "id": 14,
+      "standort_id": 2,
+      "slot": 5,
+      "name": "Werkstatt 5",
+      "created_at": "2026-03-12T21:55:05.364Z"
+    },
+    {
+      "id": 15,
+      "standort_id": 2,
+      "slot": 6,
+      "name": "Werkstatt 6",
+      "created_at": "2026-03-12T21:55:05.364Z"
+    },
+    {
+      "id": 16,
+      "standort_id": 2,
+      "slot": 7,
+      "name": "Werkstatt 7",
+      "created_at": "2026-03-12T21:55:05.364Z"
+    },
+    {
+      "id": 17,
+      "standort_id": 2,
+      "slot": 8,
+      "name": "Werkstatt 8",
+      "created_at": "2026-03-12T21:55:05.364Z"
+    },
+    {
+      "id": 18,
+      "standort_id": 2,
+      "slot": 9,
+      "name": "Werkstatt 9",
+      "created_at": "2026-03-12T21:55:05.364Z"
+    },
+    {
+      "id": 19,
+      "standort_id": 3,
+      "slot": 1,
+      "name": "Werkstatt 1",
+      "created_at": "2026-03-12T21:55:05.364Z"
+    },
+    {
+      "id": 20,
+      "standort_id": 3,
+      "slot": 2,
+      "name": "Werkstatt 2",
+      "created_at": "2026-03-12T21:55:05.364Z"
+    },
+    {
+      "id": 21,
+      "standort_id": 3,
+      "slot": 3,
+      "name": "Werkstatt 3",
+      "created_at": "2026-03-12T21:55:05.364Z"
+    },
+    {
+      "id": 22,
+      "standort_id": 3,
+      "slot": 4,
+      "name": "Werkstatt 4",
+      "created_at": "2026-03-12T21:55:05.364Z"
+    },
+    {
+      "id": 23,
+      "standort_id": 3,
+      "slot": 5,
+      "name": "Werkstatt 5",
+      "created_at": "2026-03-12T21:55:05.364Z"
+    },
+    {
+      "id": 24,
+      "standort_id": 3,
+      "slot": 6,
+      "name": "Werkstatt 6",
+      "created_at": "2026-03-12T21:55:05.364Z"
+    },
+    {
+      "id": 25,
+      "standort_id": 3,
+      "slot": 7,
+      "name": "Werkstatt 7",
+      "created_at": "2026-03-12T21:55:05.364Z"
+    },
+    {
+      "id": 26,
+      "standort_id": 3,
+      "slot": 8,
+      "name": "Werkstatt 8",
+      "created_at": "2026-03-12T21:55:05.364Z"
+    },
+    {
+      "id": 27,
+      "standort_id": 3,
+      "slot": 9,
+      "name": "Werkstatt 9",
+      "created_at": "2026-03-12T21:55:05.364Z"
+    },
+    {
+      "id": 28,
+      "standort_id": 4,
+      "slot": 1,
+      "name": "Werkstatt 1",
+      "created_at": "2026-03-12T21:55:05.364Z"
+    },
+    {
+      "id": 29,
+      "standort_id": 4,
+      "slot": 2,
+      "name": "Werkstatt 2",
+      "created_at": "2026-03-12T21:55:05.364Z"
+    },
+    {
+      "id": 30,
+      "standort_id": 4,
+      "slot": 3,
+      "name": "Werkstatt 3",
+      "created_at": "2026-03-12T21:55:05.364Z"
+    },
+    {
+      "id": 31,
+      "standort_id": 4,
+      "slot": 4,
+      "name": "Werkstatt 4",
+      "created_at": "2026-03-12T21:55:05.364Z"
+    },
+    {
+      "id": 32,
+      "standort_id": 4,
+      "slot": 5,
+      "name": "Werkstatt 5",
+      "created_at": "2026-03-12T21:55:05.364Z"
+    },
+    {
+      "id": 33,
+      "standort_id": 4,
+      "slot": 6,
+      "name": "Werkstatt 6",
+      "created_at": "2026-03-12T21:55:05.364Z"
+    },
+    {
+      "id": 34,
+      "standort_id": 4,
+      "slot": 7,
+      "name": "Werkstatt 7",
+      "created_at": "2026-03-12T21:55:05.364Z"
+    },
+    {
+      "id": 35,
+      "standort_id": 4,
+      "slot": 8,
+      "name": "Werkstatt 8",
+      "created_at": "2026-03-12T21:55:05.364Z"
+    },
+    {
+      "id": 36,
+      "standort_id": 4,
+      "slot": 9,
+      "name": "Werkstatt 9",
+      "created_at": "2026-03-12T21:55:05.364Z"
+    },
+    {
+      "id": 37,
+      "standort_id": 5,
+      "slot": 1,
+      "name": "Werkstatt 1",
+      "created_at": "2026-03-12T21:55:05.364Z"
+    },
+    {
+      "id": 38,
+      "standort_id": 5,
+      "slot": 2,
+      "name": "Werkstatt 2",
+      "created_at": "2026-03-12T21:55:05.364Z"
+    },
+    {
+      "id": 39,
+      "standort_id": 5,
+      "slot": 3,
+      "name": "Werkstatt 3",
+      "created_at": "2026-03-12T21:55:05.364Z"
+    },
+    {
+      "id": 40,
+      "standort_id": 5,
+      "slot": 4,
+      "name": "Werkstatt 4",
+      "created_at": "2026-03-12T21:55:05.364Z"
+    },
+    {
+      "id": 41,
+      "standort_id": 5,
+      "slot": 5,
+      "name": "Werkstatt 5",
+      "created_at": "2026-03-12T21:55:05.364Z"
+    },
+    {
+      "id": 42,
+      "standort_id": 5,
+      "slot": 6,
+      "name": "Werkstatt 6",
+      "created_at": "2026-03-12T21:55:05.364Z"
+    },
+    {
+      "id": 43,
+      "standort_id": 5,
+      "slot": 7,
+      "name": "Werkstatt 7",
+      "created_at": "2026-03-12T21:55:05.364Z"
+    },
+    {
+      "id": 44,
+      "standort_id": 5,
+      "slot": 8,
+      "name": "Werkstatt 8",
+      "created_at": "2026-03-12T21:55:05.364Z"
+    },
+    {
+      "id": 45,
+      "standort_id": 5,
+      "slot": 9,
+      "name": "Werkstatt 9",
+      "created_at": "2026-03-12T21:55:05.364Z"
+    },
+    {
+      "id": 46,
+      "standort_id": 6,
+      "slot": 1,
+      "name": "Werkstatt 1",
+      "created_at": "2026-03-12T21:55:05.364Z"
+    },
+    {
+      "id": 47,
+      "standort_id": 6,
+      "slot": 2,
+      "name": "Werkstatt 2",
+      "created_at": "2026-03-12T21:55:05.364Z"
+    },
+    {
+      "id": 48,
+      "standort_id": 6,
+      "slot": 3,
+      "name": "Werkstatt 3",
+      "created_at": "2026-03-12T21:55:05.364Z"
+    },
+    {
+      "id": 49,
+      "standort_id": 6,
+      "slot": 4,
+      "name": "Werkstatt 4",
+      "created_at": "2026-03-12T21:55:05.364Z"
+    },
+    {
+      "id": 50,
+      "standort_id": 6,
+      "slot": 5,
+      "name": "Werkstatt 5",
+      "created_at": "2026-03-12T21:55:05.364Z"
+    },
+    {
+      "id": 51,
+      "standort_id": 6,
+      "slot": 6,
+      "name": "Werkstatt 6",
+      "created_at": "2026-03-12T21:55:05.364Z"
+    },
+    {
+      "id": 52,
+      "standort_id": 6,
+      "slot": 7,
+      "name": "Werkstatt 7",
+      "created_at": "2026-03-12T21:55:05.364Z"
+    },
+    {
+      "id": 53,
+      "standort_id": 6,
+      "slot": 8,
+      "name": "Werkstatt 8",
+      "created_at": "2026-03-12T21:55:05.364Z"
+    },
+    {
+      "id": 54,
+      "standort_id": 6,
+      "slot": 9,
+      "name": "Werkstatt 9",
+      "created_at": "2026-03-12T21:55:05.364Z"
+    },
+    {
+      "id": 55,
+      "standort_id": 7,
+      "slot": 1,
+      "name": "Werkstatt 1",
+      "created_at": "2026-03-12T21:55:05.364Z"
+    },
+    {
+      "id": 56,
+      "standort_id": 7,
+      "slot": 2,
+      "name": "Werkstatt 2",
+      "created_at": "2026-03-12T21:55:05.364Z"
+    },
+    {
+      "id": 57,
+      "standort_id": 7,
+      "slot": 3,
+      "name": "Werkstatt 3",
+      "created_at": "2026-03-12T21:55:05.364Z"
+    },
+    {
+      "id": 58,
+      "standort_id": 7,
+      "slot": 4,
+      "name": "Werkstatt 4",
+      "created_at": "2026-03-12T21:55:05.364Z"
+    },
+    {
+      "id": 59,
+      "standort_id": 7,
+      "slot": 5,
+      "name": "Werkstatt 5",
+      "created_at": "2026-03-12T21:55:05.364Z"
+    },
+    {
+      "id": 60,
+      "standort_id": 7,
+      "slot": 6,
+      "name": "Werkstatt 6",
+      "created_at": "2026-03-12T21:55:05.364Z"
+    },
+    {
+      "id": 61,
+      "standort_id": 7,
+      "slot": 7,
+      "name": "Werkstatt 7",
+      "created_at": "2026-03-12T21:55:05.364Z"
+    },
+    {
+      "id": 62,
+      "standort_id": 7,
+      "slot": 8,
+      "name": "Werkstatt 8",
+      "created_at": "2026-03-12T21:55:05.364Z"
+    },
+    {
+      "id": 63,
+      "standort_id": 7,
+      "slot": 9,
+      "name": "Werkstatt 9",
+      "created_at": "2026-03-12T21:55:05.364Z"
+    },
+    {
+      "id": 64,
+      "standort_id": 8,
+      "slot": 1,
+      "name": "Werkstatt 1",
+      "created_at": "2026-03-12T21:55:05.364Z"
+    },
+    {
+      "id": 65,
+      "standort_id": 8,
+      "slot": 2,
+      "name": "Werkstatt 2",
+      "created_at": "2026-03-12T21:55:05.364Z"
+    },
+    {
+      "id": 66,
+      "standort_id": 8,
+      "slot": 3,
+      "name": "Werkstatt 3",
+      "created_at": "2026-03-12T21:55:05.364Z"
+    },
+    {
+      "id": 67,
+      "standort_id": 8,
+      "slot": 4,
+      "name": "Werkstatt 4",
+      "created_at": "2026-03-12T21:55:05.364Z"
+    },
+    {
+      "id": 68,
+      "standort_id": 8,
+      "slot": 5,
+      "name": "Werkstatt 5",
+      "created_at": "2026-03-12T21:55:05.364Z"
+    },
+    {
+      "id": 69,
+      "standort_id": 8,
+      "slot": 6,
+      "name": "Werkstatt 6",
+      "created_at": "2026-03-12T21:55:05.364Z"
+    },
+    {
+      "id": 70,
+      "standort_id": 8,
+      "slot": 7,
+      "name": "Werkstatt 7",
+      "created_at": "2026-03-12T21:55:05.364Z"
+    },
+    {
+      "id": 71,
+      "standort_id": 8,
+      "slot": 8,
+      "name": "Werkstatt 8",
+      "created_at": "2026-03-12T21:55:05.364Z"
+    },
+    {
+      "id": 72,
+      "standort_id": 8,
+      "slot": 9,
+      "name": "Werkstatt 9",
+      "created_at": "2026-03-12T21:55:05.364Z"
+    },
+    {
+      "id": 73,
+      "standort_id": 9,
+      "slot": 1,
+      "name": "Werkstatt 1",
+      "created_at": "2026-03-12T21:55:05.364Z"
+    },
+    {
+      "id": 74,
+      "standort_id": 9,
+      "slot": 2,
+      "name": "Werkstatt 2",
+      "created_at": "2026-03-12T21:55:05.364Z"
+    },
+    {
+      "id": 75,
+      "standort_id": 9,
+      "slot": 3,
+      "name": "Werkstatt 3",
+      "created_at": "2026-03-12T21:55:05.364Z"
+    },
+    {
+      "id": 76,
+      "standort_id": 9,
+      "slot": 4,
+      "name": "Werkstatt 4",
+      "created_at": "2026-03-12T21:55:05.364Z"
+    },
+    {
+      "id": 77,
+      "standort_id": 9,
+      "slot": 5,
+      "name": "Werkstatt 5",
+      "created_at": "2026-03-12T21:55:05.364Z"
+    },
+    {
+      "id": 78,
+      "standort_id": 9,
+      "slot": 6,
+      "name": "Werkstatt 6",
+      "created_at": "2026-03-12T21:55:05.364Z"
+    },
+    {
+      "id": 79,
+      "standort_id": 9,
+      "slot": 7,
+      "name": "Werkstatt 7",
+      "created_at": "2026-03-12T21:55:05.364Z"
+    },
+    {
+      "id": 80,
+      "standort_id": 9,
+      "slot": 8,
+      "name": "Werkstatt 8",
+      "created_at": "2026-03-12T21:55:05.364Z"
+    },
+    {
+      "id": 81,
+      "standort_id": 9,
+      "slot": 9,
+      "name": "Werkstatt 9",
+      "created_at": "2026-03-12T21:55:05.364Z"
+    },
+    {
+      "id": 82,
+      "standort_id": 10,
+      "slot": 1,
+      "name": "Werkstatt 1",
+      "created_at": "2026-03-12T21:55:05.364Z"
+    },
+    {
+      "id": 83,
+      "standort_id": 10,
+      "slot": 2,
+      "name": "Werkstatt 2",
+      "created_at": "2026-03-12T21:55:05.364Z"
+    },
+    {
+      "id": 84,
+      "standort_id": 10,
+      "slot": 3,
+      "name": "Werkstatt 3",
+      "created_at": "2026-03-12T21:55:05.364Z"
+    },
+    {
+      "id": 85,
+      "standort_id": 10,
+      "slot": 4,
+      "name": "Werkstatt 4",
+      "created_at": "2026-03-12T21:55:05.364Z"
+    },
+    {
+      "id": 86,
+      "standort_id": 10,
+      "slot": 5,
+      "name": "Werkstatt 5",
+      "created_at": "2026-03-12T21:55:05.364Z"
+    },
+    {
+      "id": 87,
+      "standort_id": 10,
+      "slot": 6,
+      "name": "Werkstatt 6",
+      "created_at": "2026-03-12T21:55:05.364Z"
+    },
+    {
+      "id": 88,
+      "standort_id": 10,
+      "slot": 7,
+      "name": "Werkstatt 7",
+      "created_at": "2026-03-12T21:55:05.364Z"
+    },
+    {
+      "id": 89,
+      "standort_id": 10,
+      "slot": 8,
+      "name": "Werkstatt 8",
+      "created_at": "2026-03-12T21:55:05.364Z"
+    },
+    {
+      "id": 90,
+      "standort_id": 10,
+      "slot": 9,
+      "name": "Werkstatt 9",
+      "created_at": "2026-03-12T21:55:05.364Z"
+    },
+    {
+      "id": 91,
+      "standort_id": 11,
+      "slot": 1,
+      "name": "Werkstatt 1",
+      "created_at": "2026-03-12T21:55:05.364Z"
+    },
+    {
+      "id": 92,
+      "standort_id": 11,
+      "slot": 2,
+      "name": "Werkstatt 2",
+      "created_at": "2026-03-12T21:55:05.364Z"
+    },
+    {
+      "id": 93,
+      "standort_id": 11,
+      "slot": 3,
+      "name": "Werkstatt 3",
+      "created_at": "2026-03-12T21:55:05.364Z"
+    },
+    {
+      "id": 94,
+      "standort_id": 11,
+      "slot": 4,
+      "name": "Werkstatt 4",
+      "created_at": "2026-03-12T21:55:05.364Z"
+    },
+    {
+      "id": 95,
+      "standort_id": 11,
+      "slot": 5,
+      "name": "Werkstatt 5",
+      "created_at": "2026-03-12T21:55:05.364Z"
+    },
+    {
+      "id": 96,
+      "standort_id": 11,
+      "slot": 6,
+      "name": "Werkstatt 6",
+      "created_at": "2026-03-12T21:55:05.364Z"
+    },
+    {
+      "id": 97,
+      "standort_id": 11,
+      "slot": 7,
+      "name": "Werkstatt 7",
+      "created_at": "2026-03-12T21:55:05.364Z"
+    },
+    {
+      "id": 98,
+      "standort_id": 11,
+      "slot": 8,
+      "name": "Werkstatt 8",
+      "created_at": "2026-03-12T21:55:05.364Z"
+    },
+    {
+      "id": 99,
+      "standort_id": 11,
+      "slot": 9,
+      "name": "Werkstatt 9",
+      "created_at": "2026-03-12T21:55:05.364Z"
+    },
+    {
+      "id": 100,
+      "standort_id": 12,
+      "slot": 1,
+      "name": "Werkstatt 1",
+      "created_at": "2026-03-12T21:55:05.364Z"
+    },
+    {
+      "id": 101,
+      "standort_id": 12,
+      "slot": 2,
+      "name": "Werkstatt 2",
+      "created_at": "2026-03-12T21:55:05.364Z"
+    },
+    {
+      "id": 102,
+      "standort_id": 12,
+      "slot": 3,
+      "name": "Werkstatt 3",
+      "created_at": "2026-03-12T21:55:05.364Z"
+    },
+    {
+      "id": 103,
+      "standort_id": 12,
+      "slot": 4,
+      "name": "Werkstatt 4",
+      "created_at": "2026-03-12T21:55:05.364Z"
+    },
+    {
+      "id": 104,
+      "standort_id": 12,
+      "slot": 5,
+      "name": "Werkstatt 5",
+      "created_at": "2026-03-12T21:55:05.364Z"
+    },
+    {
+      "id": 105,
+      "standort_id": 12,
+      "slot": 6,
+      "name": "Werkstatt 6",
+      "created_at": "2026-03-12T21:55:05.364Z"
+    },
+    {
+      "id": 106,
+      "standort_id": 12,
+      "slot": 7,
+      "name": "Werkstatt 7",
+      "created_at": "2026-03-12T21:55:05.364Z"
+    },
+    {
+      "id": 107,
+      "standort_id": 12,
+      "slot": 8,
+      "name": "Werkstatt 8",
+      "created_at": "2026-03-12T21:55:05.364Z"
+    },
+    {
+      "id": 108,
+      "standort_id": 12,
+      "slot": 9,
+      "name": "Werkstatt 9",
+      "created_at": "2026-03-12T21:55:05.364Z"
+    },
+    {
+      "id": 109,
+      "standort_id": 13,
+      "slot": 1,
+      "name": "Werkstatt 1",
+      "created_at": "2026-03-12T21:55:05.364Z"
+    },
+    {
+      "id": 110,
+      "standort_id": 13,
+      "slot": 2,
+      "name": "Werkstatt 2",
+      "created_at": "2026-03-12T21:55:05.364Z"
+    },
+    {
+      "id": 111,
+      "standort_id": 13,
+      "slot": 3,
+      "name": "Werkstatt 3",
+      "created_at": "2026-03-12T21:55:05.364Z"
+    },
+    {
+      "id": 112,
+      "standort_id": 13,
+      "slot": 4,
+      "name": "Werkstatt 4",
+      "created_at": "2026-03-12T21:55:05.364Z"
+    },
+    {
+      "id": 113,
+      "standort_id": 13,
+      "slot": 5,
+      "name": "Werkstatt 5",
+      "created_at": "2026-03-12T21:55:05.364Z"
+    },
+    {
+      "id": 114,
+      "standort_id": 13,
+      "slot": 6,
+      "name": "Werkstatt 6",
+      "created_at": "2026-03-12T21:55:05.364Z"
+    },
+    {
+      "id": 115,
+      "standort_id": 13,
+      "slot": 7,
+      "name": "Werkstatt 7",
+      "created_at": "2026-03-12T21:55:05.364Z"
+    },
+    {
+      "id": 116,
+      "standort_id": 13,
+      "slot": 8,
+      "name": "Werkstatt 8",
+      "created_at": "2026-03-12T21:55:05.364Z"
+    },
+    {
+      "id": 117,
+      "standort_id": 13,
+      "slot": 9,
+      "name": "Werkstatt 9",
+      "created_at": "2026-03-12T21:55:05.364Z"
+    },
+    {
+      "id": 118,
+      "standort_id": 14,
+      "slot": 1,
+      "name": "Werkstatt 1",
+      "created_at": "2026-03-12T21:55:05.364Z"
+    },
+    {
+      "id": 119,
+      "standort_id": 14,
+      "slot": 2,
+      "name": "Werkstatt 2",
+      "created_at": "2026-03-12T21:55:05.364Z"
+    },
+    {
+      "id": 120,
+      "standort_id": 14,
+      "slot": 3,
+      "name": "Werkstatt 3",
+      "created_at": "2026-03-12T21:55:05.364Z"
+    },
+    {
+      "id": 121,
+      "standort_id": 14,
+      "slot": 4,
+      "name": "Werkstatt 4",
+      "created_at": "2026-03-12T21:55:05.364Z"
+    },
+    {
+      "id": 122,
+      "standort_id": 14,
+      "slot": 5,
+      "name": "Werkstatt 5",
+      "created_at": "2026-03-12T21:55:05.364Z"
+    },
+    {
+      "id": 123,
+      "standort_id": 14,
+      "slot": 6,
+      "name": "Werkstatt 6",
+      "created_at": "2026-03-12T21:55:05.364Z"
+    },
+    {
+      "id": 124,
+      "standort_id": 14,
+      "slot": 7,
+      "name": "Werkstatt 7",
+      "created_at": "2026-03-12T21:55:05.364Z"
+    },
+    {
+      "id": 125,
+      "standort_id": 14,
+      "slot": 8,
+      "name": "Werkstatt 8",
+      "created_at": "2026-03-12T21:55:05.364Z"
+    },
+    {
+      "id": 126,
+      "standort_id": 14,
+      "slot": 9,
+      "name": "Werkstatt 9",
+      "created_at": "2026-03-12T21:55:05.364Z"
+    },
+    {
+      "id": 127,
+      "standort_id": 15,
+      "slot": 1,
+      "name": "Werkstatt 1",
+      "created_at": "2026-03-12T21:55:05.364Z"
+    },
+    {
+      "id": 128,
+      "standort_id": 15,
+      "slot": 2,
+      "name": "Werkstatt 2",
+      "created_at": "2026-03-12T21:55:05.364Z"
+    },
+    {
+      "id": 129,
+      "standort_id": 15,
+      "slot": 3,
+      "name": "Werkstatt 3",
+      "created_at": "2026-03-12T21:55:05.364Z"
+    },
+    {
+      "id": 130,
+      "standort_id": 15,
+      "slot": 4,
+      "name": "Werkstatt 4",
+      "created_at": "2026-03-12T21:55:05.364Z"
+    },
+    {
+      "id": 131,
+      "standort_id": 15,
+      "slot": 5,
+      "name": "Werkstatt 5",
+      "created_at": "2026-03-12T21:55:05.364Z"
+    },
+    {
+      "id": 132,
+      "standort_id": 15,
+      "slot": 6,
+      "name": "Werkstatt 6",
+      "created_at": "2026-03-12T21:55:05.364Z"
+    },
+    {
+      "id": 133,
+      "standort_id": 15,
+      "slot": 7,
+      "name": "Werkstatt 7",
+      "created_at": "2026-03-12T21:55:05.364Z"
+    },
+    {
+      "id": 134,
+      "standort_id": 15,
+      "slot": 8,
+      "name": "Werkstatt 8",
+      "created_at": "2026-03-12T21:55:05.364Z"
+    },
+    {
+      "id": 135,
+      "standort_id": 15,
+      "slot": 9,
+      "name": "Werkstatt 9",
+      "created_at": "2026-03-12T21:55:05.364Z"
+    },
+    {
+      "id": 136,
+      "standort_id": 16,
+      "slot": 1,
+      "name": "Werkstatt 1",
+      "created_at": "2026-03-12T21:55:05.364Z"
+    },
+    {
+      "id": 137,
+      "standort_id": 16,
+      "slot": 2,
+      "name": "Werkstatt 2",
+      "created_at": "2026-03-12T21:55:05.364Z"
+    },
+    {
+      "id": 138,
+      "standort_id": 16,
+      "slot": 3,
+      "name": "Werkstatt 3",
+      "created_at": "2026-03-12T21:55:05.364Z"
+    },
+    {
+      "id": 139,
+      "standort_id": 16,
+      "slot": 4,
+      "name": "Werkstatt 4",
+      "created_at": "2026-03-12T21:55:05.364Z"
+    },
+    {
+      "id": 140,
+      "standort_id": 16,
+      "slot": 5,
+      "name": "Werkstatt 5",
+      "created_at": "2026-03-12T21:55:05.364Z"
+    },
+    {
+      "id": 141,
+      "standort_id": 16,
+      "slot": 6,
+      "name": "Werkstatt 6",
+      "created_at": "2026-03-12T21:55:05.364Z"
+    },
+    {
+      "id": 142,
+      "standort_id": 16,
+      "slot": 7,
+      "name": "Werkstatt 7",
+      "created_at": "2026-03-12T21:55:05.364Z"
+    },
+    {
+      "id": 143,
+      "standort_id": 16,
+      "slot": 8,
+      "name": "Werkstatt 8",
+      "created_at": "2026-03-12T21:55:05.364Z"
+    },
+    {
+      "id": 144,
+      "standort_id": 16,
+      "slot": 9,
+      "name": "Werkstatt 9",
+      "created_at": "2026-03-12T21:55:05.364Z"
+    },
+    {
+      "id": 145,
+      "standort_id": 17,
+      "slot": 1,
+      "name": "Werkstatt 1",
+      "created_at": "2026-03-12T21:55:05.364Z"
+    },
+    {
+      "id": 146,
+      "standort_id": 17,
+      "slot": 2,
+      "name": "Werkstatt 2",
+      "created_at": "2026-03-12T21:55:05.364Z"
+    },
+    {
+      "id": 147,
+      "standort_id": 17,
+      "slot": 3,
+      "name": "Werkstatt 3",
+      "created_at": "2026-03-12T21:55:05.364Z"
+    },
+    {
+      "id": 148,
+      "standort_id": 17,
+      "slot": 4,
+      "name": "Werkstatt 4",
+      "created_at": "2026-03-12T21:55:05.364Z"
+    },
+    {
+      "id": 149,
+      "standort_id": 17,
+      "slot": 5,
+      "name": "Werkstatt 5",
+      "created_at": "2026-03-12T21:55:05.364Z"
+    },
+    {
+      "id": 150,
+      "standort_id": 17,
+      "slot": 6,
+      "name": "Werkstatt 6",
+      "created_at": "2026-03-12T21:55:05.364Z"
+    },
+    {
+      "id": 151,
+      "standort_id": 17,
+      "slot": 7,
+      "name": "Werkstatt 7",
+      "created_at": "2026-03-12T21:55:05.364Z"
+    },
+    {
+      "id": 152,
+      "standort_id": 17,
+      "slot": 8,
+      "name": "Werkstatt 8",
+      "created_at": "2026-03-12T21:55:05.364Z"
+    },
+    {
+      "id": 153,
+      "standort_id": 17,
+      "slot": 9,
+      "name": "Werkstatt 9",
+      "created_at": "2026-03-12T21:55:05.364Z"
+    },
+    {
+      "id": 154,
+      "standort_id": 18,
+      "slot": 1,
+      "name": "Werkstatt 1",
+      "created_at": "2026-03-12T21:55:05.364Z"
+    },
+    {
+      "id": 155,
+      "standort_id": 18,
+      "slot": 2,
+      "name": "Werkstatt 2",
+      "created_at": "2026-03-12T21:55:05.364Z"
+    },
+    {
+      "id": 156,
+      "standort_id": 18,
+      "slot": 3,
+      "name": "Werkstatt 3",
+      "created_at": "2026-03-12T21:55:05.364Z"
+    },
+    {
+      "id": 157,
+      "standort_id": 18,
+      "slot": 4,
+      "name": "Werkstatt 4",
+      "created_at": "2026-03-12T21:55:05.364Z"
+    },
+    {
+      "id": 158,
+      "standort_id": 18,
+      "slot": 5,
+      "name": "Werkstatt 5",
+      "created_at": "2026-03-12T21:55:05.364Z"
+    },
+    {
+      "id": 159,
+      "standort_id": 18,
+      "slot": 6,
+      "name": "Werkstatt 6",
+      "created_at": "2026-03-12T21:55:05.364Z"
+    },
+    {
+      "id": 160,
+      "standort_id": 18,
+      "slot": 7,
+      "name": "Werkstatt 7",
+      "created_at": "2026-03-12T21:55:05.364Z"
+    },
+    {
+      "id": 161,
+      "standort_id": 18,
+      "slot": 8,
+      "name": "Werkstatt 8",
+      "created_at": "2026-03-12T21:55:05.364Z"
+    },
+    {
+      "id": 162,
+      "standort_id": 18,
+      "slot": 9,
+      "name": "Werkstatt 9",
+      "created_at": "2026-03-12T21:55:05.364Z"
+    },
+    {
+      "id": 163,
+      "standort_id": 19,
+      "slot": 1,
+      "name": "Werkstatt 1",
+      "created_at": "2026-03-12T21:55:05.364Z"
+    },
+    {
+      "id": 164,
+      "standort_id": 19,
+      "slot": 2,
+      "name": "Werkstatt 2",
+      "created_at": "2026-03-12T21:55:05.364Z"
+    },
+    {
+      "id": 165,
+      "standort_id": 19,
+      "slot": 3,
+      "name": "Werkstatt 3",
+      "created_at": "2026-03-12T21:55:05.364Z"
+    },
+    {
+      "id": 166,
+      "standort_id": 19,
+      "slot": 4,
+      "name": "Werkstatt 4",
+      "created_at": "2026-03-12T21:55:05.364Z"
+    },
+    {
+      "id": 167,
+      "standort_id": 19,
+      "slot": 5,
+      "name": "Werkstatt 5",
+      "created_at": "2026-03-12T21:55:05.364Z"
+    },
+    {
+      "id": 168,
+      "standort_id": 19,
+      "slot": 6,
+      "name": "Werkstatt 6",
+      "created_at": "2026-03-12T21:55:05.364Z"
+    },
+    {
+      "id": 169,
+      "standort_id": 19,
+      "slot": 7,
+      "name": "Werkstatt 7",
+      "created_at": "2026-03-12T21:55:05.364Z"
+    },
+    {
+      "id": 170,
+      "standort_id": 19,
+      "slot": 8,
+      "name": "Werkstatt 8",
+      "created_at": "2026-03-12T21:55:05.364Z"
+    },
+    {
+      "id": 171,
+      "standort_id": 19,
+      "slot": 9,
+      "name": "Werkstatt 9",
+      "created_at": "2026-03-12T21:55:05.364Z"
+    },
+    {
+      "id": 172,
+      "standort_id": 20,
+      "slot": 1,
+      "name": "Werkstatt 1",
+      "created_at": "2026-03-12T21:55:05.364Z"
+    },
+    {
+      "id": 173,
+      "standort_id": 20,
+      "slot": 2,
+      "name": "Werkstatt 2",
+      "created_at": "2026-03-12T21:55:05.364Z"
+    },
+    {
+      "id": 174,
+      "standort_id": 20,
+      "slot": 3,
+      "name": "Werkstatt 3",
+      "created_at": "2026-03-12T21:55:05.364Z"
+    },
+    {
+      "id": 175,
+      "standort_id": 20,
+      "slot": 4,
+      "name": "Werkstatt 4",
+      "created_at": "2026-03-12T21:55:05.364Z"
+    },
+    {
+      "id": 176,
+      "standort_id": 20,
+      "slot": 5,
+      "name": "Werkstatt 5",
+      "created_at": "2026-03-12T21:55:05.364Z"
+    },
+    {
+      "id": 177,
+      "standort_id": 20,
+      "slot": 6,
+      "name": "Werkstatt 6",
+      "created_at": "2026-03-12T21:55:05.364Z"
+    },
+    {
+      "id": 178,
+      "standort_id": 20,
+      "slot": 7,
+      "name": "Werkstatt 7",
+      "created_at": "2026-03-12T21:55:05.364Z"
+    },
+    {
+      "id": 179,
+      "standort_id": 20,
+      "slot": 8,
+      "name": "Werkstatt 8",
+      "created_at": "2026-03-12T21:55:05.364Z"
+    },
+    {
+      "id": 180,
+      "standort_id": 20,
+      "slot": 9,
+      "name": "Werkstatt 9",
+      "created_at": "2026-03-12T21:55:05.364Z"
+    },
+    {
+      "id": 181,
+      "standort_id": 21,
+      "slot": 1,
+      "name": "Werkstatt 1",
+      "created_at": "2026-03-12T21:55:05.364Z"
+    },
+    {
+      "id": 182,
+      "standort_id": 21,
+      "slot": 2,
+      "name": "Werkstatt 2",
+      "created_at": "2026-03-12T21:55:05.364Z"
+    },
+    {
+      "id": 183,
+      "standort_id": 21,
+      "slot": 3,
+      "name": "Werkstatt 3",
+      "created_at": "2026-03-12T21:55:05.364Z"
+    },
+    {
+      "id": 184,
+      "standort_id": 21,
+      "slot": 4,
+      "name": "Werkstatt 4",
+      "created_at": "2026-03-12T21:55:05.364Z"
+    },
+    {
+      "id": 185,
+      "standort_id": 21,
+      "slot": 5,
+      "name": "Werkstatt 5",
+      "created_at": "2026-03-12T21:55:05.364Z"
+    },
+    {
+      "id": 186,
+      "standort_id": 21,
+      "slot": 6,
+      "name": "Werkstatt 6",
+      "created_at": "2026-03-12T21:55:05.364Z"
+    },
+    {
+      "id": 187,
+      "standort_id": 21,
+      "slot": 7,
+      "name": "Werkstatt 7",
+      "created_at": "2026-03-12T21:55:05.364Z"
+    },
+    {
+      "id": 188,
+      "standort_id": 21,
+      "slot": 8,
+      "name": "Werkstatt 8",
+      "created_at": "2026-03-12T21:55:05.364Z"
+    },
+    {
+      "id": 189,
+      "standort_id": 21,
+      "slot": 9,
+      "name": "Werkstatt 9",
+      "created_at": "2026-03-12T21:55:05.364Z"
+    }
+  ],
+  "werkstatt": [
+    {
+      "id": 1,
+      "fahrzeug_id": 6,
+      "workshop_slot": 1,
+      "werkstatt_name": "Werkstatt 1",
+      "positionsnummer": "",
+      "problem": "Bremsen ",
+      "pruefzeichen": "ok",
+      "status_datum": "2026-02-27",
+      "datum_von": "2026-02-26",
+      "datum_bis": "2026-03-08",
+      "tage": 11,
+      "beschreibung": null,
+      "status": "abgeschlossen",
+      "created_at": "2026-03-11T15:16:04.738Z"
+    },
+    {
+      "id": 2,
+      "fahrzeug_id": 6,
+      "workshop_slot": 1,
+      "werkstatt_name": "Werkstatt 1",
+      "positionsnummer": "",
+      "problem": "Bremsen ",
+      "pruefzeichen": "ok",
+      "status_datum": "2026-03-08",
+      "datum_von": "2026-03-08",
+      "datum_bis": "2026-03-08",
+      "tage": 1,
+      "beschreibung": null,
+      "status": "abgeschlossen",
+      "created_at": "2026-03-11T16:06:08.923Z"
+    },
+    {
+      "id": 3,
+      "fahrzeug_id": 6,
+      "workshop_slot": 1,
+      "werkstatt_name": "Werkstatt 1",
+      "positionsnummer": "",
+      "problem": "Bremsen ",
+      "pruefzeichen": "ok",
+      "status_datum": "2026-02-20",
+      "datum_von": "2026-03-08",
+      "datum_bis": "2026-03-08",
+      "tage": 1,
+      "beschreibung": null,
+      "status": "abgeschlossen",
+      "created_at": "2026-03-11T16:20:12.192Z"
+    },
+    {
+      "id": 4,
+      "fahrzeug_id": 7,
+      "workshop_slot": 1,
+      "werkstatt_name": "Werkstatt 1",
+      "positionsnummer": "197",
+      "problem": "Adblue",
+      "pruefzeichen": "ok",
+      "status_datum": "2026-03-06",
+      "datum_von": "2026-03-06",
+      "datum_bis": "2026-03-08",
+      "tage": 3,
+      "beschreibung": "Adblue Fehler ",
+      "status": "abgeschlossen",
+      "created_at": "2026-03-11T16:47:30.392Z"
+    },
+    {
+      "id": 5,
+      "fahrzeug_id": 6,
+      "workshop_slot": 1,
+      "werkstatt_name": "Werkstatt 1",
+      "positionsnummer": "198",
+      "problem": "Bremsen ",
+      "pruefzeichen": "nein",
+      "status_datum": "2026-02-27",
+      "datum_von": "2026-02-26",
+      "datum_bis": "2026-03-08",
+      "tage": 11,
+      "beschreibung": "Getriebe",
+      "status": "abgeschlossen",
+      "created_at": "2026-03-11T17:48:04.995Z"
+    }
+  ],
+  "schaeden": [
+    {
+      "id": 1,
+      "fahrzeug_id": 3,
+      "fahrer_name": "",
+      "fahrer_telefon": "",
+      "beschreibung": "Frontschaden nach Parkrempler",
+      "unfallgegner_name": "Max Mustermann",
+      "unfallgegner_kennzeichen": "M-AB-1234",
+      "versicherung": "Allianz",
+      "telefon": "01701234567",
+      "foto": null,
+      "datum": "2026-03-06",
+      "status": "in_pruefung",
+      "polizei_vor_ort": "nein",
+      "verletzte": "nein",
+      "vu_nummer": "",
+      "created_by": 1,
+      "created_at": "2026-03-11T13:39:00.771Z"
+    },
+    {
+      "id": 2,
+      "fahrzeug_id": 6,
+      "fahrer_name": "",
+      "fahrer_telefon": "",
+      "beschreibung": "test",
+      "unfallgegner_name": "müller",
+      "unfallgegner_kennzeichen": "OF-TE 12345",
+      "versicherung": "keine ",
+      "telefon": "keine ",
+      "foto": "/uploads/1773243609101_ChatGPT_Image_11._M__rz_2026__14_21_29.png",
+      "datum": "2026-03-08",
+      "status": "abgeschlossen",
+      "polizei_vor_ort": "nein",
+      "verletzte": "nein",
+      "vu_nummer": "",
+      "created_by": 4,
+      "created_at": "2026-03-11T15:40:09.096Z"
+    },
+    {
+      "id": 3,
+      "fahrzeug_id": 7,
+      "fahrer_name": "",
+      "fahrer_telefon": "",
+      "beschreibung": null,
+      "unfallgegner_name": "müller",
+      "unfallgegner_kennzeichen": "OF-TE 12345",
+      "versicherung": "keine ",
+      "telefon": "keine ",
+      "foto": null,
+      "datum": "2026-03-08",
+      "status": "abgeschlossen",
+      "polizei_vor_ort": "nein",
+      "verletzte": "nein",
+      "vu_nummer": "",
+      "created_by": 4,
+      "created_at": "2026-03-11T17:00:59.669Z"
+    },
+    {
+      "id": 4,
+      "fahrzeug_id": 6,
+      "fahrer_name": "nusterman",
+      "fahrer_telefon": "123456789",
+      "beschreibung": "test",
+      "unfallgegner_name": "müller",
+      "unfallgegner_kennzeichen": "OF-TE 12345",
+      "versicherung": "keine ",
+      "telefon": null,
+      "foto": null,
+      "datum": "2026-03-08",
+      "status": "abgeschlossen",
+      "polizei_vor_ort": "ja",
+      "verletzte": "nein",
+      "vu_nummer": "keine ",
+      "created_by": 4,
+      "created_at": "2026-03-11T17:32:10.618Z"
+    }
+  ],
+  "uvv_pruefungen": [
+    {
+      "id": 1,
+      "fahrzeug_id": 6,
+      "pruefer": "Michael Weber",
+      "datum": "2026-03-08",
+      "naechste_pruefung_datum": "2027-02-26",
+      "kommentar": null,
+      "created_at": "2026-03-11T15:32:28.213Z"
+    }
+  ],
+  "uvv_checkpunkte": [
+    {
+      "id": 1,
+      "uvv_pruefung_id": 1,
+      "punkt_nr": 1,
+      "punkt_name": "Beleuchtung",
+      "status": "ok",
+      "kommentar": null
+    },
+    {
+      "id": 2,
+      "uvv_pruefung_id": 1,
+      "punkt_nr": 2,
+      "punkt_name": "Scheibenwischer",
+      "status": "ok",
+      "kommentar": null
+    },
+    {
+      "id": 3,
+      "uvv_pruefung_id": 1,
+      "punkt_nr": 3,
+      "punkt_name": "Spiegel",
+      "status": "ok",
+      "kommentar": null
+    },
+    {
+      "id": 4,
+      "uvv_pruefung_id": 1,
+      "punkt_nr": 4,
+      "punkt_name": "Hupe",
+      "status": "ok",
+      "kommentar": null
+    },
+    {
+      "id": 5,
+      "uvv_pruefung_id": 1,
+      "punkt_nr": 5,
+      "punkt_name": "Bremsen",
+      "status": "ok",
+      "kommentar": null
+    },
+    {
+      "id": 6,
+      "uvv_pruefung_id": 1,
+      "punkt_nr": 6,
+      "punkt_name": "Lenkung",
+      "status": "ok",
+      "kommentar": null
+    },
+    {
+      "id": 7,
+      "uvv_pruefung_id": 1,
+      "punkt_nr": 7,
+      "punkt_name": "Reifen",
+      "status": "ok",
+      "kommentar": null
+    },
+    {
+      "id": 8,
+      "uvv_pruefung_id": 1,
+      "punkt_nr": 8,
+      "punkt_name": "Reifendruck",
+      "status": "ok",
+      "kommentar": null
+    },
+    {
+      "id": 9,
+      "uvv_pruefung_id": 1,
+      "punkt_nr": 9,
+      "punkt_name": "Radmuttern",
+      "status": "ok",
+      "kommentar": null
+    },
+    {
+      "id": 10,
+      "uvv_pruefung_id": 1,
+      "punkt_nr": 10,
+      "punkt_name": "Sitze",
+      "status": "ok",
+      "kommentar": null
+    },
+    {
+      "id": 11,
+      "uvv_pruefung_id": 1,
+      "punkt_nr": 11,
+      "punkt_name": "Sicherheitsgurte",
+      "status": "ok",
+      "kommentar": null
+    },
+    {
+      "id": 12,
+      "uvv_pruefung_id": 1,
+      "punkt_nr": 12,
+      "punkt_name": "Heizung",
+      "status": "ok",
+      "kommentar": null
+    },
+    {
+      "id": 13,
+      "uvv_pruefung_id": 1,
+      "punkt_nr": 13,
+      "punkt_name": "Aufbauten",
+      "status": "ok",
+      "kommentar": null
+    },
+    {
+      "id": 14,
+      "uvv_pruefung_id": 1,
+      "punkt_nr": 14,
+      "punkt_name": "Abgasanlage",
+      "status": "ok",
+      "kommentar": null
+    },
+    {
+      "id": 15,
+      "uvv_pruefung_id": 1,
+      "punkt_nr": 15,
+      "punkt_name": "Warnweste",
+      "status": "ok",
+      "kommentar": null
+    },
+    {
+      "id": 16,
+      "uvv_pruefung_id": 1,
+      "punkt_nr": 16,
+      "punkt_name": "Verbandskasten",
+      "status": "ok",
+      "kommentar": null
+    },
+    {
+      "id": 17,
+      "uvv_pruefung_id": 1,
+      "punkt_nr": 17,
+      "punkt_name": "Ladungssicherung",
+      "status": "ok",
+      "kommentar": null
+    },
+    {
+      "id": 18,
+      "uvv_pruefung_id": 1,
+      "punkt_nr": 18,
+      "punkt_name": "Schloesser",
+      "status": "ok",
+      "kommentar": null
+    },
+    {
+      "id": 19,
+      "uvv_pruefung_id": 1,
+      "punkt_nr": 19,
+      "punkt_name": "Einbauten",
+      "status": "ok",
+      "kommentar": null
+    },
+    {
+      "id": 20,
+      "uvv_pruefung_id": 1,
+      "punkt_nr": 20,
+      "punkt_name": "Betriebsanleitung",
+      "status": "ok",
+      "kommentar": null
+    }
+  ]
+}
