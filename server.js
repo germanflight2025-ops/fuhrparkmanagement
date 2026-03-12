@@ -206,6 +206,10 @@ function workshopDays(datumVon, datumBis) {
 }
 
 
+function workshopAreaName(data, standortId, slot) {
+  return (data.workshop_bereiche || []).find((item) => Number(item.standort_id) === Number(standortId) && Number(item.slot) === Number(slot))?.name || `Werkstatt ${slot}`;
+}
+
 function nextWorkshopNumber(items) {
   const numbers = items
     .map((item) => String(item.positionsnummer || '').trim())
