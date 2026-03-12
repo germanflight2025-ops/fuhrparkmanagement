@@ -758,7 +758,8 @@ async function handleWorkshopSubmit(event) {
   event.preventDefault();
   try {
     const isEditing = Boolean(state.editWorkshopId);
-    const payload = Object.fromEntries(new FormData(event.target));
+      const draftWorkshop = currentWorkshopDraft();
+      const payload = Object.fromEntries(new FormData(event.target));
     payload.workshop_slot = Number(draftWorkshop.workshop_slot || 1) || 1;
     payload.werkstatt_name = String(payload.werkstatt_name || '').trim() || draftWorkshop.werkstatt_name || 'Werkstatt';
     if (!payload.fahrzeug_id || !payload.datum_von) throw new Error('Fahrzeug und Von Datum sind Pflichtfelder.');
