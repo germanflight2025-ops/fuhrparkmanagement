@@ -11,7 +11,8 @@
   benutzer: [],
   editUserId: null,
   editVehicleId: null,
-  editWorkshopId: null
+  editWorkshopId: null,
+  editingWorkshopAreaId: null
 };
 
 const el = (id) => document.getElementById(id);
@@ -535,10 +536,12 @@ function renderWorkshopTile(area, entries) {
     <section class="workshop-tile">
       <div class="workshop-tile-head">
         <div>
-          <span class="workshop-tile-kicker">Werkstatt ${area.slot}</span>
-          <input class="workshop-area-input" data-action="workshop-area-name" data-id="${area.id}" value="${area.name || `Werkstatt ${area.slot}`}" placeholder="Werkstattname">
+          ${String(state.editingWorkshopAreaId) === String(area.id) ? `<input class="workshop-area-input" data-action="workshop-area-name" data-id="${area.id}" value="${area.name || `Werkstatt ${area.slot}`}" placeholder="Werkstattname">` : `<strong class="workshop-area-title">${area.name || `Werkstatt ${area.slot}`}</strong>`}
+          <span class="workshop-tile-kicker">Bereich: Werkstatt ${area.slot}</span>
         </div>
-        <button class="icon-btn" data-action="workshop-area-save" data-id="${area.id}" title="Werkstattname speichern">&#10010;</button>
+        <div class="action-row">
+          ${String(state.editingWorkshopAreaId) === String(area.id) ? `<button class="icon-btn workshop-head-btn" data-action="workshop-area-save" data-id="${area.id}" title="Werkstattname speichern">&#10003;</button><button class="icon-btn secondary workshop-head-btn" data-action="workshop-area-cancel" data-id="${area.id}" title="Abbrechen">&#10005;</button>` : `<button class="icon-btn workshop-edit-btn" data-action="workshop-area-edit" data-id="${area.id}" title="Werkstattname bearbeiten">&#9998;</button>`}
+        </div>
       </div>
       <div class="workshop-tile-stats">
         <span>${entries.length} Auftraege</span>
@@ -956,11 +959,26 @@ async function bindInlineActions() {
       await refreshApp();
     };
   });
+  document.querySelectorAll('[data-action="workshop-area-edit"]').forEach((node) => {
+    node.onclick = async () => {
+      state.editingWorkshopAreaId = node.dataset.id;
+      renderLists();
+      bindInlineActions();
+    };
+  });
+  document.querySelectorAll('[data-action="workshop-area-cancel"]').forEach((node) => {
+    node.onclick = async () => {
+      state.editingWorkshopAreaId = null;
+      renderLists();
+      bindInlineActions();
+    };
+  });
   document.querySelectorAll('[data-action="workshop-area-save"]').forEach((node) => {
     node.onclick = async () => {
       const input = document.querySelector(`[data-action="workshop-area-name"][data-id="${node.dataset.id}"]`);
       if (!input || !node.dataset.id) return;
       await api(`/api/werkstatt-bereiche/${node.dataset.id}`, { method: 'PUT', body: JSON.stringify({ name: input.value }) });
+      state.editingWorkshopAreaId = null;
       await refreshApp();
       renderForms();
       bindDynamicForms();
