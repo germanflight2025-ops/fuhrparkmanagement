@@ -283,7 +283,7 @@ function currentUserDraft() {
       rolle: 'benutzer',
       standort_id: activeLocationId(),
       aktiv: 1,
-      passwort: 'Passwort123!'
+      passwort: ''
     };
   }
   const user = state.benutzer.find((entry) => String(entry.id) === String(state.editUserId));
@@ -447,13 +447,13 @@ function renderForms() {
     <label>Benutzername<input name="benutzername" required placeholder="z. B. mweber" value="${draftUser.benutzername}"></label>
     <label>Name<input name="name" required placeholder="Vor- und Nachname" value="${draftUser.name}"></label>
     <label>E-Mail<input name="email" type="email" required placeholder="name@firma.de" value="${draftUser.email}"></label>
-    <label>${isEditingUser ? 'Neues Passwort' : 'Passwort'}<input name="passwort" type="text" ${isEditingUser ? '' : 'required'} value="${draftUser.passwort}" placeholder="${isEditingUser ? 'leer = unveraendert' : 'Passwort123!'}"></label>
+    <label>${isEditingUser ? 'Neues Passwort' : 'Passwort'}<input name="passwort" type="text" ${isEditingUser ? '' : 'required'} value="${draftUser.passwort}" placeholder="${isEditingUser ? 'leer = unveraendert' : 'Mindestens 8 Zeichen, Gross- und Kleinbuchstabe, Zahl'}"></label>
     <div class="two-col">
       <label>Rolle<select name="rolle"><option value="admin" ${draftUser.rolle === 'admin' ? 'selected' : ''}>admin</option><option value="benutzer" ${draftUser.rolle === 'benutzer' ? 'selected' : ''}>benutzer</option>${state.user?.rolle === 'hauptadmin' ? `<option value="hauptadmin" ${draftUser.rolle === 'hauptadmin' ? 'selected' : ''}>hauptadmin</option>` : ''}</select></label>
       <label>Standort<select name="standort_id" ${state.user?.rolle !== 'hauptadmin' ? 'disabled' : ''}>${state.meta.standorte.map((s) => `<option value="${s.id}" ${String(draftUser.standort_id) === String(s.id) ? 'selected' : ''}>${s.name}</option>`).join('')}</select></label>
     </div>
     <label>Aktiv<select name="aktiv"><option value="1" ${draftUser.aktiv ? 'selected' : ''}>Ja</option><option value="0" ${!draftUser.aktiv ? 'selected' : ''}>Nein</option></select></label>
-    <p id="userFormMessage" class="muted">${isEditingUser ? 'Hier kannst du Name, Rolle, Standort, Aktiv-Status und Passwort aendern.' : 'Hier kannst du neue Benutzer fuer den Standort anlegen.'}</p>
+    <p id="userFormMessage" class="muted">${isEditingUser ? 'Hier kannst du Name, Rolle, Standort, Aktiv-Status und manuell ein neues Passwort setzen.' : 'Hier kannst du neue Benutzer fuer den Standort anlegen. Passwort: mindestens 8 Zeichen, Gross- und Kleinbuchstabe, Zahl.'}</p>
     <button type="submit">${isEditingUser ? 'Aenderungen speichern' : 'Benutzer speichern'}</button>`;
 }
 
