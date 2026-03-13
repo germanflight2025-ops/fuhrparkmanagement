@@ -234,7 +234,8 @@ async function loadFromPostgres() {
     ['werkstatt', 'SELECT * FROM werkstatt ORDER BY id'],
     ['schaeden', 'SELECT * FROM schaeden ORDER BY id'],
     ['uvv_pruefungen', 'SELECT * FROM uvv_pruefungen ORDER BY id'],
-    ['uvv_checkpunkte', 'SELECT * FROM uvv_checkpunkte ORDER BY id']
+    ['uvv_checkpunkte', 'SELECT * FROM uvv_checkpunkte ORDER BY id'],
+    ['aktivitaeten', 'SELECT * FROM aktivitaeten ORDER BY id']
   ];
   const data = {};
   for (const [key, sql] of queries) {
@@ -254,7 +255,7 @@ async function saveToPostgres(data) {
   const client = await pgPool.connect();
   try {
     await client.query('BEGIN');
-    await client.query('TRUNCATE uvv_checkpunkte, uvv_pruefungen, schaeden, werkstatt, werkstatt_bereiche, fahrzeuge, benutzer, standorte RESTART IDENTITY CASCADE');
+    await client.query('TRUNCATE aktivitaeten, uvv_checkpunkte, uvv_pruefungen, schaeden, werkstatt, werkstatt_bereiche, fahrzeuge, benutzer, standorte RESTART IDENTITY CASCADE');
     await insertPgRows(client, 'standorte', ['id', 'name', 'created_at'], data.standorte || []);
     await insertPgRows(client, 'benutzer', ['id', 'benutzername', 'name', 'email', 'passwort_hash', 'rolle', 'standort_id', 'aktiv', 'created_at'], data.benutzer || []);
     await insertPgRows(client, 'fahrzeuge', ['id', 'kennzeichen', 'fahrzeug', 'standort_id', 'status', 'hu_datum', 'uvv_datum', 'fahrzeugschein_pdf', 'created_at'], data.fahrzeuge || []);
@@ -263,6 +264,7 @@ async function saveToPostgres(data) {
     await insertPgRows(client, 'schaeden', ['id', 'fahrzeug_id', 'fahrer_name', 'fahrer_telefon', 'beschreibung', 'unfallgegner_name', 'unfallgegner_kennzeichen', 'versicherung', 'telefon', 'foto', 'datum', 'status', 'polizei_vor_ort', 'verletzte', 'vu_nummer', 'created_by', 'created_at'], data.schaeden || []);
     await insertPgRows(client, 'uvv_pruefungen', ['id', 'fahrzeug_id', 'pruefer', 'datum', 'naechste_pruefung_datum', 'kommentar', 'created_at'], data.uvv_pruefungen || []);
     await insertPgRows(client, 'uvv_checkpunkte', ['id', 'uvv_pruefung_id', 'punkt_nr', 'punkt_name', 'status', 'kommentar'], data.uvv_checkpunkte || []);
+    await insertPgRows(client, 'aktivitaeten', ['id', 'modul', 'aktion', 'details', 'benutzer_id', 'benutzer_name', 'rolle', 'standort_id', 'created_at'], data.aktivitaeten || []);
     await client.query('COMMIT');
   } catch (error) {
     await client.query('ROLLBACK');
@@ -366,6 +368,37 @@ function readDb() {
 
 function locationName(data, id) {
   return data.standorte.find((item) => item.id === id)?.name || '';
+}
+
+function resolveActivityStandortId(data, user, explicitStandortId = null) {
+  if (explicitStandortId) return Number(explicitStandortId) || null;
+  if (user?.rolle === 'hauptadmin') return user.standort_id || findLocationId(data, 'Carlswerk') || null;
+  return user?.standort_id || null;
+}
+
+function logActivity(data, user, modul, aktion, details, explicitStandortId = null) {
+  if (!user || !data) return;
+  const standort_id = resolveActivityStandortId(data, user, explicitStandortId);
+  const row = {
+    id: nextId(data.aktivitaeten || []),
+    modul,
+    aktion,
+    details: String(details || '').trim(),
+    benutzer_id: user.id || null,
+    benutzer_name: user.name || user.benutzername || '',
+    rolle: user.rolle || '',
+    standort_id,
+    created_at: nowIso()
+  };
+  data.aktivitaeten = [row, ...(data.aktivitaeten || [])].slice(0, 500);
+}
+
+function scopedActivities(data, user, req) {
+  const chosen = selectedStandortId(req, user);
+  return (data.aktivitaeten || []).filter((item) => {
+    if (user.rolle === 'hauptadmin') return chosen ? Number(item.standort_id) === Number(chosen) : true;
+    return Number(item.standort_id) === Number(user.standort_id);
+  }).map((item) => ({ ...item, standort: item.standort_id ? locationName(data, item.standort_id) : '-' }));
 }
 
 function selectedStandortId(req, user) {
@@ -1082,6 +1115,7 @@ app.post('/api/import/csv', authRequired, requireRoles('hauptadmin', 'admin'), (
   const records = parse(req.body.csv || '', { delimiter: ';', columns: ['kennzeichen', 'fahrzeug', 'uvv', 'hu', 'standort'], trim: true, skip_empty_lines: true });
   const created = [];
   const errors = [];
+  const importedStandorte = new Set();
   for (const [index, row] of records.entries()) {
     const standort = data.standorte.find((item) => item.name.toLowerCase() === sanitizeLocationName(row.standort).toLowerCase());
     if (!row.kennzeichen || !row.fahrzeug || !standort) {
@@ -1102,6 +1136,11 @@ app.post('/api/import/csv', authRequired, requireRoles('hauptadmin', 'admin'), (
   writeDb(data);
   res.json({ imported: created.length, created, errors });
 });
+app.get('/api/aktivitaeten', authRequired, requireRoles('hauptadmin', 'admin'), (req, res) => {
+  const data = readDb();
+  res.json(scopedActivities(data, req.user, req).slice(0, 100));
+});
+
 app.get('/api/export/csv', authRequired, requireRoles('hauptadmin', 'admin'), (req, res) => {
   const data = readDb();
   const rows = scopedVehicles(data, req.user, req);
@@ -1142,6 +1181,8 @@ start().catch((error) => {
   console.error('Serverstart fehlgeschlagen:', error);
   process.exit(1);
 });
+
+
 
 
 
