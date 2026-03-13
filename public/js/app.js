@@ -612,7 +612,7 @@ function renderLists() {
     { key: 'rolle', label: 'Rolle', render: (v) => `<span class="${badgeClass(v)}">${v}</span>` },
     { key: 'standort', label: 'Standort' },
     { key: 'aktiv', label: 'Aktiv', render: (v) => v ? '<span class="badge ok">Ja</span>' : '<span class="badge danger">Nein</span>' },
-    { key: 'id', label: 'Aktion', render: (v) => canManage ? `<button class="icon-btn" data-action="user-edit" data-id="${v}" title="Benutzer bearbeiten">&#9998;</button>` : '-' }
+    { key: 'id', label: 'Aktion', render: (v, row) => { if (!canManage) return '-'; const edit = `<button class="icon-btn" data-action="user-edit" data-id="${v}" title="Benutzer bearbeiten">&#9998;</button>`; const canDelete = state.user?.rolle === 'hauptadmin' && Number(row.id) !== Number(state.user?.id); const del = canDelete ? `<button class="icon-btn secondary" data-action="user-delete" data-id="${v}" title="Benutzer loeschen">&#128465;</button>` : ''; return `<div class="action-row">${edit}${del}</div>`; } }
   ]);
 
   el('locationsTable').innerHTML = renderTable(state.meta.standorte, [

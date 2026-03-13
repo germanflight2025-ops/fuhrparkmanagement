@@ -119,6 +119,10 @@ function registerFailedLogin(req, loginValue) {
   loginAttempts.set(state.key, state);
   return state;
 }
+
+function countActiveHauptadmins(data, excludeId = null) {
+  return (data.benutzer || []).filter((item) => item.rolle === 'hauptadmin' && Number(item.aktiv) === 1 && (!excludeId || Number(item.id) !== Number(excludeId))).length;
+}
 function createWorkshopAreas(standorte, existing = []) {
   const now = nowIso();
   const rows = [];
@@ -607,12 +611,28 @@ app.put('/api/benutzer/:id', authRequired, requireRoles('hauptadmin', 'admin'), 
   if (findUserConflict(data, nextBenutzername, nextEmail, row.id)) {
     return res.status(400).json({ error: 'Benutzername oder E-Mail ist bereits vergeben.' });
   }
+  const nextRole = req.user.rolle === 'hauptadmin' ? (req.body.rolle || row.rolle) : row.rolle;
+  if (Number(row.id) === Number(req.user.id) && row.rolle === 'hauptadmin' && nextRole !== 'hauptadmin') {
+    return res.status(400).json({ error: 'Du kannst deine eigene Hauptadmin-Rolle nicht entfernen.' });
+  }
+  if (row.rolle === 'hauptadmin' && nextRole !== 'hauptadmin' && countActiveHauptadmins(data, row.id) < 1) {
+    return res.status(400).json({ error: 'Der letzte aktive Hauptadmin kann nicht herabgestuft werden.' });
+  }
   row.benutzername = nextBenutzername;
   row.name = nextName;
   row.email = nextEmail;
-  row.rolle = req.user.rolle === 'hauptadmin' ? (req.body.rolle || row.rolle) : row.rolle;
-  row.standort_id = req.user.rolle === 'hauptadmin' ? ((req.body.rolle || row.rolle) === 'hauptadmin' ? (Number(req.body.standort_id) || findLocationId(data, 'Carlswerk')) : Number(req.body.standort_id) || row.standort_id) : req.user.standort_id;
-  if (typeof req.body.aktiv !== 'undefined') row.aktiv = Number(req.body.aktiv) ? 1 : 0;
+  row.rolle = nextRole;
+  row.standort_id = req.user.rolle === 'hauptadmin' ? (nextRole === 'hauptadmin' ? (Number(req.body.standort_id) || findLocationId(data, 'Carlswerk')) : Number(req.body.standort_id) || row.standort_id) : req.user.standort_id;
+  if (typeof req.body.aktiv !== 'undefined') {
+    const nextAktiv = Number(req.body.aktiv) ? 1 : 0;
+    if (Number(row.id) === Number(req.user.id) && nextAktiv === 0) {
+      return res.status(400).json({ error: 'Du kannst deinen eigenen Benutzer nicht deaktivieren.' });
+    }
+    if (row.rolle === 'hauptadmin' && nextAktiv === 0 && countActiveHauptadmins(data, row.id) < 1) {
+      return res.status(400).json({ error: 'Der letzte aktive Hauptadmin kann nicht deaktiviert werden.' });
+    }
+    row.aktiv = nextAktiv;
+  }
   if (req.body.passwort) {
     const passwordError = validatePasswordStrength(req.body.passwort);
     if (passwordError) {
@@ -622,6 +642,21 @@ app.put('/api/benutzer/:id', authRequired, requireRoles('hauptadmin', 'admin'), 
   }
   writeDb(data);
   res.json({ ...row, passwort_hash: undefined, standort: row.standort_id ? locationName(data, row.standort_id) : null });
+});
+
+app.delete('/api/benutzer/:id', authRequired, requireRoles('hauptadmin'), (req, res) => {
+  const data = readDb();
+  const row = data.benutzer.find((item) => item.id === Number(req.params.id));
+  if (!row) return res.status(404).json({ error: 'Benutzer nicht gefunden.' });
+  if (Number(row.id) === Number(req.user.id)) {
+    return res.status(400).json({ error: 'Du kannst deinen eigenen Benutzer nicht loeschen.' });
+  }
+  if (row.rolle === 'hauptadmin' && countActiveHauptadmins(data, row.id) < 1) {
+    return res.status(400).json({ error: 'Der letzte aktive Hauptadmin kann nicht geloescht werden.' });
+  }
+  data.benutzer = data.benutzer.filter((item) => item.id !== row.id);
+  writeDb(data);
+  res.json({ success: true });
 });
 
 app.get('/api/fahrzeuge', authRequired, (req, res) => res.json(scopedVehicles(readDb(), req.user, req)));
