@@ -42,6 +42,9 @@ const CHECKPOINTS = [
 ];
 const PRUEFZEICHEN = ['nein', 'ok'];
 const WORKSHOP_SLOTS = Array.from({ length: 9 }, (_, index) => index + 1);
+const loginAttempts = new Map();
+const LOGIN_WINDOW_MS = 15 * 60 * 1000;
+const MAX_LOGIN_ATTEMPTS = 5;
 
 function nextId(items) {
   return items.length ? Math.max(...items.map((item) => item.id)) + 1 : 1;
@@ -66,6 +69,55 @@ function findLocationId(source, name) {
 
 function normalizeStatus(value, allowed, fallback) {
   return allowed.includes(value) ? value : fallback;
+}
+function normalizeLoginValue(value) {
+  return String(value || '').trim().toLowerCase();
+}
+
+function isValidEmail(value) {
+  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(String(value || '').trim());
+}
+
+function validatePasswordStrength(password) {
+  const value = String(password || '');
+  if (value.length < 8) return 'Passwort muss mindestens 8 Zeichen haben.';
+  if (!/[A-Z]/.test(value)) return 'Passwort braucht mindestens einen Grossbuchstaben.';
+  if (!/[a-z]/.test(value)) return 'Passwort braucht mindestens einen Kleinbuchstaben.';
+  if (!/[0-9]/.test(value)) return 'Passwort braucht mindestens eine Zahl.';
+  return null;
+}
+
+function findUserConflict(data, benutzername, email, excludeId = null) {
+  const normalizedUsername = normalizeLoginValue(benutzername);
+  const normalizedEmail = normalizeLoginValue(email);
+  return (data.benutzer || []).find((item) => {
+    if (excludeId && Number(item.id) === Number(excludeId)) return false;
+    return normalizeLoginValue(item.benutzername) === normalizedUsername || normalizeLoginValue(item.email) === normalizedEmail;
+  }) || null;
+}
+
+function getLoginAttemptState(req, loginValue) {
+  const key = [req.ip || 'unknown', normalizeLoginValue(loginValue)].join('|');
+  const now = Date.now();
+  const existing = loginAttempts.get(key);
+  if (!existing || now - existing.firstAttemptAt > LOGIN_WINDOW_MS) {
+    const fresh = { key, count: 0, firstAttemptAt: now };
+    loginAttempts.set(key, fresh);
+    return fresh;
+  }
+  return existing;
+}
+
+function clearLoginAttempts(req, loginValue) {
+  const key = [req.ip || 'unknown', normalizeLoginValue(loginValue)].join('|');
+  loginAttempts.delete(key);
+}
+
+function registerFailedLogin(req, loginValue) {
+  const state = getLoginAttemptState(req, loginValue);
+  state.count += 1;
+  loginAttempts.set(state.key, state);
+  return state;
 }
 function createWorkshopAreas(standorte, existing = []) {
   const now = nowIso();
@@ -451,11 +503,20 @@ app.get('/api/meta', authRequired, (req, res) => {
 
 app.post('/api/auth/login', (req, res) => {
   const data = readDb();
-  const loginValue = String(req.body.login || req.body.email || '').trim().toLowerCase();
-  const user = data.benutzer.find((entry) => entry.aktiv && (String(entry.benutzername || '').trim().toLowerCase() === loginValue || String(entry.email || '').trim().toLowerCase() === loginValue));
+  const loginValue = normalizeLoginValue(req.body.login || req.body.email || '');
+  if (!loginValue || !String(req.body.passwort || '')) {
+    return res.status(400).json({ error: 'Benutzername und Passwort sind Pflicht.' });
+  }
+  const state = getLoginAttemptState(req, loginValue);
+  if (state.count >= MAX_LOGIN_ATTEMPTS) {
+    return res.status(429).json({ error: 'Zu viele Fehlversuche. Bitte spaeter erneut versuchen.' });
+  }
+  const user = data.benutzer.find((entry) => entry.aktiv && (normalizeLoginValue(entry.benutzername) === loginValue || normalizeLoginValue(entry.email) === loginValue));
   if (!user || !bcrypt.compareSync(req.body.passwort || '', user.passwort_hash)) {
+    registerFailedLogin(req, loginValue);
     return res.status(401).json({ error: 'Benutzername oder Passwort ist falsch.' });
   }
+  clearLoginAttempts(req, loginValue);
   const payload = { ...user, standort: user.standort_id ? locationName(data, user.standort_id) : null };
   delete payload.passwort_hash;
   res.json({ token: signUser(payload), user: payload });
@@ -507,7 +568,24 @@ app.post('/api/benutzer', authRequired, requireRoles('hauptadmin', 'admin'), (re
   const requestedStandortId = Number(req.body.standort_id) || null;
   const rolle = req.user.rolle === 'hauptadmin' ? req.body.rolle : (req.body.rolle === 'hauptadmin' ? 'admin' : req.body.rolle);
   const standort_id = rolle === 'hauptadmin' ? (requestedStandortId || findLocationId(data, 'Carlswerk')) : (req.user.rolle === 'hauptadmin' ? requestedStandortId : req.user.standort_id);
-  const row = { id: nextId(data.benutzer), benutzername: String(req.body.benutzername || '').trim(), name: req.body.name, email: req.body.email, passwort_hash: bcrypt.hashSync(req.body.passwort || 'Passwort123!', 10), rolle, standort_id, aktiv: 1, created_at: nowIso() };
+  const benutzername = String(req.body.benutzername || '').trim();
+  const name = String(req.body.name || '').trim();
+  const email = String(req.body.email || '').trim();
+  const passwort = String(req.body.passwort || '');
+  if (!benutzername || !name || !email) {
+    return res.status(400).json({ error: 'Benutzername, Name und E-Mail sind Pflicht.' });
+  }
+  if (!isValidEmail(email)) {
+    return res.status(400).json({ error: 'Bitte eine gueltige E-Mail angeben.' });
+  }
+  const passwordError = validatePasswordStrength(passwort);
+  if (passwordError) {
+    return res.status(400).json({ error: passwordError });
+  }
+  if (findUserConflict(data, benutzername, email)) {
+    return res.status(400).json({ error: 'Benutzername oder E-Mail ist bereits vergeben.' });
+  }
+  const row = { id: nextId(data.benutzer), benutzername, name, email, passwort_hash: bcrypt.hashSync(passwort, 10), rolle, standort_id, aktiv: 1, created_at: nowIso() };
   data.benutzer.push(row);
   writeDb(data);
   res.json({ ...row, passwort_hash: undefined, standort: standort_id ? locationName(data, standort_id) : null });
@@ -517,13 +595,31 @@ app.put('/api/benutzer/:id', authRequired, requireRoles('hauptadmin', 'admin'), 
   const row = data.benutzer.find((item) => item.id === Number(req.params.id));
   if (!row) return res.status(404).json({ error: 'Benutzer nicht gefunden.' });
   if (req.user.rolle !== 'hauptadmin' && row.standort_id !== req.user.standort_id) return res.status(403).json({ error: 'Kein Zugriff auf diesen Benutzer.' });
-  row.benutzername = req.body.benutzername || row.benutzername;
-  row.name = req.body.name || row.name;
-  row.email = req.body.email || row.email;
+  const nextBenutzername = String(req.body.benutzername || row.benutzername || '').trim();
+  const nextName = String(req.body.name || row.name || '').trim();
+  const nextEmail = String(req.body.email || row.email || '').trim();
+  if (!nextBenutzername || !nextName || !nextEmail) {
+    return res.status(400).json({ error: 'Benutzername, Name und E-Mail sind Pflicht.' });
+  }
+  if (!isValidEmail(nextEmail)) {
+    return res.status(400).json({ error: 'Bitte eine gueltige E-Mail angeben.' });
+  }
+  if (findUserConflict(data, nextBenutzername, nextEmail, row.id)) {
+    return res.status(400).json({ error: 'Benutzername oder E-Mail ist bereits vergeben.' });
+  }
+  row.benutzername = nextBenutzername;
+  row.name = nextName;
+  row.email = nextEmail;
   row.rolle = req.user.rolle === 'hauptadmin' ? (req.body.rolle || row.rolle) : row.rolle;
   row.standort_id = req.user.rolle === 'hauptadmin' ? ((req.body.rolle || row.rolle) === 'hauptadmin' ? (Number(req.body.standort_id) || findLocationId(data, 'Carlswerk')) : Number(req.body.standort_id) || row.standort_id) : req.user.standort_id;
   if (typeof req.body.aktiv !== 'undefined') row.aktiv = Number(req.body.aktiv) ? 1 : 0;
-  if (req.body.passwort) row.passwort_hash = bcrypt.hashSync(req.body.passwort, 10);
+  if (req.body.passwort) {
+    const passwordError = validatePasswordStrength(req.body.passwort);
+    if (passwordError) {
+      return res.status(400).json({ error: passwordError });
+    }
+    row.passwort_hash = bcrypt.hashSync(req.body.passwort, 10);
+  }
   writeDb(data);
   res.json({ ...row, passwort_hash: undefined, standort: row.standort_id ? locationName(data, row.standort_id) : null });
 });
