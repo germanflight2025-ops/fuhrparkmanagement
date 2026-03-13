@@ -734,7 +734,7 @@ async function handleLogin(event) {
     await refreshApp();
     showView(state.user.rolle === 'benutzer' ? 'schaeden' : 'dashboard');
   } catch (error) {
-    el('loginError').textContent = error.message;
+    el('loginError').textContent = error.message.includes('Zu viele Fehlversuche') ? error.message + ' Bitte spaeter erneut versuchen oder einen Admin informieren.' : error.message;
   }
 }
 
@@ -821,8 +821,8 @@ async function handleUserSubmit(event) {
     const payload = Object.fromEntries(new FormData(event.target));
     payload.aktiv = Number(payload.aktiv ?? 1);
     if (state.user?.rolle !== 'hauptadmin') payload.standort_id = state.user?.standort_id || '';
-    if (!payload.benutzername || !payload.name || !payload.email) throw new Error('Benutzername, Name und E-Mail sind Pflichtfelder.');
-    if (!isEditing && !payload.passwort) throw new Error('Beim neuen Benutzer muss ein Passwort vergeben werden.');
+    if (!payload.benutzername || !payload.name || !payload.email) throw new Error('Bitte Benutzername, Name und E-Mail vollstaendig ausfuellen.');
+    if (!isEditing && !payload.passwort) throw new Error('Bitte fuer den neuen Benutzer ein Passwort vergeben.');
 
     if (isEditing) {
       if (!payload.passwort) delete payload.passwort;
@@ -834,7 +834,7 @@ async function handleUserSubmit(event) {
 
     event.target.reset();
     await refreshApp();
-    setUserFormMessage(isEditing ? 'Benutzer wurde aktualisiert.' : 'Benutzer wurde angelegt.', 'success');
+    setUserFormMessage(isEditing ? 'Benutzer wurde gespeichert. Neues Passwort ist sofort aktiv.' : 'Benutzer wurde angelegt.', 'success');
   } catch (error) {
     setUserFormMessage(error.message || 'Benutzer konnte nicht gespeichert werden.', 'error');
   }
