@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Werkstatteditor</title>
+  <link rel="stylesheet" href="/css/vehicle-window.css?v=20260403-workshop">
+</head>
+<body>
+  <div class="vehicle-shell">
+    <header class="vehicle-window-topbar">
+      <button type="button" class="back-btn" id="closeWindowBtn">Zurueck</button>
+      <div class="window-title-group">
+        <span class="eyebrow">Werkstatteditor</span>
+        <h1 id="editorTitle">Neuer Werkstattauftrag</h1>
+        <p id="editorSubtitle">Werkstattdaten, Zeiten und Status in einem eigenen Fenster.</p>
+      </div>
+      <div class="topbar-actions">
+        <button type="button" class="secondary-btn" id="reloadBtn">Neu laden</button>
+      </div>
+    </header>
+
+    <main class="vehicle-window-content">
+      <section class="detail-grid detail-grid-single">
+        <article class="detail-card">
+          <div class="section-head">
+            <h3>Auftragsdaten</h3>
+          </div>
+          <form id="workshopEditorForm" class="docs-form">
+            <label>Fahrzeug
+              <select name="fahrzeug_id" id="workshopVehicle"></select>
+            </label>
+            <div class="split-two">
+              <label>Werkstattplatz
+                <select name="workshop_slot" id="workshopSlot"></select>
+              </label>
+              <label>Werkstattname
+                <input name="werkstatt_name" placeholder="z. B. Iveco SW">
+              </label>
+            </div>
+            <div class="split-two">
+              <label>Nummer / Feld
+                <input name="positionsnummer" placeholder="leer = automatische Nummer">
+              </label>
+              <label>Fehler / Thema
+                <input name="problem" placeholder="z. B. AdBlue Fehler">
+              </label>
+            </div>
+            <div class="split-two">
+              <label>Status
+                <select name="status" id="workshopStatus"></select>
+              </label>
+              <label>Symbol
+                <select name="pruefzeichen">
+                  <option value="nein">Nein</option>
+                  <option value="ok">OK</option>
+                </select>
+              </label>
+            </div>
+            <div class="split-two">
+              <label>Status Datum
+                <input name="status_datum" type="date">
+              </label>
+              <label>Von Datum
+                <input name="datum_von" type="date" required>
+              </label>
+            </div>
+            <label>Bis Datum
+              <input name="datum_bis" type="date">
+            </label>
+            <label>Beschreibung
+              <textarea name="beschreibung" rows="5" placeholder="Was wird gemacht?"></textarea>
+            </label>
+            <p id="editorMessage" class="muted">Werkstattauftrag wird direkt im System gespeichert.</p>
+            <button type="submit" class="primary-btn">Speichern</button>
+          </form>
+        </article>
+
+        <article class="detail-card">
+          <div class="section-head">
+            <h3>Hinweise</h3>
+          </div>
+          <div class="stack-panel">
+            <div class="stack-item">
+              <strong>Werkstattplatz</strong>
+              <p>Der Platz wird direkt mit dem Fahrzeug und dem Auftrag verknuepft.</p>
+            </div>
+            <div class="stack-item">
+              <strong>Status & Symbol</strong>
+              <p>Status und Pruefzeichen fliessen direkt in die Werkstatt- und Fahrzeuguebersicht ein.</p>
+            </div>
+            <div class="stack-item">
+              <strong>Von / Bis</strong>
+              <p>Die Tage werden im System automatisch aus dem Zeitraum berechnet.</p>
+            </div>
+          </div>
+        </article>
+      </section>
+    </main>
+  </div>
+
+  <script src="/js/workshop-editor.js?v=20260403-workshop"></script>
+</body>
+</html>

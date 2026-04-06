@@ -38,9 +38,13 @@ Dann im Browser oeffnen:
 
 Alternativ kann Render die Datei `render.yaml` direkt verwenden.
 
+Health-Check fuer den ersten Deploy:
+
+- `/api/health`
+
 ## Wichtiger Hinweis zu Render
 
-Diese Version trennt jetzt feste Seed-Daten in `data/seed.json` von der lokalen Runtime-Datei `data/runtime/db.json`. Das ist fuer eine Demo gut, aber auf kostenlosen Hostern nicht dauerhaft sicher. Nach einem neuen Deploy oder Server-Neustart koennen lokale Dateien verloren gehen. Fuer echten Dauerbetrieb sollte spaeter auf PostgreSQL umgestellt werden.
+Diese Version trennt jetzt feste Seed-Daten in `data/seed.json` von der lokalen Runtime-Datei `data/runtime/db.json`. Das ist fuer einen ersten Demo-Deploy gut, aber auf kostenlosen Hostern nicht dauerhaft sicher. Nach einem neuen Deploy oder Server-Neustart koennen lokale Dateien verloren gehen. Fuer echten Dauerbetrieb sollte PostgreSQL aktiv genutzt werden.
 
 ## Wichtige Dateien fuer Hosting
 
@@ -48,7 +52,7 @@ Diese Version trennt jetzt feste Seed-Daten in `data/seed.json` von der lokalen 
 - `package.json`
 - `render.yaml`
 - `data/seed.json`
-- `data/runtime/db.json` (lokal erzeugt)
+- `data/runtime/db.json` (nur lokal / nicht fuer Git)
 
 ## PostgreSQL Vorbereitung
 

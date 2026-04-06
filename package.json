@@ -6,11 +6,13 @@
   "scripts": {
     "start": "node server.js",
     "dev": "node server.js",
-    "pg:import": "node scripts/import-json-to-postgres.js"
+    "pg:import": "node scripts/import-json-to-postgres.js",
+    "test": "node --test"
   },
   "dependencies": {
     "bcryptjs": "^2.4.3",
     "csv-parse": "^5.6.0",
+    "dotenv": "^17.4.1",
     "express": "^4.21.2",
     "jsonwebtoken": "^9.0.2",
     "multer": "^1.4.5-lts.1",
