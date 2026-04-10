@@ -42,6 +42,9 @@ const CHECKPOINTS = [
 ];
 const PRUEFZEICHEN = ['nein', 'ok'];
 const WORKSHOP_SLOTS = Array.from({ length: 9 }, (_, index) => index + 1);
+const MSFS_PILOT_STATUS = ['verfuegbar', 'im_flug', 'urlaub', 'krank'];
+const MSFS_FLUG_STATUS = ['geplant', 'gebucht', 'abgeschlossen', 'storniert'];
+const MSFS_DIENSTPLAN_STATUS = ['geplant', 'bestaetigt', 'frei', 'krank'];
 const loginAttempts = new Map();
 const LOGIN_WINDOW_MS = 15 * 60 * 1000;
 const MAX_LOGIN_ATTEMPTS = 5;
@@ -168,7 +171,17 @@ function seedData() {
     uvv_pruefungen: [
       { id: 1, fahrzeug_id: 1, pruefer: 'Michael Weber', datum: '2026-03-01', naechste_pruefung_datum: '2027-03-01', kommentar: 'Fahrzeug in gutem Zustand', created_at: nowIso() }
     ],
-    uvv_checkpunkte: CHECKPOINTS.map((punkt_name, index) => ({ id: index + 1, uvv_pruefung_id: 1, punkt_nr: index + 1, punkt_name, status: 'ok', kommentar: '' }))
+    uvv_checkpunkte: CHECKPOINTS.map((punkt_name, index) => ({ id: index + 1, uvv_pruefung_id: 1, punkt_nr: index + 1, punkt_name, status: 'ok', kommentar: '' })),
+    msfs_piloten: [
+      { id: 1, name: 'Anna Becker', standort_id: findLocationId(standorte, 'Frankfurt'), status: 'verfuegbar', rang: 'Kapitain', created_at: nowIso() },
+      { id: 2, name: 'Lukas Steiner', standort_id: findLocationId(standorte, 'Muenchen'), status: 'im_flug', rang: 'First Officer', created_at: nowIso() }
+    ],
+    msfs_fluege: [
+      { id: 1, flugnummer: 'MSF101', von: 'EDDF', nach: 'EGLL', abflug: '2026-04-08T18:00', ankunft: '2026-04-08T19:20', standort_id: findLocationId(standorte, 'Frankfurt'), pilot_id: 1, status: 'gebucht', gebucht_von: 'mweber', created_at: nowIso() }
+    ],
+    msfs_dienstplan: [
+      { id: 1, pilot_id: 1, standort_id: findLocationId(standorte, 'Frankfurt'), datum: '2026-04-08', schicht: 'Abendrotation', status: 'bestaetigt', notiz: 'MSF101', created_at: nowIso() }
+    ]
   };
 }
 
@@ -354,6 +367,30 @@ function migrateData(data) {
   }));
   data.uvv_pruefungen = (data.uvv_pruefungen || []).map((item) => ({ ...item, naechste_pruefung_datum: item.naechste_pruefung_datum || plusOneYear(item.datum) }));
   data.uvv_checkpunkte = data.uvv_checkpunkte || [];
+  data.msfs_piloten = (data.msfs_piloten || []).map((item) => ({
+    ...item,
+    status: normalizeStatus(item.status, MSFS_PILOT_STATUS, 'verfuegbar'),
+    standort_id: Number(item.standort_id) || null,
+    rang: item.rang || 'Pilot',
+    created_at: item.created_at || nowIso()
+  }));
+  data.msfs_fluege = (data.msfs_fluege || []).map((item) => ({
+    ...item,
+    status: normalizeStatus(item.status, MSFS_FLUG_STATUS, 'geplant'),
+    standort_id: Number(item.standort_id) || null,
+    pilot_id: Number(item.pilot_id) || null,
+    gebucht_von: item.gebucht_von || '',
+    created_at: item.created_at || nowIso()
+  }));
+  data.msfs_dienstplan = (data.msfs_dienstplan || []).map((item) => ({
+    ...item,
+    status: normalizeStatus(item.status, MSFS_DIENSTPLAN_STATUS, 'geplant'),
+    standort_id: Number(item.standort_id) || null,
+    pilot_id: Number(item.pilot_id) || null,
+    schicht: item.schicht || '',
+    notiz: item.notiz || '',
+    created_at: item.created_at || nowIso()
+  }));
   data.__needs_write = changed;
   return data;
 }
@@ -466,6 +503,27 @@ function scopedVehicles(data, user, req) {
   return filterByStandort(data, data.fahrzeuge, user, req, (vehicle) => vehicle.standort_id).map((vehicle) => vehicleWithLocation(data, vehicle));
 }
 
+function scopedMsfsPiloten(data, user, req) {
+  return filterByStandort(data, data.msfs_piloten || [], user, req, (item) => item.standort_id)
+    .map((item) => ({ ...item, standort: locationName(data, item.standort_id) }));
+}
+
+function scopedMsfsFluege(data, user, req) {
+  return filterByStandort(data, data.msfs_fluege || [], user, req, (item) => item.standort_id)
+    .map((item) => {
+      const pilot = (data.msfs_piloten || []).find((entry) => Number(entry.id) === Number(item.pilot_id));
+      return { ...item, standort: locationName(data, item.standort_id), pilot_name: pilot?.name || '-' };
+    });
+}
+
+function scopedMsfsDienstplan(data, user, req) {
+  return filterByStandort(data, data.msfs_dienstplan || [], user, req, (item) => item.standort_id)
+    .map((item) => {
+      const pilot = (data.msfs_piloten || []).find((entry) => Number(entry.id) === Number(item.pilot_id));
+      return { ...item, standort: locationName(data, item.standort_id), pilot_name: pilot?.name || '-' };
+    });
+}
+
 function canAccessVehicle(user, vehicle) {
   return !!vehicle && (user.rolle === 'hauptadmin' || vehicle.standort_id === user.standort_id);
 }
@@ -484,8 +542,8 @@ function mapWorkshopStatusToVehicleStatus(status) {
 }
 
 function visibleViewsForRole(role) {
-  if (role === 'benutzer') return ['schaeden'];
-  return ['dashboard', 'fahrzeuge', 'werkstatt', 'schaeden', 'uvv', 'benutzer', 'standorte', 'statistik', 'suche', 'import', 'impressum'];
+  if (role === 'benutzer') return ['schaeden', 'benachrichtigungen'];
+  return ['dashboard', 'fahrzeuge', 'werkstatt', 'schaeden', 'uvv', 'benachrichtigungen', 'benutzer', 'fuehrerscheinkontrolle', 'adressbuch', 'reinigung', 'lagerverwaltung', 'standorte', 'statistik', 'suche', 'import', 'impressum'];
 }
 
 function assertAllowedStatus(value, allowed) {
@@ -532,6 +590,9 @@ app.get('/api/meta', authRequired, (req, res) => {
     workshopSlots: WORKSHOP_SLOTS,
     schadenStatus: SCHADEN_STATUS,
     pruefzeichen: PRUEFZEICHEN,
+    msfsPilotStatus: MSFS_PILOT_STATUS,
+    msfsFlugStatus: MSFS_FLUG_STATUS,
+    msfsDienstplanStatus: MSFS_DIENSTPLAN_STATUS,
     uvvCheckpoints: CHECKPOINTS,
     visibleViews: visibleViewsForRole(req.user.rolle),
     selectedStandortId: selectedStandortId(req, req.user)
@@ -1037,6 +1098,161 @@ app.get('/api/uvv/:id/pdf', authRequired, (req, res) => {
   doc.end();
 });
 
+app.get('/api/msfs/piloten', authRequired, (req, res) => {
+  const data = readDb();
+  res.json(scopedMsfsPiloten(data, req.user, req));
+});
+
+app.post('/api/msfs/piloten', authRequired, requireRoles('hauptadmin', 'admin'), (req, res) => {
+  const data = readDb();
+  const standort_id = req.user.rolle === 'hauptadmin' ? Number(req.body.standort_id) : Number(req.user.standort_id);
+  const name = String(req.body.name || '').trim();
+  if (!name) return res.status(400).json({ error: 'Pilotenname ist Pflicht.' });
+  const row = {
+    id: nextId(data.msfs_piloten || []),
+    name,
+    rang: String(req.body.rang || 'Pilot').trim() || 'Pilot',
+    status: normalizeStatus(req.body.status, MSFS_PILOT_STATUS, 'verfuegbar'),
+    standort_id,
+    created_at: nowIso()
+  };
+  data.msfs_piloten = [...(data.msfs_piloten || []), row];
+  writeDb(data);
+  res.json({ ...row, standort: locationName(data, standort_id) });
+});
+
+app.put('/api/msfs/piloten/:id', authRequired, requireRoles('hauptadmin', 'admin'), (req, res) => {
+  const data = readDb();
+  const row = (data.msfs_piloten || []).find((item) => Number(item.id) === Number(req.params.id));
+  if (!row) return res.status(404).json({ error: 'Pilot nicht gefunden.' });
+  if (req.user.rolle !== 'hauptadmin' && Number(row.standort_id) !== Number(req.user.standort_id)) return res.status(403).json({ error: 'Kein Zugriff auf diesen Piloten.' });
+  row.name = String(req.body.name || row.name).trim();
+  row.rang = String(req.body.rang || row.rang || 'Pilot').trim() || 'Pilot';
+  row.status = normalizeStatus(req.body.status || row.status, MSFS_PILOT_STATUS, 'verfuegbar');
+  writeDb(data);
+  res.json({ ...row, standort: locationName(data, row.standort_id) });
+});
+
+app.delete('/api/msfs/piloten/:id', authRequired, requireRoles('hauptadmin', 'admin'), (req, res) => {
+  const data = readDb();
+  const row = (data.msfs_piloten || []).find((item) => Number(item.id) === Number(req.params.id));
+  if (!row) return res.status(404).json({ error: 'Pilot nicht gefunden.' });
+  if (req.user.rolle !== 'hauptadmin' && Number(row.standort_id) !== Number(req.user.standort_id)) return res.status(403).json({ error: 'Kein Zugriff auf diesen Piloten.' });
+  data.msfs_piloten = (data.msfs_piloten || []).filter((item) => Number(item.id) !== Number(row.id));
+  data.msfs_fluege = (data.msfs_fluege || []).map((item) => Number(item.pilot_id) === Number(row.id) ? { ...item, pilot_id: null } : item);
+  data.msfs_dienstplan = (data.msfs_dienstplan || []).map((item) => Number(item.pilot_id) === Number(row.id) ? { ...item, pilot_id: null } : item);
+  writeDb(data);
+  res.json({ success: true });
+});
+
+app.get('/api/msfs/fluege', authRequired, (req, res) => {
+  const data = readDb();
+  res.json(scopedMsfsFluege(data, req.user, req));
+});
+
+app.post('/api/msfs/fluege', authRequired, (req, res) => {
+  const data = readDb();
+  const standort_id = req.user.rolle === 'hauptadmin' ? (Number(req.body.standort_id) || selectedStandortId(req, req.user) || findLocationId(data, 'Carlswerk')) : Number(req.user.standort_id);
+  const flugnummer = String(req.body.flugnummer || '').trim().toUpperCase();
+  if (!flugnummer || !req.body.von || !req.body.nach || !req.body.abflug) {
+    return res.status(400).json({ error: 'Flugnummer, Route und Abflug sind Pflicht.' });
+  }
+  const row = {
+    id: nextId(data.msfs_fluege || []),
+    flugnummer,
+    von: String(req.body.von || '').trim().toUpperCase(),
+    nach: String(req.body.nach || '').trim().toUpperCase(),
+    abflug: req.body.abflug,
+    ankunft: req.body.ankunft || '',
+    status: normalizeStatus(req.body.status, MSFS_FLUG_STATUS, 'gebucht'),
+    standort_id,
+    pilot_id: Number(req.body.pilot_id) || null,
+    gebucht_von: req.user.benutzername || req.user.name || '',
+    created_at: nowIso()
+  };
+  data.msfs_fluege = [...(data.msfs_fluege || []), row];
+  writeDb(data);
+  const pilot = (data.msfs_piloten || []).find((item) => Number(item.id) === Number(row.pilot_id));
+  res.json({ ...row, standort: locationName(data, standort_id), pilot_name: pilot?.name || '-' });
+});
+
+app.put('/api/msfs/fluege/:id', authRequired, (req, res) => {
+  const data = readDb();
+  const row = (data.msfs_fluege || []).find((item) => Number(item.id) === Number(req.params.id));
+  if (!row) return res.status(404).json({ error: 'Flug nicht gefunden.' });
+  if (req.user.rolle !== 'hauptadmin' && Number(row.standort_id) !== Number(req.user.standort_id)) return res.status(403).json({ error: 'Kein Zugriff auf diesen Flug.' });
+  row.flugnummer = String(req.body.flugnummer || row.flugnummer).trim().toUpperCase();
+  row.von = String(req.body.von || row.von).trim().toUpperCase();
+  row.nach = String(req.body.nach || row.nach).trim().toUpperCase();
+  row.abflug = req.body.abflug || row.abflug;
+  row.ankunft = req.body.ankunft || row.ankunft || '';
+  row.status = normalizeStatus(req.body.status || row.status, MSFS_FLUG_STATUS, 'geplant');
+  row.pilot_id = typeof req.body.pilot_id !== 'undefined' ? (Number(req.body.pilot_id) || null) : row.pilot_id;
+  writeDb(data);
+  const pilot = (data.msfs_piloten || []).find((item) => Number(item.id) === Number(row.pilot_id));
+  res.json({ ...row, standort: locationName(data, row.standort_id), pilot_name: pilot?.name || '-' });
+});
+
+app.delete('/api/msfs/fluege/:id', authRequired, requireRoles('hauptadmin', 'admin'), (req, res) => {
+  const data = readDb();
+  const row = (data.msfs_fluege || []).find((item) => Number(item.id) === Number(req.params.id));
+  if (!row) return res.status(404).json({ error: 'Flug nicht gefunden.' });
+  if (req.user.rolle !== 'hauptadmin' && Number(row.standort_id) !== Number(req.user.standort_id)) return res.status(403).json({ error: 'Kein Zugriff auf diesen Flug.' });
+  data.msfs_fluege = (data.msfs_fluege || []).filter((item) => Number(item.id) !== Number(row.id));
+  writeDb(data);
+  res.json({ success: true });
+});
+
+app.get('/api/msfs/dienstplan', authRequired, (req, res) => {
+  const data = readDb();
+  res.json(scopedMsfsDienstplan(data, req.user, req));
+});
+
+app.post('/api/msfs/dienstplan', authRequired, requireRoles('hauptadmin', 'admin'), (req, res) => {
+  const data = readDb();
+  const standort_id = req.user.rolle === 'hauptadmin' ? (Number(req.body.standort_id) || selectedStandortId(req, req.user) || findLocationId(data, 'Carlswerk')) : Number(req.user.standort_id);
+  if (!req.body.datum) return res.status(400).json({ error: 'Datum ist Pflicht.' });
+  const row = {
+    id: nextId(data.msfs_dienstplan || []),
+    pilot_id: Number(req.body.pilot_id) || null,
+    standort_id,
+    datum: req.body.datum,
+    schicht: String(req.body.schicht || '').trim(),
+    status: normalizeStatus(req.body.status, MSFS_DIENSTPLAN_STATUS, 'geplant'),
+    notiz: String(req.body.notiz || '').trim(),
+    created_at: nowIso()
+  };
+  data.msfs_dienstplan = [...(data.msfs_dienstplan || []), row];
+  writeDb(data);
+  const pilot = (data.msfs_piloten || []).find((item) => Number(item.id) === Number(row.pilot_id));
+  res.json({ ...row, standort: locationName(data, standort_id), pilot_name: pilot?.name || '-' });
+});
+
+app.put('/api/msfs/dienstplan/:id', authRequired, requireRoles('hauptadmin', 'admin'), (req, res) => {
+  const data = readDb();
+  const row = (data.msfs_dienstplan || []).find((item) => Number(item.id) === Number(req.params.id));
+  if (!row) return res.status(404).json({ error: 'Dienstplaneintrag nicht gefunden.' });
+  if (req.user.rolle !== 'hauptadmin' && Number(row.standort_id) !== Number(req.user.standort_id)) return res.status(403).json({ error: 'Kein Zugriff auf diesen Dienstplaneintrag.' });
+  row.pilot_id = typeof req.body.pilot_id !== 'undefined' ? (Number(req.body.pilot_id) || null) : row.pilot_id;
+  row.datum = req.body.datum || row.datum;
+  row.schicht = String(req.body.schicht || row.schicht || '').trim();
+  row.status = normalizeStatus(req.body.status || row.status, MSFS_DIENSTPLAN_STATUS, 'geplant');
+  row.notiz = String(req.body.notiz || row.notiz || '').trim();
+  writeDb(data);
+  const pilot = (data.msfs_piloten || []).find((item) => Number(item.id) === Number(row.pilot_id));
+  res.json({ ...row, standort: locationName(data, row.standort_id), pilot_name: pilot?.name || '-' });
+});
+
+app.delete('/api/msfs/dienstplan/:id', authRequired, requireRoles('hauptadmin', 'admin'), (req, res) => {
+  const data = readDb();
+  const row = (data.msfs_dienstplan || []).find((item) => Number(item.id) === Number(req.params.id));
+  if (!row) return res.status(404).json({ error: 'Dienstplaneintrag nicht gefunden.' });
+  if (req.user.rolle !== 'hauptadmin' && Number(row.standort_id) !== Number(req.user.standort_id)) return res.status(403).json({ error: 'Kein Zugriff auf diesen Dienstplaneintrag.' });
+  data.msfs_dienstplan = (data.msfs_dienstplan || []).filter((item) => Number(item.id) !== Number(row.id));
+  writeDb(data);
+  res.json({ success: true });
+});
+
 app.get('/api/dashboard', authRequired, (req, res) => {
   const data = readDb();
   const vehicles = scopedVehicles(data, req.user, req);
@@ -1181,12 +1397,6 @@ start().catch((error) => {
   console.error('Serverstart fehlgeschlagen:', error);
   process.exit(1);
 });
-
-
-
-
-
-
 
 
 
