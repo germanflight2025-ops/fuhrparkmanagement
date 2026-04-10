@@ -1,22 +1,22 @@
 :root {
-  --bg: #091427;
-  --panel: #0f1e3b;
-  --panel-soft: #14274b;
-  --ink: #eef4ff;
-  --muted: #9db0cf;
-  --line: rgba(255,255,255,0.1);
+  --bg: #eef2f7;
+  --panel: #f8fafc;
+  --panel-soft: #ffffff;
+  --ink: #111827;
+  --muted: #6b7280;
+  --line: rgba(15, 23, 42, 0.1);
   --brand: #3b82f6;
   --brand-dark: #2563eb;
   --accent: #1d4ed8;
   --danger: #ef4444;
 }
 * { box-sizing: border-box; }
-body { margin: 0; font-family: "Segoe UI", Tahoma, sans-serif; background: linear-gradient(180deg, #071121 0%, #0b1d39 100%); color: var(--ink); }
+body { margin: 0; font-family: "Segoe UI", Tahoma, sans-serif; background: #e5e7eb; color: var(--ink); }
 button, input, select, textarea { font: inherit; }
 button { border: 0; border-radius: 10px; padding: 10px 14px; background: var(--brand); color: white; cursor: pointer; }
 button.secondary { background: #334155; }
 button:hover { background: var(--brand-dark); }
-input, select, textarea { width: 100%; padding: 12px 14px; border: 1px solid var(--line); border-radius: 10px; background: #0a1732; color: var(--ink); }
+input, select, textarea { width: 100%; padding: 12px 14px; border: 1px solid #d1d5db; border-radius: 10px; background: #ffffff; color: #111827; }
 label { display: grid; gap: 6px; color: var(--muted); }
 textarea { resize: vertical; }
 .app-shell { min-height: 100vh; display: grid; grid-template-columns: 260px 1fr; }
@@ -26,20 +26,21 @@ textarea { resize: vertical; }
 .content-logged-out .login-grid-single { grid-template-columns: 1fr; }
 .content-logged-out .panel.card.accent { padding: 28px; }
 
-.sidebar { background: linear-gradient(180deg, #081325, #0a1a35); color: white; padding: 24px 18px; display: flex; flex-direction: column; gap: 24px; border-right: 1px solid rgba(255,255,255,0.06); }
-.sidebar h1 { margin: 0; font-size: 30px; }
-.sidebar .muted { color: #cbd5e1; }
+.sidebar { background: linear-gradient(180deg, #06122b, #08193f); color: white; padding: 22px 14px; display: flex; flex-direction: column; gap: 18px; border-right: 1px solid rgba(255,255,255,0.06); }
+.sidebar h1 { margin: 0; font-size: 38px; }
+.sidebar .muted { color: #cbd5e1; font-size: 14px; }
 .sidebar nav { display: grid; gap: 10px; }
-.nav-btn { width: 100%; min-height: 44px; display: flex; align-items: center; justify-content: flex-start; text-align: left; background: transparent; color: #cbd5e1; border: 1px solid rgba(255,255,255,0.05); line-height: 1.2; }
-.nav-btn.active { background: rgba(59,130,246,0.22); color: white; border-color: rgba(59,130,246,0.45); }
+.nav-btn { width: 100%; min-height: 40px; display: flex; align-items: center; justify-content: space-between; text-align: left; background: transparent; color: #dbe5fb; border: 1px solid rgba(255,255,255,0.08); border-radius: 9px; line-height: 1.2; padding: 10px 12px; font-size: 15px; }
+.nav-btn.active { background: rgba(59,130,246,0.28); color: white; border-color: rgba(96,165,250,0.5); }
+.menu-badge { background: #f1f5f9; color: #7c2d12; border-radius: 999px; font-size: 11px; padding: 2px 8px; font-weight: 700; }
 .sidebar-footer { margin-top: auto; display: grid; gap: 10px; }
-.content { padding: 24px 28px; }
+.content { padding: 22px 18px; background: #e5e7eb; }
 .topbar { margin-bottom: 24px; display: flex; justify-content: space-between; gap: 16px; align-items: flex-start; }
 .topbar h2 { margin: 0; font-size: 28px; }
 .topbar-controls { min-width: 280px; display: grid; gap: 8px; }
 .topbar-label { min-width: 260px; }
-.topbar-pill { background: rgba(59,130,246,0.18); border: 1px solid rgba(59,130,246,0.35); border-radius: 12px; padding: 12px 14px; color: #dbeafe; }
-.panel.card { background: var(--panel); border: 1px solid rgba(255,255,255,0.06); box-shadow: 0 16px 32px rgba(0, 0, 0, 0.2); border-radius: 18px; padding: 22px; }
+.topbar-pill { background: #f3f4f6; border: 1px solid #e5e7eb; border-radius: 12px; padding: 10px 12px; color: #1f2937; }
+.panel.card { background: var(--panel); border: 1px solid #d1d5db; box-shadow: 0 6px 16px rgba(15, 23, 42, 0.08); border-radius: 14px; padding: 18px; }
 .panel.accent { background: linear-gradient(160deg, #102447, #12315c); }
 .stats-grid, .grid-2, .login-grid { display: grid; gap: 20px; }
 .stats-grid { grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); margin-bottom: 20px; }

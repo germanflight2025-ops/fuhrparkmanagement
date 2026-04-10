@@ -2,13 +2,19 @@ const state = {
   token: sessionStorage.getItem('fuhrpark_token') || localStorage.getItem('fuhrpark_token') || '',
   user: JSON.parse(sessionStorage.getItem('fuhrpark_user') || localStorage.getItem('fuhrpark_user') || 'null'),
   selectedStandortId: sessionStorage.getItem('fuhrpark_selected_standort') || localStorage.getItem('fuhrpark_selected_standort') || '',
-  meta: { standorte: [], fahrzeugStatus: [], werkstattStatus: [], schadenStatus: [], pruefzeichen: [], uvvCheckpoints: [], visibleViews: [] },
+  meta: { standorte: [], fahrzeugStatus: [], werkstattStatus: [], schadenStatus: [], pruefzeichen: [], uvvCheckpoints: [], msfsPilotStatus: [], msfsFlugStatus: [], msfsDienstplanStatus: [], visibleViews: [] },
   dashboard: null,
   fahrzeuge: [],
   werkstatt: [],
   schaeden: [],
   uvv: [],
+  pilots: [],
+  flights: [],
+  rosters: [],
   benutzer: [],
+  editPilotId: null,
+  editFlightId: null,
+  editRosterId: null,
   editUserId: null,
   editVehicleId: null,
   editWorkshopId: null,
@@ -23,7 +29,12 @@ const viewMeta = {
   werkstatt: ['Werkstatt', 'Werkstatt-Uebersicht mit aktiven Auftraegen und Bereichen.'],
   schaeden: ['Schaeden', 'Unfall- und Schadenmeldungen strukturiert erfassen.'],
   uvv: ['UVV', 'Pruefungen mit 20 Punkten dokumentieren.'],
+  benachrichtigungen: ['Benachrichtigungen', 'Hinweise, Erinnerungen und Systemmeldungen.'],
   benutzer: ['Benutzer', 'Benutzer anlegen, aktivieren und verwalten.'],
+  fuehrerscheinkontrolle: ['Fuehrerscheinkontrolle', 'Kontrollfristen und Nachweise fuer Fahrer verwalten.'],
+  adressbuch: ['Adressbuch', 'Kontakte von Partnern, Werkstaetten und Ansprechpartnern.'],
+  reinigung: ['Reinigung', 'Reinigungs- und Aufbereitungsprozesse koordinieren.'],
+  lagerverwaltung: ['Lagerverwaltung', 'Materialbestand und Verbrauch zentral steuern.'],
   standorte: ['Standorte', 'Standorte anlegen und bearbeiten.'],
   statistik: ['Statistik', 'Verdichtete Auswertung aller Kernbereiche.'],
   suche: ['Suche', 'Globale Suche ueber Fahrzeuge und Statusdaten.'],
@@ -320,6 +331,45 @@ function setUserFormMessage(message, type = 'info') {
   node.textContent = message;
 }
 
+function currentPilotDraft() {
+  const row = state.pilots.find((entry) => String(entry.id) === String(state.editPilotId));
+  return {
+    id: row?.id || '',
+    name: row?.name || '',
+    rang: row?.rang || 'Pilot',
+    status: row?.status || 'verfuegbar',
+    standort_id: row?.standort_id || activeLocationId()
+  };
+}
+
+function currentFlightDraft() {
+  const row = state.flights.find((entry) => String(entry.id) === String(state.editFlightId));
+  return {
+    id: row?.id || '',
+    flugnummer: row?.flugnummer || '',
+    von: row?.von || '',
+    nach: row?.nach || '',
+    abflug: row?.abflug || '',
+    ankunft: row?.ankunft || '',
+    pilot_id: row?.pilot_id || '',
+    status: row?.status || 'gebucht',
+    standort_id: row?.standort_id || activeLocationId()
+  };
+}
+
+function currentRosterDraft() {
+  const row = state.rosters.find((entry) => String(entry.id) === String(state.editRosterId));
+  return {
+    id: row?.id || '',
+    datum: row?.datum || '',
+    schicht: row?.schicht || '',
+    pilot_id: row?.pilot_id || '',
+    status: row?.status || 'geplant',
+    notiz: row?.notiz || '',
+    standort_id: row?.standort_id || activeLocationId()
+  };
+}
+
 function renderForms() {
   const locationOptions = locationOptionsMarkup();
   const vehicleOptions = vehicleOptionsMarkup();
@@ -455,6 +505,47 @@ function renderForms() {
     <label>Aktiv<select name="aktiv"><option value="1" ${draftUser.aktiv ? 'selected' : ''}>Ja</option><option value="0" ${!draftUser.aktiv ? 'selected' : ''}>Nein</option></select></label>
     <p id="userFormMessage" class="muted">${isEditingUser ? 'Hier kannst du Name, Rolle, Standort, Aktiv-Status und manuell ein neues Passwort setzen.' : 'Hier kannst du neue Benutzer fuer den Standort anlegen. Passwort: mindestens 8 Zeichen, Gross- und Kleinbuchstabe, Zahl.'}</p>
     <button type="submit">${isEditingUser ? 'Aenderungen speichern' : 'Benutzer speichern'}</button>`;
+
+  const draftPilot = currentPilotDraft();
+  if (el('pilotForm')) el('pilotForm').innerHTML = `
+    <h3>${state.editPilotId ? 'Pilot bearbeiten' : 'Pilot anlegen'}</h3>
+    <label>Name<input name="name" required value="${draftPilot.name}" placeholder="Pilot Name"></label>
+    <label>Rang<input name="rang" value="${draftPilot.rang}" placeholder="Kapitain, First Officer..."></label>
+    <label>Status<select name="status">${optionsHtml(state.meta.msfsPilotStatus, draftPilot.status)}</select></label>
+    <button type="submit">${state.editPilotId ? 'Pilot speichern' : 'Pilot anlegen'}</button>
+  `;
+
+  const draftFlight = currentFlightDraft();
+  if (el('flightForm')) el('flightForm').innerHTML = `
+    <h3>${state.editFlightId ? 'Flug bearbeiten' : 'Flug buchen'}</h3>
+    <div class="two-col">
+      <label>Flugnummer<input name="flugnummer" required value="${draftFlight.flugnummer}" placeholder="MSF101"></label>
+      <label>Status<select name="status">${optionsHtml(state.meta.msfsFlugStatus, draftFlight.status)}</select></label>
+    </div>
+    <div class="two-col">
+      <label>Von (ICAO)<input name="von" required value="${draftFlight.von}" placeholder="EDDF"></label>
+      <label>Nach (ICAO)<input name="nach" required value="${draftFlight.nach}" placeholder="EGLL"></label>
+    </div>
+    <div class="two-col">
+      <label>Abflug<input name="abflug" type="datetime-local" required value="${draftFlight.abflug}"></label>
+      <label>Ankunft<input name="ankunft" type="datetime-local" value="${draftFlight.ankunft}"></label>
+    </div>
+    <label>Pilot<select name="pilot_id"><option value="">ohne Zuweisung</option>${state.pilots.map((p) => `<option value="${p.id}" ${String(draftFlight.pilot_id) === String(p.id) ? 'selected' : ''}>${p.name}</option>`).join('')}</select></label>
+    <button type="submit">${state.editFlightId ? 'Flug speichern' : 'Flug buchen'}</button>
+  `;
+
+  const draftRoster = currentRosterDraft();
+  if (el('rosterForm')) el('rosterForm').innerHTML = `
+    <h3>${state.editRosterId ? 'Dienstplaneintrag bearbeiten' : 'Dienstplaneintrag'}</h3>
+    <div class="two-col">
+      <label>Datum<input name="datum" type="date" required value="${draftRoster.datum}"></label>
+      <label>Status<select name="status">${optionsHtml(state.meta.msfsDienstplanStatus, draftRoster.status)}</select></label>
+    </div>
+    <label>Schicht<input name="schicht" value="${draftRoster.schicht}" placeholder="Fruehdienst, Abendrotation ..."></label>
+    <label>Pilot<select name="pilot_id"><option value="">ohne Zuweisung</option>${state.pilots.map((p) => `<option value="${p.id}" ${String(draftRoster.pilot_id) === String(p.id) ? 'selected' : ''}>${p.name}</option>`).join('')}</select></label>
+    <label>Notiz<textarea name="notiz" rows="3" placeholder="Freitext">${draftRoster.notiz}</textarea></label>
+    <button type="submit">${state.editRosterId ? 'Dienstplan speichern' : 'Eintrag speichern'}</button>
+  `;
 }
 
 function dashboardSignature(data) {
@@ -605,6 +696,35 @@ function renderLists() {
     { key: 'id', label: 'PDF', render: (v) => `<button onclick="downloadPdf(${v})">PDF</button>` }
   ]);
 
+  if (el('pilotTable')) el('pilotTable').innerHTML = renderTable(state.pilots, [
+    { key: 'name', label: 'Name' },
+    { key: 'rang', label: 'Rang' },
+    { key: 'standort', label: 'Standort' },
+    { key: 'status', label: 'Status', render: (v) => `<span class="${badgeClass(v)}">${v}</span>` },
+    { key: 'id', label: 'Aktion', render: (v) => canManage ? `<div class="action-row"><button class="icon-btn" data-action="pilot-edit" data-id="${v}">&#9998;</button><button class="secondary" data-action="pilot-delete" data-id="${v}">Loeschen</button></div>` : '-' }
+  ]);
+
+  if (el('flightTable')) el('flightTable').innerHTML = renderTable(state.flights, [
+    { key: 'flugnummer', label: 'Flug' },
+    { key: 'von', label: 'Von' },
+    { key: 'nach', label: 'Nach' },
+    { key: 'abflug', label: 'Abflug' },
+    { key: 'ankunft', label: 'Ankunft' },
+    { key: 'pilot_name', label: 'Pilot' },
+    { key: 'status', label: 'Status', render: (v) => `<span class="${badgeClass(v)}">${v}</span>` },
+    { key: 'gebucht_von', label: 'Gebucht von' },
+    { key: 'id', label: 'Aktion', render: (v, row) => `<div class="action-row"><button class="icon-btn" data-action="flight-edit" data-id="${v}">&#9998;</button>${canManage || state.user?.benutzername === row.gebucht_von ? `<button class="secondary" data-action="flight-delete" data-id="${v}">Loeschen</button>` : ''}</div>` }
+  ]);
+
+  if (el('rosterTable')) el('rosterTable').innerHTML = renderTable(state.rosters, [
+    { key: 'datum', label: 'Datum' },
+    { key: 'schicht', label: 'Schicht' },
+    { key: 'pilot_name', label: 'Pilot' },
+    { key: 'status', label: 'Status', render: (v) => `<span class="${badgeClass(v)}">${v}</span>` },
+    { key: 'notiz', label: 'Notiz' },
+    { key: 'id', label: 'Aktion', render: (v) => canManage ? `<div class="action-row"><button class="icon-btn" data-action="roster-edit" data-id="${v}">&#9998;</button><button class="secondary" data-action="roster-delete" data-id="${v}">Loeschen</button></div>` : '-' }
+  ]);
+
   el('usersTable').innerHTML = renderTable(state.benutzer, [
     { key: 'benutzername', label: 'Benutzername' },
     { key: 'name', label: 'Name', render: (v, row) => `${v || '-'}${String(state.editUserId) === String(row.id) ? '<br><span class="muted">Wird gerade bearbeitet</span>' : ''}` },
@@ -659,6 +779,9 @@ async function loadData() {
     state.workshopBereiche = [];
     state.schaeden = [];
     state.uvv = [];
+    state.pilots = [];
+    state.flights = [];
+    state.rosters = [];
     state.benutzer = [];
     renderForms();
     renderLists();
@@ -670,19 +793,25 @@ async function loadData() {
   }
 
   const suffix = querySuffix();
-  const [fahrzeuge, werkstatt, workshopBereiche, schaeden, uvv, dashboard] = await Promise.all([
+  const [fahrzeuge, werkstatt, workshopBereiche, schaeden, uvv, dashboard, pilots, flights, rosters] = await Promise.all([
     api(`/api/fahrzeuge${suffix}`),
     api(`/api/werkstatt${suffix}`),
     api(`/api/werkstatt-bereiche${suffix}`),
     api(`/api/schaeden${suffix}`),
     api(`/api/uvv${suffix}`),
-    api(`/api/dashboard${suffix}`)
+    api(`/api/dashboard${suffix}`),
+    api(`/api/msfs/piloten${suffix}`),
+    api(`/api/msfs/fluege${suffix}`),
+    api(`/api/msfs/dienstplan${suffix}`)
   ]);
   state.fahrzeuge = fahrzeuge;
   state.werkstatt = werkstatt;
   state.workshopBereiche = workshopBereiche;
   state.schaeden = schaeden;
   state.uvv = uvv;
+  state.pilots = pilots;
+  state.flights = flights;
+  state.rosters = rosters;
   state.dashboard = dashboard;
   state.benutzer = state.user.rolle === 'benutzer' ? [] : await api(`/api/benutzer${suffix}`);
   renderForms();
@@ -840,6 +969,45 @@ async function handleUserSubmit(event) {
   }
 }
 
+async function handlePilotSubmit(event) {
+  event.preventDefault();
+  const payload = Object.fromEntries(new FormData(event.target));
+  if (state.editPilotId) {
+    await api(`/api/msfs/piloten/${state.editPilotId}`, { method: 'PUT', body: JSON.stringify(payload) });
+    state.editPilotId = null;
+  } else {
+    await api('/api/msfs/piloten', { method: 'POST', body: JSON.stringify(payload) });
+  }
+  event.target.reset();
+  await refreshApp();
+}
+
+async function handleFlightSubmit(event) {
+  event.preventDefault();
+  const payload = Object.fromEntries(new FormData(event.target));
+  if (state.editFlightId) {
+    await api(`/api/msfs/fluege/${state.editFlightId}`, { method: 'PUT', body: JSON.stringify(payload) });
+    state.editFlightId = null;
+  } else {
+    await api('/api/msfs/fluege', { method: 'POST', body: JSON.stringify(payload) });
+  }
+  event.target.reset();
+  await refreshApp();
+}
+
+async function handleRosterSubmit(event) {
+  event.preventDefault();
+  const payload = Object.fromEntries(new FormData(event.target));
+  if (state.editRosterId) {
+    await api(`/api/msfs/dienstplan/${state.editRosterId}`, { method: 'PUT', body: JSON.stringify(payload) });
+    state.editRosterId = null;
+  } else {
+    await api('/api/msfs/dienstplan', { method: 'POST', body: JSON.stringify(payload) });
+  }
+  event.target.reset();
+  await refreshApp();
+}
+
 async function handleSearch() {
   const q = encodeURIComponent(el('searchInput').value.trim());
   const path = querySuffix() ? `/api/suche${querySuffix()}&q=${q}` : `/api/suche?q=${q}`;
@@ -963,6 +1131,45 @@ async function bindInlineActions() {
       setUserEdit(node.dataset.id);
     };
   });
+  document.querySelectorAll('[data-action="pilot-edit"]').forEach((node) => {
+    node.onclick = async () => {
+      state.editPilotId = node.dataset.id;
+      renderForms();
+      bindDynamicForms();
+    };
+  });
+  document.querySelectorAll('[data-action="pilot-delete"]').forEach((node) => {
+    node.onclick = async () => {
+      await api(`/api/msfs/piloten/${node.dataset.id}`, { method: 'DELETE' });
+      await refreshApp();
+    };
+  });
+  document.querySelectorAll('[data-action="flight-edit"]').forEach((node) => {
+    node.onclick = async () => {
+      state.editFlightId = node.dataset.id;
+      renderForms();
+      bindDynamicForms();
+    };
+  });
+  document.querySelectorAll('[data-action="flight-delete"]').forEach((node) => {
+    node.onclick = async () => {
+      await api(`/api/msfs/fluege/${node.dataset.id}`, { method: 'DELETE' });
+      await refreshApp();
+    };
+  });
+  document.querySelectorAll('[data-action="roster-edit"]').forEach((node) => {
+    node.onclick = async () => {
+      state.editRosterId = node.dataset.id;
+      renderForms();
+      bindDynamicForms();
+    };
+  });
+  document.querySelectorAll('[data-action="roster-delete"]').forEach((node) => {
+    node.onclick = async () => {
+      await api(`/api/msfs/dienstplan/${node.dataset.id}`, { method: 'DELETE' });
+      await refreshApp();
+    };
+  });
   document.querySelectorAll('[data-action="location-save"]').forEach((node) => {
     node.onclick = async () => {
       const input = document.querySelector(`[data-action="location-name"][data-id="${node.dataset.id}"]`);
@@ -1013,6 +1220,9 @@ function bindDynamicForms() {
   el('workshopForm').onsubmit = handleWorkshopSubmit;
   el('damageForm').onsubmit = handleDamageSubmit;
   el('uvvForm').onsubmit = handleUvvSubmit;
+  if (el('pilotForm')) el('pilotForm').onsubmit = handlePilotSubmit;
+  if (el('flightForm')) el('flightForm').onsubmit = handleFlightSubmit;
+  if (el('rosterForm')) el('rosterForm').onsubmit = handleRosterSubmit;
   el('userForm').onsubmit = handleUserSubmit;
   const cancelVehicleButton = document.querySelector('[data-action="vehicle-cancel"]');
   if (cancelVehicleButton) cancelVehicleButton.onclick = resetVehicleForm;
@@ -1037,6 +1247,3 @@ setInterval(async () => {
 }, 120000);
 
 bootstrap();
-
-
-

@@ -19,7 +19,12 @@
         <button class="nav-btn" data-view="werkstatt">Werkstatt</button>
         <button class="nav-btn" data-view="schaeden">Schaeden</button>
         <button class="nav-btn" data-view="uvv">UVV</button>
+        <button class="nav-btn nav-btn-with-badge" data-view="benachrichtigungen">Benachrichtigungen <span class="menu-badge">37</span></button>
         <button class="nav-btn" data-view="benutzer">Benutzer</button>
+        <button class="nav-btn" data-view="fuehrerscheinkontrolle">Fuehrerscheinkontrolle</button>
+        <button class="nav-btn" data-view="adressbuch">Adressbuch</button>
+        <button class="nav-btn" data-view="reinigung">Reinigung</button>
+        <button class="nav-btn" data-view="lagerverwaltung">Lagerverwaltung</button>
         <button class="nav-btn" data-view="standorte">Standorte</button>
         <button class="nav-btn" data-view="statistik">Statistik</button>
         <button class="nav-btn" data-view="suche">Suche</button>
@@ -130,6 +135,12 @@
             </div>
           </div>
         </section>
+
+        <section id="benachrichtigungenView" class="view hidden"><div class="panel card"><h3>Benachrichtigungen</h3><p class="muted">Neue Hinweise, Freigaben und Erinnerungen erscheinen hier.</p></div></section>
+        <section id="fuehrerscheinkontrolleView" class="view hidden"><div class="panel card"><h3>Fuehrerscheinkontrolle</h3><p class="muted">Kontrolltermine und Nachweise fuer Fahrer werden hier verwaltet.</p></div></section>
+        <section id="adressbuchView" class="view hidden"><div class="panel card"><h3>Adressbuch</h3><p class="muted">Kontakte von Werkstaetten, Versicherungen und Dienstleistern.</p></div></section>
+        <section id="reinigungView" class="view hidden"><div class="panel card"><h3>Reinigung</h3><p class="muted">Reinigungsplaene und Fahrzeugaufbereitung im Ueberblick.</p></div></section>
+        <section id="lagerverwaltungView" class="view hidden"><div class="panel card"><h3>Lagerverwaltung</h3><p class="muted">Bestand, Materialverbrauch und Nachbestellungen.</p></div></section>
 
         <section id="benutzerView" class="view hidden">
           <div class="grid-2 layout-main">
@@ -274,7 +285,5 @@
   <script src="/js/app.js"></script>
 </body>
 </html>
-
-
 
 
