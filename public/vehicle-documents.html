@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dokumenten-Archiv</title>
+  <link rel="stylesheet" href="/css/vehicle-window.css?v=20260403-docs">
+</head>
+<body>
+  <div class="vehicle-shell">
+    <header class="vehicle-window-topbar">
+      <button type="button" class="back-btn" id="closeWindowBtn">Zurueck</button>
+      <div class="window-title-group">
+        <span class="eyebrow">Dokumenten-Archiv</span>
+        <h1 id="docsTitle">Fahrzeugdokumente</h1>
+        <p id="docsSubtitle">Bitte kurz warten.</p>
+      </div>
+      <div class="topbar-actions">
+        <button type="button" class="secondary-btn" id="reloadBtn">Neu laden</button>
+      </div>
+    </header>
+
+    <main class="vehicle-window-content">
+      <section class="detail-grid detail-grid-single">
+        <article class="detail-card">
+          <div class="section-head">
+            <h3>Vorhandene Dokumente</h3>
+          </div>
+          <div id="docsList" class="stack-panel"></div>
+        </article>
+
+        <article class="detail-card">
+          <div class="section-head">
+            <h3>Neues Dokument hochladen</h3>
+          </div>
+          <form id="docsUploadForm" class="docs-form">
+            <label>Name
+              <input name="name" required placeholder="z. B. Versicherungsschein">
+            </label>
+            <label>Typ
+              <select name="typ">
+                <option value="Versicherung">Versicherung</option>
+                <option value="Leasing">Leasing</option>
+                <option value="Rechnung">Rechnung</option>
+                <option value="Sonstiges" selected>Sonstiges</option>
+              </select>
+            </label>
+            <label>Datei
+              <input name="datei" type="file" required>
+            </label>
+            <p id="docsMessage" class="muted">Hier laedt du fahrzeugbezogene Dokumente hoch.</p>
+            <button type="submit" class="primary-btn">Dokument hochladen</button>
+          </form>
+        </article>
+      </section>
+    </main>
+  </div>
+
+  <script src="/js/vehicle-documents.js?v=20260403-docs"></script>
+</body>
+</html>

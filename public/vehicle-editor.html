@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Fahrzeugeditor</title>
+  <link rel="stylesheet" href="/css/vehicle-window.css?v=20260403-editor">
+</head>
+<body>
+  <div class="vehicle-shell">
+    <header class="vehicle-window-topbar">
+      <button type="button" class="back-btn" id="closeWindowBtn">Zurueck</button>
+      <div class="window-title-group">
+        <span class="eyebrow">Fahrzeugeditor</span>
+        <h1 id="editorTitle">Neues Fahrzeug anlegen</h1>
+        <p id="editorSubtitle">Stammdaten, Termine, Tankkarten und PDF in einem eigenen Fenster.</p>
+      </div>
+      <div class="topbar-actions">
+        <button type="button" class="secondary-btn" id="reloadBtn">Neu laden</button>
+      </div>
+    </header>
+
+    <main class="vehicle-window-content">
+      <section class="detail-grid detail-grid-single">
+        <article class="detail-card">
+          <div class="section-head">
+            <h3>Fahrzeugdaten</h3>
+          </div>
+          <form id="vehicleEditorForm" class="docs-form">
+            <label>Kennzeichen
+              <input name="kennzeichen" required placeholder="F-AB 1234">
+            </label>
+            <label>Fahrzeugmodell
+              <input name="fahrzeug" required placeholder="VW Golf">
+            </label>
+            <label>Standort
+              <select name="standort_id" id="editorStandort"></select>
+            </label>
+            <label>Status
+              <select name="status" id="editorStatus"></select>
+            </label>
+            <div class="split-two">
+              <label>HU Datum
+                <input name="hu_datum" type="date">
+              </label>
+              <label>UVV Datum
+                <input name="uvv_datum" type="date">
+              </label>
+            </div>
+            <div class="split-two">
+              <label>FIN
+                <input name="fin" placeholder="WBA...">
+              </label>
+              <label>Radiocode
+                <input name="radiocode" placeholder="1234">
+              </label>
+            </div>
+            <label>Fahrzeugschein PDF
+              <input name="fahrzeugschein_pdf" type="file" accept="application/pdf">
+            </label>
+            <p id="editorMessage" class="muted">Neues Fahrzeug wird beim Speichern direkt im Fuhrpark angelegt.</p>
+            <button type="submit" class="primary-btn">Speichern</button>
+          </form>
+        </article>
+
+        <article class="detail-card">
+          <div class="section-head">
+            <h3>Tankkarten</h3>
+          </div>
+          <div class="docs-form">
+            <label class="checkbox-inline">
+              <input name="tankkarten_vorhanden" id="editorTankkartenVorhanden" type="checkbox">
+              <span>Tankkarten vorhanden</span>
+            </label>
+            <div class="stack-item">
+              <strong>ARAL</strong>
+              <div class="docs-form">
+                <label>Kartennummer
+                  <input name="tankkarte_aral_nummer" form="vehicleEditorForm">
+                </label>
+                <div class="split-two">
+                  <label>Aktiv seit
+                    <input name="tankkarte_aral_aktiv_seit" form="vehicleEditorForm" type="date">
+                  </label>
+                  <label>Gueltig bis
+                    <input name="tankkarte_aral_gueltig_bis" form="vehicleEditorForm" type="date">
+                  </label>
+                </div>
+              </div>
+            </div>
+            <div class="stack-item">
+              <strong>SHELL</strong>
+              <div class="docs-form">
+                <label>Kartennummer
+                  <input name="tankkarte_shell_nummer" form="vehicleEditorForm">
+                </label>
+                <label>Kartenname
+                  <input name="tankkarte_shell_name" form="vehicleEditorForm">
+                </label>
+                <div class="split-two">
+                  <label>Gueltig von
+                    <input name="tankkarte_shell_gueltig_von" form="vehicleEditorForm" type="date">
+                  </label>
+                  <label>Gueltig bis
+                    <input name="tankkarte_shell_gueltig_bis" form="vehicleEditorForm" type="date">
+                  </label>
+                </div>
+              </div>
+            </div>
+          </div>
+        </article>
+      </section>
+    </main>
+  </div>
+
+  <script src="/js/vehicle-editor.js?v=20260403-editor"></script>
+</body>
+</html>
