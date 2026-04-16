@@ -9,9 +9,19 @@
 <body>
   <div id="appShell" class="app-shell app-shell-logged-out">
     <aside id="sidebar" class="sidebar hidden">
-      <div>
-        <h1>Fuhrpark</h1>
-        <p class="muted">Management by Michael Weber</p>
+      <div class="sidebar-brand">
+        <svg class="sidebar-logo" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+          <rect width="32" height="32" rx="8" fill="#2563EB"/>
+          <path d="M5 21h22M8 21v-6l4-4h8l4 4v6" stroke="#fff" stroke-width="2" stroke-linejoin="round"/>
+          <circle cx="11" cy="23" r="2" fill="#fff"/>
+          <circle cx="21" cy="23" r="2" fill="#fff"/>
+          <path d="M16 11V7" stroke="#93C5FD" stroke-width="2" stroke-linecap="round"/>
+          <path d="M13 9h6" stroke="#93C5FD" stroke-width="2" stroke-linecap="round"/>
+        </svg>
+        <div>
+          <strong class="sidebar-brand-name">FleetControl24</strong>
+          <span class="sidebar-brand-claim">Digitale Fuhrparkplattform</span>
+        </div>
       </div>
       <nav>
         <button class="nav-btn active" data-view="dashboard">Dashboard</button>
@@ -46,33 +56,68 @@
       </header>
 
       <section id="loginView" class="panel visible login-stage">
-        <div class="login-grid login-grid-hero">
-          <div class="login-hero-media">
-            <div class="login-hero-image" aria-hidden="true"></div>
-            <div class="login-hero-copy">
-              <span class="login-hero-eyebrow">FleetControl24</span>
-              <h1>Digitale Fuhrparkverwaltung fuer Unternehmen</h1>
-              <p>FleetControl24 buendelt Fahrzeuge, Werkstatt, Schaeden, Reinigung, UVV und Fuehrerscheinkontrolle in einer zentralen Software fuer den betrieblichen Alltag.</p>
-              <div class="login-hero-list">
-                <div><strong>Zentrale Uebersicht</strong><span>Fahrzeuge, Standorte, Dokumente und Status in einem System.</span></div>
-                <div><strong>Klare Organisation</strong><span>Werkstatt, Schaeden und Fristen fruehzeitig im Blick behalten.</span></div>
-                <div><strong>Praxisnah</strong><span>Geeignet fuer Unternehmen mit einem oder mehreren Standorten.</span></div>
+        <div class="login-saas-layout">
+          <div class="login-saas-left">
+            <div class="login-saas-brand">
+              <svg class="login-brand-logo" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                <rect width="40" height="40" rx="10" fill="#2563EB"/>
+                <path d="M6 27h28M10 27V19l5-5h10l5 5v8" stroke="#fff" stroke-width="2.2" stroke-linejoin="round"/>
+                <circle cx="14" cy="29.5" r="2.5" fill="#fff"/>
+                <circle cx="26" cy="29.5" r="2.5" fill="#fff"/>
+                <path d="M20 14V9" stroke="#93C5FD" stroke-width="2" stroke-linecap="round"/>
+                <path d="M17 11h6" stroke="#93C5FD" stroke-width="2" stroke-linecap="round"/>
+              </svg>
+              <div>
+                <strong class="login-brand-name">FleetControl24</strong>
+                <span class="login-brand-claim">Digitale Fuhrparkplattform</span>
+              </div>
+            </div>
+            <div class="login-saas-hero">
+              <h1>Fuhrpark. Digital.<br>Unter Kontrolle.</h1>
+              <p>FleetControl24 vereint Fahrzeuge, Werkstatt, Schaeden, UVV, Reinigung und Fuehrerscheinkontrolle in einer professionellen Plattform fuer den betrieblichen Alltag.</p>
+              <ul class="login-feature-list">
+                <li>
+                  <span class="login-feature-icon">&#10003;</span>
+                  <div><strong>Zentrale Leitstelle</strong><span>Fahrzeuge, Standorte und Status live im Blick.</span></div>
+                </li>
+                <li>
+                  <span class="login-feature-icon">&#10003;</span>
+                  <div><strong>Fristen &amp; Pruefungen</strong><span>HU, UVV und Werkstatttermine rechtzeitig erkennen.</span></div>
+                </li>
+                <li>
+                  <span class="login-feature-icon">&#10003;</span>
+                  <div><strong>Mehrstandort-faehig</strong><span>Klare Rollen und Standortlogik fuer jede Unternehmensgroesse.</span></div>
+                </li>
+              </ul>
+            </div>
+          </div>
+          <div class="login-saas-right">
+            <div class="login-saas-card">
+              <div class="login-card-head">
+                <h2>Willkommen zurueck</h2>
+                <p>Melden Sie sich mit Ihrem Konto an.</p>
+              </div>
+              <form id="loginForm" class="login-form">
+                <div class="login-field">
+                  <label for="loginInput">Benutzername oder E-Mail</label>
+                  <input id="loginInput" name="login" required placeholder="z. B. mweber oder admin@firma.de" autocomplete="username">
+                </div>
+                <div class="login-field">
+                  <label for="loginPassword">Passwort</label>
+                  <input id="loginPassword" name="passwort" type="password" required placeholder="Passwort eingeben" autocomplete="current-password">
+                </div>
+                <button type="submit" class="login-submit-btn">Anmelden</button>
+              </form>
+              <p id="loginError" class="login-error-msg"></p>
+              <div class="login-saas-footer">
+                <span>FleetControl24 &mdash; Michael Weber, Sandweg 6, 63225 Langen</span>
               </div>
             </div>
           </div>
-          <div class="panel card accent login-card">
-            <span class="login-hero-eyebrow">Kundenportal</span>
-            <h3>Login</h3>
-            <p class="muted">Zugang fuer Admins, Mitarbeiter und Kundenbereiche.</p>
-            <form id="loginForm" class="form-grid">
-              <label>Benutzername oder E-Mail<input name="login" required placeholder="z. B. Michael Weber oder admin@firma.de"></label>
-              <label>Passwort<input name="passwort" type="password" required placeholder="Passwort eingeben"></label>
-              <button type="submit">Anmelden</button>
-            </form>
-            <p id="loginError" class="error"></p>
-          </div>
         </div>
       </section>
+
+      <div id="staleDataHint" class="stale-data-hint hidden"></div>
 
       <section id="appView" class="hidden">
         <div id="dashboardView" class="view visible">

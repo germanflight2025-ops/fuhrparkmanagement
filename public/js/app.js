@@ -1168,7 +1168,7 @@ function filteredKontakte() {
 }
 
 function renderForms() {
-  el('vehicleForm').innerHTML = `
+  if (el('vehicleForm')) el('vehicleForm').innerHTML = `
     <div class="compact-launch-card">
       <div>
         <span class="eyebrow">Fahrzeugverwaltung</span>
@@ -1177,7 +1177,7 @@ function renderForms() {
       <p class="muted">Die Liste bleibt frei, der Editor laeuft im separaten Fenster.</p>
     </div>`;
 
-  el('workshopForm').innerHTML = `
+  if (el('workshopForm')) el('workshopForm').innerHTML = `
     <div class="compact-launch-card">
       <div>
         <span class="eyebrow">Werkstatt</span>
@@ -1189,6 +1189,7 @@ function renderForms() {
   const draftDamage = currentDamageDraft();
   const isEditingDamage = Boolean(state.editDamageId);
   const isDriverDamageFlow = state.user?.rolle === 'benutzer';
+  if (el('damageForm')) {
   if (!isDriverDamageFlow && !isEditingDamage) {
     el('damageForm').innerHTML = `
       <div class="compact-launch-card">
@@ -1261,6 +1262,7 @@ function renderForms() {
     <button type="submit">${isEditingDamage ? damageText('save_edit') : damageText('save_new')}</button>
     </div>`;
   }
+  } // end if (el('damageForm'))
 
   const draftUvv = currentUvvDraft();
   const isEditingUvv = Boolean(state.editUvvId);
@@ -1276,7 +1278,7 @@ function renderForms() {
       </div>
     </div>`).join('');
 
-  el('uvvForm').innerHTML = `
+  if (el('uvvForm')) el('uvvForm').innerHTML = `
     <div class="form-header-row">
       <div>
         <h3>${isEditingUvv ? 'UVV bearbeiten' : 'Neue UVV-Pruefung'}</h3>
@@ -1303,7 +1305,7 @@ function renderForms() {
   const draftUser = currentUserDraft();
   const isEditingUser = Boolean(state.editUserId);
   const roleOptions = availableUserRoleOptions().map(([value, label]) => `<option value="${value}" ${draftUser.rolle === value ? 'selected' : ''}>${label}</option>`).join('');
-  el('userForm').innerHTML = `
+  if (el('userForm')) el('userForm').innerHTML = `
     <div class="form-header-row">
       <div>
         <h3>${isEditingUser ? 'Benutzer bearbeiten' : 'Benutzer anlegen'}</h3>
@@ -1476,7 +1478,7 @@ function renderScannerModule() {
     ? (state.meta.standorte.find((item) => String(item.id) === String(state.selectedStandortId))?.name || 'Standort')
     : 'Alle Standorte';
 
-  el('scannerSummary').innerHTML = `
+  if (el('scannerSummary')) el('scannerSummary').innerHTML = `
     <div class="stats-grid scanner-kpi-grid">
       <div class="panel card"><span class="muted">Scanner gesamt</span><strong>${scannerRows.length}</strong></div>
       <div class="panel card"><span class="muted">Aktiv zugeordnet</span><strong>${assigned}</strong></div>
@@ -1502,7 +1504,7 @@ function renderScannerModule() {
     } }
   ]);
 
-  el('rampenTable').innerHTML = renderTable(rampRows, [
+  if (el('rampenTable')) el('rampenTable').innerHTML = renderTable(rampRows, [
     { key: 'nummer', label: 'Rampe', render: (v) => `<strong>${rampLabel(v)}</strong>` },
     { key: 'scanner_label', label: 'Scanner', render: (v, row) => row.scanner_id ? `<span>${v}</span><br><small class="muted">Nr. ${row.scanner_nummer}</small>` : '<span class="muted">Frei</span>' },
     { key: 'standort', label: 'Standort', render: (v) => v || '<span class="muted">-</span>' },
@@ -1661,6 +1663,14 @@ function renderPreviewPanel() {
   `;
 }
 
+function miniCards(items, tone = "default") {
+  return items.map(([label, value]) => `<div class="mini-kpi mini-kpi-${tone}"><span>${label}</span><strong>${value}</strong></div>`).join('');
+}
+
+function compactList(rows, renderer, emptyText) {
+  return rows.length ? rows.map(renderer).join('') : `<p class="muted">${emptyText}</p>`;
+}
+
 function renderDashboard() {
   const data = state.dashboard || {
     counts: { fahrzeuge: 0, werkstatt: 0, schaeden: 0, uvvFaellig: 0, huFaellig: 0 },
@@ -1676,21 +1686,19 @@ function renderDashboard() {
     updatedAt: ""
   };
   const stats = [['Fahrzeuge', data.counts.fahrzeuge], ['Werkstatt', data.counts.werkstatt], ['Schaeden', data.counts.schaeden], ['UVV faellig', data.counts.uvvFaellig], ['HU faellig', data.counts.huFaellig]];
-  const miniCards = (items, tone = "default") => items.map(([label, value]) => `<div class="mini-kpi mini-kpi-${tone}"><span>${label}</span><strong>${value}</strong></div>`).join('');
-  const compactList = (rows, renderer, emptyText) => rows.length ? rows.map(renderer).join('') : `<p class="muted">${emptyText}</p>`;
 
-  el('stats').innerHTML = stats.map(([label, value], index) => `<div class="stat-card stat-card-${index + 1}"><span>${label}</span><strong>${value}</strong><small>Echtzeitstatus fuer den ausgewaehlten Standort</small></div>`).join('');
-  el('dashboardUpdatedAt').textContent = data.updatedAt ? `Stand ${String(data.updatedAt).slice(11, 16)} Uhr` : "";
-  el('fahrzeugKpis').innerHTML = miniCards([['Aktiv', data.fahrzeugKpis.aktiv || 0], ['Nicht aktiv', data.fahrzeugKpis.nichtAktiv || 0], ['Pruefung', data.fahrzeugKpis.pruefung || 0], ['Werkstatt', data.fahrzeugKpis.werkstatt || 0], ['Schaden', data.fahrzeugKpis.schaden || 0]], "vehicle");
-  el('werkstattKpis').innerHTML = miniCards([['Gesamt', data.werkstattKpis.gesamt || 0], ['Offen', data.werkstattKpis.offen || 0], ['Bearbeitung', data.werkstattKpis.bearbeitung || 0], ['Abgeschlossen', data.werkstattKpis.abgeschlossen || 0]], "workshop");
-  el('schadenKpis').innerHTML = miniCards([['Gesamt', data.schadenKpis.gesamt || 0], ['Gemeldet', data.schadenKpis.gemeldet || 0], ['Reparatur', data.schadenKpis.reparatur || 0], ['Abgeschlossen', data.schadenKpis.abgeschlossen || 0]], "damage");
-  el('latestVehicles').innerHTML = compactList(data.latestVehicles || [], (item) => `<div class="compact-item"><strong>${item.kennzeichen}</strong><span>${item.fahrzeug} | ${item.standort}</span><span class="${badgeClass(item.status)}">${item.status}</span></div>`, "Keine Fahrzeugdaten vorhanden.");
-  el('latestWorkshop').innerHTML = compactList(data.latestWorkshop || [], (item) => `<div class="compact-item"><strong>${item.kennzeichen}</strong><span>${item.werkstatt_name} | ${item.problem}</span><span>${item.datum}</span><span class="${badgeClass(item.status)}">${item.status}</span></div>`, "Keine Werkstattauftraege vorhanden.");
-  el('latestSchaeden').innerHTML = compactList(data.latestSchaeden || [], (item) => `<div class="compact-item"><strong>${item.kennzeichen}</strong><span>${item.beschreibung}</span><span>${item.datum}</span><span class="${badgeClass(item.status)}">${item.status}</span></div>`, "Keine Schadenmeldungen vorhanden.");
+  if (el('stats')) el('stats').innerHTML = stats.map(([label, value], index) => `<div class="stat-card stat-card-${index + 1}"><span>${label}</span><strong>${value}</strong><small>Echtzeitstatus fuer den ausgewaehlten Standort</small></div>`).join('');
+  if (el('dashboardUpdatedAt')) el('dashboardUpdatedAt').textContent = data.updatedAt ? `Stand ${String(data.updatedAt).slice(11, 16)} Uhr` : "";
+  if (el('fahrzeugKpis')) el('fahrzeugKpis').innerHTML = miniCards([['Aktiv', data.fahrzeugKpis.aktiv || 0], ['Nicht aktiv', data.fahrzeugKpis.nichtAktiv || 0], ['Pruefung', data.fahrzeugKpis.pruefung || 0], ['Werkstatt', data.fahrzeugKpis.werkstatt || 0], ['Schaden', data.fahrzeugKpis.schaden || 0]], "vehicle");
+  if (el('werkstattKpis')) el('werkstattKpis').innerHTML = miniCards([['Gesamt', data.werkstattKpis.gesamt || 0], ['Offen', data.werkstattKpis.offen || 0], ['Bearbeitung', data.werkstattKpis.bearbeitung || 0], ['Abgeschlossen', data.werkstattKpis.abgeschlossen || 0]], "workshop");
+  if (el('schadenKpis')) el('schadenKpis').innerHTML = miniCards([['Gesamt', data.schadenKpis.gesamt || 0], ['Gemeldet', data.schadenKpis.gemeldet || 0], ['Reparatur', data.schadenKpis.reparatur || 0], ['Abgeschlossen', data.schadenKpis.abgeschlossen || 0]], "damage");
+  if (el('latestVehicles')) el('latestVehicles').innerHTML = compactList(data.latestVehicles || [], (item) => `<div class="compact-item"><strong>${item.kennzeichen}</strong><span>${item.fahrzeug} | ${item.standort}</span><span class="${badgeClass(item.status)}">${item.status}</span></div>`, "Keine Fahrzeugdaten vorhanden.");
+  if (el('latestWorkshop')) el('latestWorkshop').innerHTML = compactList(data.latestWorkshop || [], (item) => `<div class="compact-item"><strong>${item.kennzeichen}</strong><span>${item.werkstatt_name} | ${item.problem}</span><span>${item.datum}</span><span class="${badgeClass(item.status)}">${item.status}</span></div>`, "Keine Werkstattauftraege vorhanden.");
+  if (el('latestSchaeden')) el('latestSchaeden').innerHTML = compactList(data.latestSchaeden || [], (item) => `<div class="compact-item"><strong>${item.kennzeichen}</strong><span>${item.beschreibung}</span><span>${item.datum}</span><span class="${badgeClass(item.status)}">${item.status}</span></div>`, "Keine Schadenmeldungen vorhanden.");
   const locationRows = [...(data.vehiclesByLocation || [])].sort((a, b) => b.value - a.value);
   const locationMax = locationRows.length ? Math.max(...locationRows.map((item) => Number(item.value || 0)), 1) : 1;
   const locationTotal = locationRows.reduce((sum, item) => sum + Number(item.value || 0), 0);
-  el('locationChart').innerHTML = locationRows.length ? locationRows.map((item, index) => {
+  if (el('locationChart')) el('locationChart').innerHTML = locationRows.length ? locationRows.map((item, index) => {
     const value = Number(item.value || 0);
     const percent = locationTotal ? Math.round((value / locationTotal) * 100) : 0;
     const width = Math.max(Math.round((value / locationMax) * 100), value > 0 ? 8 : 0);
@@ -1702,7 +1710,7 @@ function renderDashboard() {
         <div class="location-row-track"><div class="location-row-fill" style="width:${width}%"></div></div>
       </div>`;
   }).join('') : "<p class=\"muted\">Keine Standorte vorhanden.</p>";
-  el('reminders').innerHTML = data.reminders.length ? data.reminders.map((item) => `<div><strong>${item.kennzeichen}</strong> - ${item.fahrzeug}<br><span class="badge warn">HU ${item.hu_in_tagen} Tage</span> <span class="badge warn">UVV ${item.uvv_in_tagen} Tage</span></div>`).join('') : "<p class=\"muted\">Keine kurzfristigen Faelligkeiten.</p>";
+  if (el('reminders')) el('reminders').innerHTML = data.reminders.length ? data.reminders.map((item) => `<div><strong>${item.kennzeichen}</strong> - ${item.fahrzeug}<br><span class="badge warn">HU ${item.hu_in_tagen} Tage</span> <span class="badge warn">UVV ${item.uvv_in_tagen} Tage</span></div>`).join('') : "<p class=\"muted\">Keine kurzfristigen Faelligkeiten.</p>";
   renderPreviewPanel();
 }
 
@@ -2479,7 +2487,7 @@ function renderReinigung() {
 function renderLists() {
   const canManage = state.user && state.user.rolle !== 'benutzer';
 
-  el('vehiclesTable').innerHTML = renderTable(state.fahrzeuge, [
+  if (el('vehiclesTable')) el('vehiclesTable').innerHTML = renderTable(state.fahrzeuge, [
     { key: 'kennzeichen', label: 'Kennzeichen', render: (v, row) => `<button class="vehicle-link-btn" data-action="vehicle-open" data-id="${row.id}">${v || '-'}</button>${String(state.editVehicleId) === String(row.id) ? '<br><span class="muted">Wird gerade bearbeitet</span>' : ''}` },
     { key: 'fahrzeug', label: 'Modell' },
     { key: 'fin', label: 'FIN', render: (v) => `<small class="code-font">${v || '-'}</small>` },
@@ -2493,7 +2501,7 @@ function renderLists() {
     { key: 'created_at', label: 'Angelegt', render: (v) => String(v || '').slice(0, 10) },
     { key: 'id', label: 'Aktion', render: (v, row) => canManage ? `<div class="action-row"><button class="secondary" data-action="vehicle-open" data-id="${v}">Details</button>${row.fahrzeugschein_pdf ? `<a class="icon-btn secondary-link" href="${row.fahrzeugschein_pdf}" target="_blank" rel="noopener" title="Fahrzeugschein oeffnen">PDF</a>` : ''}<button class="icon-btn" data-action="vehicle-docs" data-id="${v}" title="Dokumenten-Archiv">&#128193;</button><button class="icon-btn" data-action="vehicle-edit" data-id="${v}" title="Fahrzeug bearbeiten">&#9998;</button><button class="secondary" data-action="vehicle-delete" data-id="${v}">Loeschen</button></div>` : `<div class="action-row"><button class="secondary" data-action="vehicle-open" data-id="${v}">Details</button><button class="icon-btn" data-action="vehicle-docs" data-id="${v}" title="Dokumenten-Archiv">&#128193;</button></div>` }
   ]);
-  el('workshopTable').innerHTML = renderTable(filteredWorkshopRows(), [
+  if (el('workshopTable')) el('workshopTable').innerHTML = renderTable(filteredWorkshopRows(), [
     { key: 'werkstatt_name', label: 'Werkstattname', render: (v, row) => `${v || '-'}${String(state.editWorkshopId) === String(row.id) ? '<br><span class="muted">Wird gerade bearbeitet</span>' : ''}` },
     { key: 'kennzeichen', label: 'Fahrzeug' },
     { key: 'positionsnummer', label: 'Nr.' },
@@ -2507,7 +2515,7 @@ function renderLists() {
   ]);
   renderWorkshopOverview();
   const canEditDamageRow = (row) => canManage || (state.user?.rolle === 'benutzer' && Number(row.created_by) === Number(state.user?.id) && row.status !== 'abgeschlossen');
-  el('damageTable').innerHTML = renderTable(state.schaeden, [
+  if (el('damageTable')) el('damageTable').innerHTML = renderTable(state.schaeden, [
     { key: 'kennzeichen', label: 'Kennzeichen' },
     { key: 'fahrer_name', label: 'Fahrer', render: (v, row) => [v || '-', row.fahrer_telefon || ''].filter(Boolean).join('<br>') },
     { key: 'datum', label: 'Datum' },
@@ -2522,7 +2530,7 @@ function renderLists() {
     { key: 'id', label: 'Aktion', render: (v, row) => canEditDamageRow(row) ? `<div class="action-row"><button class="icon-btn" data-action="damage-edit" data-id="${v}" title="Schaden bearbeiten">&#9998;</button>${canManage ? `<button class="secondary" data-action="damage-delete" data-id="${v}">Loeschen</button>` : ''}</div>` : '-' }
   ]);
 
-  el('uvvTable').innerHTML = renderTable(state.uvv, [
+  if (el('uvvTable')) el('uvvTable').innerHTML = renderTable(state.uvv, [
     { key: 'kennzeichen', label: 'Kennzeichen' },
     { key: 'pruefer', label: 'Pruefer' },
     { key: 'datum', label: 'Pruefdatum' },
@@ -2532,7 +2540,7 @@ function renderLists() {
   ]);
   renderVehicleDetailModal();
 
-  el('licenseCheckTable').innerHTML = renderTable(state.licenseChecks || [], [
+  if (el('licenseCheckTable')) el('licenseCheckTable').innerHTML = renderTable(state.licenseChecks || [], [
     { key: 'benutzer_name', label: 'Fahrer' },
     { key: 'klassen', label: 'Klassen' },
     { key: 'ausstellungsdatum', label: 'Ausstellung', render: (v) => formatShortDate(v) },
@@ -2545,7 +2553,7 @@ function renderLists() {
     { key: 'id', label: 'Aktion', render: (v) => canManage ? `<div class="action-row"><button class="icon-btn" data-action="license-edit" data-id="${v}" title="Kontrolle bearbeiten">&#9998;</button><button class="secondary" data-action="license-delete" data-id="${v}">Loeschen</button><button onclick="downloadLicensePdf(${v})">PDF</button></div>` : `<button onclick="downloadLicensePdf(${v})">PDF</button>` }
   ]);
 
-  el('usersTable').innerHTML = renderTable(state.benutzer, [
+  if (el('usersTable')) el('usersTable').innerHTML = renderTable(state.benutzer, [
     { key: 'benutzername', label: 'Benutzername' },
     { key: 'name', label: 'Name', render: (v, row) => `${v || '-'}${String(state.editUserId) === String(row.id) ? '<br><span class="muted">Wird gerade bearbeitet</span>' : ''}` },
     { key: 'email', label: 'E-Mail' },
@@ -2582,7 +2590,7 @@ function renderLists() {
 
   renderCalendar();
 
-  el('locationsTable').innerHTML = renderTable(state.meta.standorte, [
+  if (el('locationsTable')) el('locationsTable').innerHTML = renderTable(state.meta.standorte, [
     { key: 'id', label: 'ID' },
     { key: 'name', label: 'Standort', render: (v, row) => state.user?.rolle === 'hauptadmin' ? `<input data-action="location-name" data-id="${row.id}" value="${v}">` : v },
     { key: 'id', label: 'Aktion', render: (v) => state.user?.rolle === 'hauptadmin' ? `<div class="action-row"><button data-action="location-save" data-id="${v}">Speichern</button><button class="secondary" data-action="location-delete" data-id="${v}">Loeschen</button></div>` : '-' }
@@ -2598,13 +2606,13 @@ function renderLists() {
     ['HU faellig', dashboardData.counts?.huFaellig || 0, 'warn'],
     ['UVV faellig', dashboardData.counts?.uvvFaellig || 0, 'warn']
   ];
-  el('statisticsHero').innerHTML = heroStats.map(([label, value, tone]) => `<div class="statistics-hero-card statistics-hero-${tone}"><span>${label}</span><strong>${value}</strong></div>`).join('');
-  el('statisticsTable').innerHTML = renderTable(statusRows, [{ key: 'label', label: 'Kategorie' }, { key: 'value', label: 'Anzahl' }]);
-  el('statisticsSummary').innerHTML = statusRows.length ? statusRows.map((item) => {
+  if (el('statisticsHero')) el('statisticsHero').innerHTML = heroStats.map(([label, value, tone]) => `<div class="statistics-hero-card statistics-hero-${tone}"><span>${label}</span><strong>${value}</strong></div>`).join('');
+  if (el('statisticsTable')) el('statisticsTable').innerHTML = renderTable(statusRows, [{ key: 'label', label: 'Kategorie' }, { key: 'value', label: 'Anzahl' }]);
+  if (el('statisticsSummary')) el('statisticsSummary').innerHTML = statusRows.length ? statusRows.map((item) => {
     const width = Math.max(Math.round((Number(item.value || 0) / maxStatusValue) * 100), item.value ? 8 : 0);
     return `<div class="statistics-status-row"><div class="statistics-status-head"><strong>${item.label}</strong><span>${item.value}</span></div><div class="statistics-status-track"><div class="statistics-status-fill" style="width:${width}%"></div></div></div>`;
   }).join('') : '<p class="muted">Keine Statistik vorhanden.</p>';
-  el('statisticsInsights').innerHTML = [
+  if (el('statisticsInsights')) el('statisticsInsights').innerHTML = [
     ['Aktive Fahrzeuge', dashboardData.fahrzeugKpis?.aktiv || 0, 'Direkt einsatzbereit'],
     ['In Werkstatt', dashboardData.fahrzeugKpis?.werkstatt || 0, 'Mit Werkstattbezug'],
     ['Schaden offen', dashboardData.schadenKpis?.gemeldet || 0, 'Neu gemeldete Schaeden'],
@@ -3409,15 +3417,15 @@ function bindEvents() {
 
 function bindDynamicForms() {
   if (el('vehicleForm')) el('vehicleForm').onsubmit = handleVehicleSubmit;
-  el('uploadDocForm').onsubmit = handleUploadDoc;
-  el('closeDocsBtn').onclick = () => {
+  if (el('uploadDocForm')) el('uploadDocForm').onsubmit = handleUploadDoc;
+  if (el('closeDocsBtn')) el('closeDocsBtn').onclick = () => {
     state.viewDocsVehicleId = null;
-    el('vehicleDocumentsPanel').classList.add('hidden');
+    el('vehicleDocumentsPanel')?.classList.add('hidden');
   };
-  el('workshopForm').onsubmit = handleWorkshopSubmit;
-  el('damageForm').onsubmit = handleDamageSubmit;
-  el('uvvForm').onsubmit = handleUvvSubmit;
-  el('userForm').onsubmit = handleUserSubmit;
+  if (el('workshopForm')) el('workshopForm').onsubmit = handleWorkshopSubmit;
+  if (el('damageForm')) el('damageForm').onsubmit = handleDamageSubmit;
+  if (el('uvvForm')) el('uvvForm').onsubmit = handleUvvSubmit;
+  if (el('userForm')) el('userForm').onsubmit = handleUserSubmit;
   if (el('kontaktForm')) el('kontaktForm').onsubmit = handleKontaktSubmit;
   const cancelVehicleButton = document.querySelector('[data-action="vehicle-cancel"]');
   if (cancelVehicleButton) cancelVehicleButton.onclick = resetVehicleForm;
@@ -3469,8 +3477,34 @@ async function bootstrap() {
   }
 }
 
+function isUserActivelyEditing() {
+  return Boolean(
+    state.editDamageId ||
+    state.editUserId ||
+    state.editKontaktId ||
+    state.editUvvId
+  );
+}
+
+function showStaleDataHint() {
+  const hint = el('staleDataHint');
+  if (hint) {
+    hint.textContent = 'Neue Daten verfuegbar';
+    hint.className = 'stale-data-hint visible';
+    hint.onclick = async () => {
+      hint.className = 'stale-data-hint hidden';
+      await refreshApp();
+    };
+  }
+}
+
 setInterval(async () => {
-  if (state.token) await refreshApp();
+  if (!state.token) return;
+  if (isUserActivelyEditing()) {
+    showStaleDataHint();
+    return;
+  }
+  await refreshApp();
 }, 120000);
 
 bootstrap();
