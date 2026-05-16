@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Fahrzeugfenster</title>
+  <link rel="stylesheet" href="/css/vehicle-window.css?v=20260403-window">
+</head>
+<body>
+  <div class="vehicle-shell">
+    <header class="vehicle-window-topbar">
+      <button type="button" class="back-btn" id="closeWindowBtn">Zurueck</button>
+      <div class="window-title-group">
+        <span class="eyebrow">Fahrzeugfenster</span>
+        <h1 id="vehicleTitle">Fahrzeug wird geladen</h1>
+        <p id="vehicleSubtitle">Bitte kurz warten.</p>
+      </div>
+      <div class="topbar-actions">
+        <button type="button" class="secondary-btn" id="reloadBtn">Neu laden</button>
+      </div>
+    </header>
+
+    <main id="vehicleWindowContent" class="vehicle-window-content">
+      <section class="hero-grid">
+        <article class="hero-card">
+          <div class="hero-header">
+            <div class="vehicle-icon">FZ</div>
+            <div>
+              <h2 id="heroName">Fahrzeug</h2>
+              <p id="heroMeta">Standort und Status</p>
+            </div>
+            <span id="heroStatus" class="status-chip">aktiv</span>
+          </div>
+          <div class="hero-actions">
+            <button type="button" class="primary-btn" id="editVehicleBtn">Bearbeiten</button>
+            <button type="button" class="secondary-btn" id="openDocsBtn">Dokumente</button>
+          </div>
+        </article>
+
+        <article class="summary-card">
+          <h3>Direktaktionen</h3>
+          <div class="summary-action-grid">
+            <button type="button" class="summary-action" id="gotoDamageBtn">
+              <strong>Schaden melden</strong>
+              <span>Zum Schadenbereich springen</span>
+            </button>
+            <button type="button" class="summary-action" id="gotoWorkshopBtn">
+              <strong>Werkstatt</strong>
+              <span>Werkstattstatus oeffnen</span>
+            </button>
+            <button type="button" class="summary-action" id="gotoUvvBtn">
+              <strong>Pruefungen</strong>
+              <span>HU, UVV und Termine ansehen</span>
+            </button>
+          </div>
+        </article>
+      </section>
+
+      <section id="vehicleKpis" class="kpi-grid"></section>
+
+      <section class="detail-grid">
+        <article class="detail-card">
+          <div class="section-head">
+            <h3>Fahrzeugdaten</h3>
+          </div>
+          <div id="vehicleMetaTable" class="meta-table"></div>
+        </article>
+
+        <article class="detail-card">
+          <div class="section-head">
+            <h3>Werkstatt</h3>
+          </div>
+          <div id="vehicleWorkshopPanel" class="stack-panel"></div>
+        </article>
+
+        <article class="detail-card">
+          <div class="section-head">
+            <h3>Schaeden</h3>
+          </div>
+          <div id="vehicleDamagePanel" class="stack-panel"></div>
+        </article>
+
+        <article class="detail-card">
+          <div class="section-head">
+            <h3>Pruefungen & Dokumente</h3>
+          </div>
+          <div id="vehicleChecksPanel" class="stack-panel"></div>
+        </article>
+      </section>
+    </main>
+  </div>
+
+  <script src="/js/vehicle-window.js?v=20260403-window"></script>
+</body>
+</html>

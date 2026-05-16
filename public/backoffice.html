@@ -1,0 +1,927 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>FleetControl24 Backoffice</title>
+  <link rel="stylesheet" href="/css/backoffice.css?v=20260405-backoffice-finish">
+</head>
+<body class="backoffice-body">
+  <section class="bo-auth-gate" id="boAuthGate">
+    <div class="bo-auth-card">
+      <span class="bo-kicker">FleetControl24 Backoffice</span>
+      <h1>Interner Zugang</h1>
+      <p>Bitte mit einem Hauptadmin- oder Superadmin-Konto anmelden.</p>
+      <form id="boLoginForm" class="bo-auth-form">
+        <label>Benutzername oder E-Mail<input name="login" required></label>
+        <label>Passwort<input name="passwort" type="password" required></label>
+        <button type="submit" class="bo-primary-action">Anmelden</button>
+      </form>
+      <p id="boLoginError" class="bo-error"></p>
+    </div>
+  </section>
+
+  <div class="bo-shell" id="boShell" style="display:none;">
+    <aside class="bo-sidebar">
+      <a class="bo-brand" href="/">
+        <span class="bo-brand-mark">FC24</span>
+        <span>
+          <strong>Backoffice</strong>
+          <small>FleetControl24</small>
+        </span>
+      </a>
+
+      <nav class="bo-nav" id="boNav">
+        <button class="bo-nav-btn active" data-view="dashboard">Dashboard</button>
+        <button class="bo-nav-btn" data-view="kunden">Kunden</button>
+        <button class="bo-nav-btn" data-view="leads">Anfragen & Demos</button>
+        <button class="bo-nav-btn" data-view="mandanten">Mandanten</button>
+        <button class="bo-nav-btn" data-view="pakete">Pakete</button>
+        <button class="bo-nav-btn" data-view="angebote">Angebote</button>
+        <button class="bo-nav-btn" data-view="rechnungen">Rechnungen</button>
+        <button class="bo-nav-btn" data-view="tickets">Tickets</button>
+        <button class="bo-nav-btn" data-view="mitarbeiter">Kundenteam</button>
+        <button class="bo-nav-btn" data-view="personal">HR / Personal</button>
+        <button class="bo-nav-btn" data-view="aufgaben">Aufgaben</button>
+        <button class="bo-nav-btn" data-view="dokumente">Dokumente</button>
+        <button class="bo-nav-btn" data-view="reports">Reports</button>
+        <button class="bo-nav-btn" data-view="technik">Technik</button>
+        <button class="bo-nav-btn" data-view="einstellungen">Einstellungen</button>
+      </nav>
+
+      <div class="bo-sidebar-footer">
+        <div class="bo-user-card">
+          <strong id="boUserName">-</strong>
+          <span id="boUserRole">-</span>
+        </div>
+        <a class="bo-ghost-link" href="/app">Zur App</a>
+        <button type="button" class="bo-ghost-btn" id="boLogoutBtn">Logout</button>
+      </div>
+    </aside>
+
+    <main class="bo-main">
+      <header class="bo-topbar">
+        <div>
+          <p class="bo-kicker">Interne Verwaltung</p>
+          <h1 id="boTitle">Dashboard</h1>
+          <p id="boSubtitle" class="bo-subtitle">Zentrale Steuerung von Kunden, Vertrieb, Support und Finanzen.</p>
+        </div>
+        <div class="bo-topbar-actions">
+          <label class="bo-search">
+            <span>Suche</span>
+            <input type="search" placeholder="Kunde, Ticket, Rechnung">
+          </label>
+          <button class="bo-primary-action" id="quickCreateCustomerBtn">Neuen Kunden anlegen</button>
+        </div>
+      </header>
+
+      <section class="bo-view visible" id="dashboardView">
+        <div class="bo-kpi-grid">
+          <article class="bo-kpi-card accent-blue"><span>Aktive Kunden</span><strong id="dashKpiCustomers">0</strong><small id="dashKpiCustomersMeta">-</small></article>
+          <article class="bo-kpi-card accent-amber"><span>Offene Tickets</span><strong id="dashKpiTickets">0</strong><small id="dashKpiTicketsMeta">-</small></article>
+          <article class="bo-kpi-card accent-green"><span>Monatsumsatz</span><strong id="dashKpiRevenue">0 EUR</strong><small id="dashKpiRevenueMeta">-</small></article>
+          <article class="bo-kpi-card accent-purple"><span>Neue Anfragen</span><strong id="dashKpiLeads">0</strong><small id="dashKpiLeadsMeta">-</small></article>
+        </div>
+
+        <div class="bo-grid bo-grid-main">
+          <section class="bo-panel">
+            <div class="bo-panel-head">
+              <h2>Kundenstatus</h2>
+              <span>Live-Ueberblick</span>
+            </div>
+            <div class="bo-mini-grid">
+              <article><strong id="dashCustomerActive">0</strong><span>Aktiv</span></article>
+              <article><strong id="dashCustomerTest">0</strong><span>Testkunden</span></article>
+              <article><strong id="dashCustomerPaused">0</strong><span>Pausiert</span></article>
+              <article><strong id="dashCustomerCancelled">0</strong><span>Gekuendigt</span></article>
+            </div>
+            <div class="bo-list" id="dashCustomerList">
+              <div class="bo-list-row"><strong>Keine Daten</strong><span>-</span><em class="bo-status">-</em></div>
+            </div>
+          </section>
+
+          <section class="bo-panel">
+            <div class="bo-panel-head">
+              <h2>Tickets & Service</h2>
+              <span>Supportstatus</span>
+            </div>
+            <div class="bo-support-board">
+              <article><strong id="dashTicketOpen">0</strong><span>Offen</span></article>
+              <article><strong id="dashTicketProgress">0</strong><span>In Bearbeitung</span></article>
+              <article><strong id="dashTicketWaiting">0</strong><span>Wartet auf Kunde</span></article>
+              <article><strong id="dashTicketDone">0</strong><span>Erledigt</span></article>
+            </div>
+            <table class="bo-table">
+              <thead><tr><th>Kunde</th><th>Thema</th><th>Prioritaet</th></tr></thead>
+              <tbody id="dashTicketTableBody">
+                <tr><td colspan="3">Keine Daten</td></tr>
+              </tbody>
+            </table>
+          </section>
+        </div>
+
+        <div class="bo-grid bo-grid-secondary">
+          <section class="bo-panel">
+            <div class="bo-panel-head">
+              <h2>Anfragen & Demos</h2>
+              <span>Vertrieb</span>
+            </div>
+            <div class="bo-lead-strip">
+              <article><strong id="dashLeadNew">0</strong><span>Neu</span></article>
+              <article><strong id="dashLeadDemo">0</strong><span>Demo</span></article>
+              <article><strong id="dashLeadOffer">0</strong><span>Angebot</span></article>
+              <article><strong id="dashLeadWon">0</strong><span>Gewonnen</span></article>
+            </div>
+            <div class="bo-list" id="dashLeadList">
+              <div class="bo-list-row"><strong>Keine Daten</strong><span>-</span><em class="bo-status">-</em></div>
+            </div>
+          </section>
+
+          <section class="bo-panel">
+            <div class="bo-panel-head">
+              <h2>Finanzen</h2>
+              <span>Forderungen</span>
+            </div>
+            <div class="bo-finance-cards">
+              <article><strong id="dashInvoiceOpen">0 EUR</strong><span>Offene Rechnungen</span></article>
+              <article><strong id="dashInvoiceOverdue">0 EUR</strong><span>Ueberfaellig</span></article>
+              <article><strong id="dashInvoiceCount">0</strong><span>Rechnungen diesen Monat</span></article>
+            </div>
+            <table class="bo-table">
+              <thead><tr><th>Kunde</th><th>Faellig</th><th>Status</th></tr></thead>
+              <tbody id="dashFinanceTableBody">
+                <tr><td colspan="3">Keine Daten</td></tr>
+              </tbody>
+            </table>
+          </section>
+
+          <section class="bo-panel">
+            <div class="bo-panel-head">
+              <h2>Aktivitaeten</h2>
+              <span>Letzte Aktionen</span>
+            </div>
+            <div class="bo-activity-list" id="dashActivityList">
+              <div><strong>Keine Aktivitaeten:</strong><span>Noch keine Eintraege.</span></div>
+            </div>
+          </section>
+
+          <section class="bo-panel">
+            <div class="bo-panel-head">
+              <h2>Systemstatus</h2>
+              <span>Technik</span>
+            </div>
+            <div class="bo-system-list" id="dashSystemList">
+              <div><span>Homepage</span><strong class="bo-status ok">online</strong></div>
+              <div><span>App</span><strong class="bo-status ok">online</strong></div>
+              <div><span>Backoffice</span><strong class="bo-status ok">online</strong></div>
+              <div><span>Letzter Backup</span><strong>heute 03:00</strong></div>
+            </div>
+          </section>
+        </div>
+      </section>
+
+      <section class="bo-view hidden" id="kundenView">
+        <div class="bo-page-head">
+          <h2>Kunden</h2>
+          <button class="bo-primary-action" id="openCustomerFormBtn">Kunde anlegen</button>
+        </div>
+        <div class="bo-customer-layout">
+          <form class="bo-panel bo-customer-form hidden" id="boCustomerForm">
+            <div class="bo-panel-head">
+              <h2 id="boCustomerFormTitle">Kunde anlegen</h2>
+              <button type="button" class="bo-inline-btn" id="boCustomerCancelBtn">Abbrechen</button>
+            </div>
+            <input type="hidden" name="id">
+            <label>Firmenname<input name="firma" required></label>
+            <label>Ansprechpartner<input name="ansprechpartner"></label>
+            <label>E-Mail<input name="email" type="email"></label>
+            <label>Telefon<input name="telefon"></label>
+            <div class="bo-form-grid">
+              <label>Paket
+                <select name="paket">
+                  <option>Kostenlos</option>
+                  <option selected>Starter</option>
+                  <option>Professional</option>
+                  <option>Enterprise</option>
+                </select>
+              </label>
+              <label>Status
+                <select name="status">
+                  <option value="aktiv">Aktiv</option>
+                  <option value="test">Test</option>
+                  <option value="pausiert">Pausiert</option>
+                  <option value="gekuendigt">Gekuendigt</option>
+                </select>
+              </label>
+              <label>Standorte<input name="standorte" type="number" min="1" value="1"></label>
+            </div>
+            <input type="hidden" name="zusatzmodule">
+            <div class="bo-module-picker">
+              <div class="bo-module-picker-head">
+                <strong>Zusatzmodule</strong>
+                <span id="boCustomerModuleHint" class="bo-form-hint">Module werden passend zum Paket aktiviert.</span>
+              </div>
+              <div id="boCustomerModuleList" class="bo-module-checklist"></div>
+            </div>
+            <label>Notiz<textarea name="notiz" rows="4"></textarea></label>
+            <button type="submit" class="bo-primary-action">Speichern</button>
+            <p id="boCustomerMessage" class="bo-form-message"></p>
+          </form>
+
+          <div>
+            <div class="bo-filter-row">
+              <input type="search" placeholder="Kunde oder Ansprechpartner suchen" id="boCustomerSearch">
+              <select id="boCustomerStatusFilter"><option value="">Alle Status</option><option value="aktiv">Aktiv</option><option value="test">Test</option><option value="pausiert">Pausiert</option></select>
+              <select id="boCustomerPackageFilter"><option value="">Alle Pakete</option><option value="Kostenlos">Kostenlos</option><option value="Starter">Starter</option><option value="Professional">Professional</option><option value="Enterprise">Enterprise</option></select>
+            </div>
+            <div class="bo-table-wrap">
+              <table class="bo-table bo-table-large">
+                <thead><tr><th>Kunde</th><th>Ansprechpartner</th><th>Paket</th><th>Standorte</th><th>Status</th><th>Aktion</th></tr></thead>
+                <tbody id="boCustomerTableBody"></tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="bo-view hidden" id="leadsView">
+        <div class="bo-page-head">
+          <h2>Anfragen & Demos</h2>
+          <button class="bo-primary-action" id="openLeadFormBtn">Anfrage erfassen</button>
+        </div>
+        <div class="bo-customer-layout">
+          <form class="bo-panel bo-customer-form hidden" id="boLeadForm">
+            <div class="bo-panel-head">
+              <h2 id="boLeadFormTitle">Anfrage anlegen</h2>
+              <button type="button" class="bo-inline-btn" id="boLeadCancelBtn">Abbrechen</button>
+            </div>
+            <input type="hidden" name="id">
+            <label>Name<input name="name" required></label>
+            <label>Firma<input name="firma" required></label>
+            <label>E-Mail<input name="email" type="email"></label>
+            <label>Telefon<input name="telefon"></label>
+              <div class="bo-form-grid">
+                <label>Fahrzeuge<input name="fahrzeuge" type="number" min="0" value="0"></label>
+                <label>Status
+                  <select name="status">
+                  <option value="neu">Neu</option>
+                  <option value="kontaktiert">Kontaktiert</option>
+                  <option value="demo">Demo</option>
+                  <option value="angebot">Angebot</option>
+                  <option value="gewonnen">Gewonnen</option>
+                  <option value="verloren">Verloren</option>
+                  </select>
+                </label>
+                <label>Quelle<input name="quelle" placeholder="z. B. Website"></label>
+              </div>
+              <label>Paketwunsch<input name="paket_wunsch" placeholder="z. B. Starter oder Enterprise"></label>
+              <div class="bo-form-grid">
+                <label>Demo-Start<input name="demo_start" type="date"></label>
+                <label>Demo-Ende<input name="demo_end" type="date"></label>
+              </div>
+            <label>Notiz<textarea name="notiz" rows="4"></textarea></label>
+            <button type="submit" class="bo-primary-action">Speichern</button>
+            <p id="boLeadMessage" class="bo-form-message"></p>
+          </form>
+
+          <div class="bo-board-wrap">
+            <div class="bo-kanban" id="boLeadBoard">
+              <article class="bo-column"><h3>Neu</h3><div class="bo-column-list" data-lead-column="neu"></div></article>
+              <article class="bo-column"><h3>Kontaktiert</h3><div class="bo-column-list" data-lead-column="kontaktiert"></div></article>
+              <article class="bo-column"><h3>Demo</h3><div class="bo-column-list" data-lead-column="demo"></div></article>
+              <article class="bo-column"><h3>Angebot</h3><div class="bo-column-list" data-lead-column="angebot"></div></article>
+              <article class="bo-column"><h3>Gewonnen</h3><div class="bo-column-list" data-lead-column="gewonnen"></div></article>
+              <article class="bo-column"><h3>Verloren</h3><div class="bo-column-list" data-lead-column="verloren"></div></article>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="bo-view hidden" id="mandantenView">
+        <div class="bo-page-head">
+          <h2>Mandanten</h2>
+          <button class="bo-primary-action" id="openMandantFormBtn">Mandant anlegen</button>
+        </div>
+        <div class="bo-customer-layout">
+          <form class="bo-panel bo-customer-form hidden" id="boMandantForm">
+            <div class="bo-panel-head">
+              <h2 id="boMandantFormTitle">Mandant anlegen</h2>
+              <button type="button" class="bo-inline-btn" id="boMandantCancelBtn">Abbrechen</button>
+            </div>
+            <input type="hidden" name="id">
+            <label>Name<input name="name" required></label>
+            <label>Subdomain<input name="subdomain" placeholder="z. B. maxclean"></label>
+            <label>Kunde / Firma<input name="firma" placeholder="Optionaler Anzeigename"></label>
+            <div class="bo-form-grid">
+              <label>Status
+                <select name="aktiv">
+                  <option value="true">Aktiv</option>
+                  <option value="false">Pausiert</option>
+                </select>
+              </label>
+            </div>
+            <button type="submit" class="bo-primary-action">Speichern</button>
+            <p id="boMandantMessage" class="bo-form-message"></p>
+          </form>
+
+          <div class="bo-table-wrap">
+            <table class="bo-table bo-table-large">
+              <thead><tr><th>Mandant</th><th>Kunde</th><th>URL</th><th>Nutzer</th><th>Status</th><th>Aktion</th></tr></thead>
+              <tbody id="boMandantTableBody"></tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <section class="bo-view hidden" id="paketeView">
+        <div class="bo-page-head">
+          <h2>Pakete</h2>
+          <button class="bo-primary-action" id="openPackageFormBtn">Paket anlegen</button>
+        </div>
+        <div class="bo-customer-layout">
+          <form class="bo-panel bo-customer-form hidden" id="boPackageForm">
+            <div class="bo-panel-head">
+              <h2 id="boPackageFormTitle">Paket anlegen</h2>
+              <button type="button" class="bo-inline-btn" id="boPackageCancelBtn">Abbrechen</button>
+            </div>
+            <input type="hidden" name="id">
+            <label>Paketname<input name="name" required placeholder="z. B. Premium"></label>
+              <div class="bo-form-grid">
+                <label>Preis<input name="preis" placeholder="z. B. 249 EUR / Monat"></label>
+                <label>Standorte<input name="standorte" placeholder="z. B. Mehrere Standorte"></label>
+                <label>Abrechnung
+                  <select name="abrechnung">
+                    <option value="monatlich">Monatlich</option>
+                    <option value="jaehrlich">Jaehrlich</option>
+                    <option value="individuell">Individuell</option>
+                  </select>
+                </label>
+                <label>Status
+                  <select name="status">
+                    <option value="aktiv">Aktiv</option>
+                    <option value="entwurf">Entwurf</option>
+                    <option value="archiviert">Archiviert</option>
+                  </select>
+                </label>
+              </div>
+              <label>Kurzbeschreibung<input name="beschreibung" placeholder="z. B. Fuer kleine Fuhrparks mit 1-2 Standorten"></label>
+              <label>Leistungen<textarea name="leistungen" rows="4" placeholder="Funktionen und Leistungsumfang"></textarea></label>
+              <button type="submit" class="bo-primary-action">Speichern</button>
+              <p id="boPackageMessage" class="bo-form-message"></p>
+            </form>
+
+            <div class="bo-table-wrap">
+              <table class="bo-table bo-table-large">
+                <thead><tr><th>Paket</th><th>Preis</th><th>Abrechnung</th><th>Standorte</th><th>Status</th><th>Leistungen</th><th>Aktion</th></tr></thead>
+                <tbody id="boPackageTableBody"></tbody>
+              </table>
+            </div>
+          </div>
+        </section>
+
+      <section class="bo-view hidden" id="angeboteView">
+        <div class="bo-page-head">
+          <h2>Angebote</h2>
+          <button class="bo-primary-action" id="openOfferFormBtn">Angebot anlegen</button>
+        </div>
+        <div class="bo-customer-layout">
+          <form class="bo-panel bo-customer-form hidden" id="boOfferForm">
+            <div class="bo-panel-head">
+              <h2 id="boOfferFormTitle">Angebot anlegen</h2>
+              <button type="button" class="bo-inline-btn" id="boOfferCancelBtn">Abbrechen</button>
+            </div>
+            <input type="hidden" name="id">
+            <label>Kunde<input name="kunde" required></label>
+            <div class="bo-form-grid">
+              <label>Paket
+                <select name="paket">
+                  <option value="Kostenlos">Kostenlos</option>
+                  <option value="Starter">Starter</option>
+                  <option value="Professional">Professional</option>
+                  <option value="Enterprise">Enterprise</option>
+                </select>
+              </label>
+              <label>Volumen<input name="volumen" placeholder="z. B. 249 EUR / Monat"></label>
+              <label>Status
+                <select name="status">
+                  <option value="entwurf">Entwurf</option>
+                  <option value="gesendet">Gesendet</option>
+                  <option value="demo">Demo</option>
+                  <option value="angenommen">Angenommen</option>
+                  <option value="abgelehnt">Abgelehnt</option>
+                </select>
+              </label>
+            </div>
+            <label>Stand<input name="stand" placeholder="z. B. 02.04.2026"></label>
+            <label>Notiz<textarea name="notiz" rows="4"></textarea></label>
+            <button type="submit" class="bo-primary-action">Speichern</button>
+            <p id="boOfferMessage" class="bo-form-message"></p>
+          </form>
+
+          <div class="bo-table-wrap">
+            <table class="bo-table bo-table-large">
+              <thead><tr><th>Kunde</th><th>Paket</th><th>Volumen</th><th>Status</th><th>Stand</th><th>Aktion</th></tr></thead>
+              <tbody id="boOfferTableBody"></tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <section class="bo-view hidden" id="rechnungenView">
+        <div class="bo-page-head">
+          <h2>Rechnungen</h2>
+          <button class="bo-primary-action" id="openInvoiceFormBtn">Rechnung anlegen</button>
+        </div>
+        <div class="bo-customer-layout">
+          <form class="bo-panel bo-customer-form hidden" id="boInvoiceForm">
+            <div class="bo-panel-head">
+              <h2 id="boInvoiceFormTitle">Rechnung anlegen</h2>
+              <button type="button" class="bo-inline-btn" id="boInvoiceCancelBtn">Abbrechen</button>
+            </div>
+            <input type="hidden" name="id">
+            <label>Rechnungsnummer<input name="nummer" placeholder="z. B. 2026-041"></label>
+            <label>Kunde<input name="kunde" required></label>
+            <div class="bo-form-grid">
+              <label>Betrag in EUR<input name="betrag" type="number" min="0" step="0.01" value="0"></label>
+              <label>Faellig am<input name="faellig_am" type="date"></label>
+              <label>Status
+                <select name="status">
+                  <option value="entwurf">Entwurf</option>
+                  <option value="offen">Offen</option>
+                  <option value="bezahlt">Bezahlt</option>
+                  <option value="ueberfaellig">Ueberfaellig</option>
+                </select>
+              </label>
+            </div>
+            <label>Notiz<textarea name="notiz" rows="4"></textarea></label>
+            <button type="submit" class="bo-primary-action">Speichern</button>
+            <p id="boInvoiceMessage" class="bo-form-message"></p>
+          </form>
+
+          <div class="bo-board-wrap">
+            <div class="bo-finance-cards" id="boInvoiceSummary">
+              <article><strong>0 EUR</strong><span>Offen</span></article>
+              <article><strong>0 EUR</strong><span>Ueberfaellig</span></article>
+              <article><strong>0 EUR</strong><span>Bezahlt</span></article>
+            </div>
+            <table class="bo-table bo-table-large">
+              <thead><tr><th>Rechnung</th><th>Kunde</th><th>Betrag</th><th>Faellig</th><th>Status</th><th>Aktion</th></tr></thead>
+              <tbody id="boInvoiceTableBody"></tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <section class="bo-view hidden" id="ticketsView">
+        <div class="bo-page-head">
+          <h2>Tickets</h2>
+          <button class="bo-primary-action" id="openTicketFormBtn">Ticket anlegen</button>
+        </div>
+        <div class="bo-customer-layout">
+          <form class="bo-panel bo-customer-form hidden" id="boTicketForm">
+            <div class="bo-panel-head">
+              <h2 id="boTicketFormTitle">Ticket anlegen</h2>
+              <button type="button" class="bo-inline-btn" id="boTicketCancelBtn">Abbrechen</button>
+            </div>
+            <input type="hidden" name="id">
+            <label>Kunde<input name="kunde" required></label>
+            <label>Betreff<input name="betreff" required></label>
+            <div class="bo-form-grid">
+              <label>Prioritaet
+                <select name="prioritaet">
+                  <option value="normal">Normal</option>
+                  <option value="mittel">Mittel</option>
+                  <option value="hoch">Hoch</option>
+                </select>
+              </label>
+              <label>Status
+                <select name="status">
+                  <option value="offen">Offen</option>
+                  <option value="in_bearbeitung">In Bearbeitung</option>
+                  <option value="wartet_auf_kunde">Wartet auf Kunde</option>
+                  <option value="erledigt">Erledigt</option>
+                </select>
+              </label>
+              <label>Zustaendig<input name="zustaendig"></label>
+            </div>
+            <label>Notiz<textarea name="notiz" rows="4"></textarea></label>
+            <button type="submit" class="bo-primary-action">Speichern</button>
+            <p id="boTicketMessage" class="bo-form-message"></p>
+          </form>
+
+          <div class="bo-board-wrap">
+            <div class="bo-kanban" id="boTicketBoard">
+              <article class="bo-column"><h3>Offen</h3><div class="bo-column-list" data-ticket-column="offen"></div></article>
+              <article class="bo-column"><h3>In Bearbeitung</h3><div class="bo-column-list" data-ticket-column="in_bearbeitung"></div></article>
+              <article class="bo-column"><h3>Wartet auf Kunde</h3><div class="bo-column-list" data-ticket-column="wartet_auf_kunde"></div></article>
+              <article class="bo-column"><h3>Erledigt</h3><div class="bo-column-list" data-ticket-column="erledigt"></div></article>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="bo-view hidden" id="mitarbeiterView">
+        <div class="bo-page-head">
+          <h2>Kundenteam</h2>
+          <button class="bo-primary-action" id="openEmployeeFormBtn">Teammitglied anlegen</button>
+        </div>
+        <div class="bo-customer-layout">
+          <form class="bo-panel bo-customer-form hidden" id="boEmployeeForm">
+            <div class="bo-panel-head">
+              <h2 id="boEmployeeFormTitle">Teammitglied anlegen</h2>
+              <button type="button" class="bo-inline-btn" id="boEmployeeCancelBtn">Abbrechen</button>
+            </div>
+            <input type="hidden" name="id">
+            <label>Kunde
+              <select name="customer_id" required id="boEmployeeCustomerSelect"></select>
+            </label>
+            <label>Name<input name="name" required></label>
+            <div class="bo-form-grid">
+              <label>Rolle
+                <select name="rolle">
+                  <option value="fuhrparkleitung">Fuhrparkleitung</option>
+                  <option value="standortleitung">Standortleitung</option>
+                  <option value="disposition">Disposition</option>
+                  <option value="fahrer">Fahrer</option>
+                  <option value="werkstattkoordination">Werkstattkoordination</option>
+                  <option value="verwaltung">Verwaltung</option>
+                </select>
+              </label>
+              <label>Status
+                <select name="status">
+                  <option value="aktiv">Aktiv</option>
+                  <option value="eingeladen">Eingeladen</option>
+                  <option value="pausiert">Pausiert</option>
+                </select>
+              </label>
+            </div>
+            <div class="bo-form-grid">
+              <label>Benutzername<input name="benutzername" required placeholder="z. B. maxmueller"></label>
+              <label>App-Rolle
+                <select name="app_rolle">
+                  <option value="hauptadmin">Verwaltung</option>
+                  <option value="admin">Fuhrparkmanager</option>
+                  <option value="abteilungsleiter">Abteilungsleiter</option>
+                  <option value="lagerleiter">Lagerleiter</option>
+                  <option value="benutzer">Fahrer</option>
+                </select>
+              </label>
+            </div>
+            <label>E-Mail<input name="email" type="email"></label>
+            <label>Telefon<input name="telefon"></label>
+            <label>Startpasswort<input name="passwort" type="password" placeholder="Beim Bearbeiten leer lassen, wenn es gleich bleiben soll."></label>
+            <div class="bo-inline-actions">
+              <button type="button" class="bo-inline-btn" id="generateWelcomeAccessBtn">Willkommenszugang erzeugen</button>
+              <button type="button" class="bo-inline-btn" id="copyWelcomeAccessBtn">Zugangsdaten kopieren</button>
+            </div>
+            <div class="bo-welcome-box" id="boWelcomeAccessBox">
+              <strong>Willkommenszugang</strong>
+              <pre id="boWelcomeAccessText">Noch keine Zugangsdaten erzeugt.</pre>
+            </div>
+            <button type="submit" class="bo-primary-action">Speichern</button>
+            <p id="boEmployeeMessage" class="bo-form-message"></p>
+          </form>
+
+          <div class="bo-table-wrap">
+            <table class="bo-table bo-table-large">
+              <thead><tr><th>Name</th><th>Kunde</th><th>Login</th><th>App-Rolle</th><th>E-Mail</th><th>Status</th><th>Aktion</th></tr></thead>
+              <tbody id="boEmployeeTableBody"></tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <section class="bo-view hidden" id="personalView">
+        <div class="bo-page-head">
+          <h2>HR / Personal</h2>
+          <button class="bo-primary-action" id="openPersonnelFormBtn">Mitarbeiter anlegen</button>
+        </div>
+        <div class="bo-customer-layout">
+          <div class="bo-table-wrap">
+            <table class="bo-table bo-table-large">
+              <thead><tr><th>Name</th><th>Abteilung</th><th>Rolle</th><th>Portal</th><th>Start</th><th>Gehalt</th><th>Login</th><th>Status</th><th>Aktion</th></tr></thead>
+              <tbody id="boPersonnelTableBody"></tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <div class="bo-modal hidden" id="boPersonnelModal">
+        <div class="bo-modal-backdrop" data-close-personnel-modal></div>
+        <div class="bo-modal-dialog bo-modal-dialog-wide">
+          <form class="bo-panel bo-customer-form" id="boPersonnelForm">
+            <div class="bo-panel-head">
+              <h2 id="boPersonnelFormTitle">Mitarbeiter anlegen</h2>
+              <button type="button" class="bo-inline-btn" id="boPersonnelCancelBtn">Abbrechen</button>
+            </div>
+            <input type="hidden" name="id">
+            <label>Name<input name="name" required></label>
+            <div class="bo-form-grid">
+              <label>Abteilung<input name="abteilung" placeholder="z. B. HR, Vertrieb, Support"></label>
+              <label>Rolle<input name="rolle" placeholder="z. B. Personalreferent"></label>
+              <label>Status
+                <select name="status">
+                  <option value="aktiv">Aktiv</option>
+                  <option value="bewerbung">Bewerbung</option>
+                  <option value="onboarding">Onboarding</option>
+                  <option value="pausiert">Pausiert</option>
+                  <option value="ausgeschieden">Ausgeschieden</option>
+                </select>
+              </label>
+            </div>
+            <div class="bo-form-grid">
+              <label>E-Mail<input name="email" type="email"></label>
+              <label>Telefon<input name="telefon"></label>
+              <label>Startdatum<input name="startdatum" type="date"></label>
+            </div>
+            <div class="bo-form-grid">
+              <label>Gehalt<input name="gehalt" placeholder="z. B. 3.200 EUR brutto"></label>
+              <label>Personalakte<input name="personalakte_nummer" placeholder="z. B. PA-2026-014"></label>
+              <label>Zugang / Login<input name="zugang_login" placeholder="z. B. m.weber"></label>
+            </div>
+            <div class="bo-form-grid">
+              <label>Personalakte Status<input name="personalakte_status" placeholder="z. B. vollstaendig, offen, in Pruefung"></label>
+              <label>Mitarbeiterportal<input name="mitarbeiterportal_status" placeholder="z. B. aktiv, vorbereitet, gesperrt"></label>
+              <label>Recruiting<input name="recruiting_phase" placeholder="z. B. Bewerbung, Interview, eingestellt"></label>
+            </div>
+            <div class="bo-form-grid">
+              <label>Performance<input name="performance_status" placeholder="z. B. Zielgespraech offen"></label>
+              <label>Zeiterfassung<input name="zeiterfassung_modell" placeholder="z. B. Vollzeit, Schicht, Vertrauenszeit"></label>
+              <label>Kostenstelle<input name="kostenstelle" placeholder="z. B. HR-100 oder Operations"></label>
+            </div>
+            <label>Backoffice-Rolle
+              <select name="backoffice_rolle">
+                <option value="mitarbeiter">Mitarbeiter</option>
+                <option value="hr">HR</option>
+              </select>
+            </label>
+            <label>Startpasswort / Zugangsdaten<input name="zugang_passwort" placeholder="z. B. temporaer oder intern dokumentiert"></label>
+            <label>Notiz<textarea name="notiz" rows="4" placeholder="Personalakte, Vertragsstand, Hinweise"></textarea></label>
+            <button type="submit" class="bo-primary-action">Speichern</button>
+            <p id="boPersonnelMessage" class="bo-form-message"></p>
+          </form>
+        </div>
+      </div>
+
+      <section class="bo-view hidden" id="aufgabenView">
+        <div class="bo-page-head">
+          <h2>Aufgaben</h2>
+          <button class="bo-primary-action" id="openTaskFormBtn">Aufgabe anlegen</button>
+        </div>
+        <div class="bo-customer-layout">
+          <form class="bo-panel bo-customer-form hidden" id="boTaskForm">
+            <div class="bo-panel-head">
+              <h2 id="boTaskFormTitle">Aufgabe anlegen</h2>
+              <button type="button" class="bo-inline-btn" id="boTaskCancelBtn">Abbrechen</button>
+            </div>
+            <input type="hidden" name="id">
+            <label>Titel<input name="titel" required></label>
+            <div class="bo-form-grid">
+              <label>Bereich
+                <select name="bereich">
+                  <option value="allgemein">Allgemein</option>
+                  <option value="vertrieb">Vertrieb</option>
+                  <option value="support">Support</option>
+                  <option value="betrieb">Betrieb</option>
+                  <option value="finanzen">Finanzen</option>
+                </select>
+              </label>
+              <label>Status
+                <select name="status">
+                  <option value="offen">Offen</option>
+                  <option value="in_bearbeitung">In Bearbeitung</option>
+                  <option value="erledigt">Erledigt</option>
+                </select>
+              </label>
+              <label>Faellig am<input name="faellig_am" type="date"></label>
+            </div>
+            <label>Notiz<textarea name="notiz" rows="4"></textarea></label>
+            <button type="submit" class="bo-primary-action">Speichern</button>
+            <p id="boTaskMessage" class="bo-form-message"></p>
+          </form>
+
+          <div class="bo-table-wrap">
+            <table class="bo-table bo-table-large">
+              <thead><tr><th>Titel</th><th>Bereich</th><th>Status</th><th>Faellig</th><th>Aktion</th></tr></thead>
+              <tbody id="boTaskTableBody"></tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <section class="bo-view hidden" id="dokumenteView">
+        <div class="bo-page-head">
+          <h2>Dokumente</h2>
+          <button class="bo-primary-action" id="openDocumentFormBtn">Dokument anlegen</button>
+        </div>
+        <div class="bo-customer-layout">
+          <form class="bo-panel bo-customer-form hidden" id="boDocumentForm">
+            <div class="bo-panel-head">
+              <h2 id="boDocumentFormTitle">Dokument anlegen</h2>
+              <button type="button" class="bo-inline-btn" id="boDocumentCancelBtn">Abbrechen</button>
+            </div>
+            <input type="hidden" name="id">
+            <label>Titel<input name="titel" required></label>
+            <div class="bo-form-grid">
+              <label>Typ
+                <select name="typ">
+                  <option value="vertrag">Vertrag</option>
+                  <option value="angebot">Angebot</option>
+                  <option value="rechnung">Rechnung</option>
+                  <option value="intern">Intern</option>
+                  <option value="sonstiges">Sonstiges</option>
+                </select>
+              </label>
+              <label>Status
+                <select name="status">
+                  <option value="aktiv">Aktiv</option>
+                  <option value="archiviert">Archiviert</option>
+                </select>
+              </label>
+            </div>
+            <label>Bezug<input name="bezug" placeholder="z. B. MaxClean GmbH oder Vertrag 2026"></label>
+            <label>Notiz<textarea name="notiz" rows="4"></textarea></label>
+            <button type="submit" class="bo-primary-action">Speichern</button>
+            <p id="boDocumentMessage" class="bo-form-message"></p>
+          </form>
+
+          <div class="bo-table-wrap">
+            <table class="bo-table bo-table-large">
+              <thead><tr><th>Titel</th><th>Typ</th><th>Bezug</th><th>Status</th><th>Aktion</th></tr></thead>
+              <tbody id="boDocumentTableBody"></tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <section class="bo-view hidden" id="reportsView">
+        <div class="bo-kpi-grid">
+          <article class="bo-kpi-card accent-green"><span>Kundenwachstum</span><strong id="reportCustomerGrowth">0</strong><small id="reportCustomerGrowthMeta">Aktive vs. pausierte Kunden</small></article>
+          <article class="bo-kpi-card accent-blue"><span>Ticketvolumen</span><strong id="reportTicketVolume">0</strong><small id="reportTicketVolumeMeta">Offene und laufende Tickets</small></article>
+          <article class="bo-kpi-card accent-purple"><span>Abschlussquote</span><strong id="reportLeadConversion">0 %</strong><small id="reportLeadConversionMeta">Gewonnene Leads</small></article>
+          <article class="bo-kpi-card accent-amber"><span>Offene Forderungen</span><strong id="reportOpenReceivables">0 EUR</strong><small id="reportOpenReceivablesMeta">Offen + ueberfaellig</small></article>
+        </div>
+        <div class="bo-grid bo-grid-secondary">
+          <section class="bo-panel">
+            <div class="bo-panel-head">
+              <h2>Vertrieb</h2>
+              <span>Angebote und Leads</span>
+            </div>
+            <table class="bo-table">
+              <thead><tr><th>Bereich</th><th>Wert</th></tr></thead>
+              <tbody id="reportSalesTableBody">
+                <tr><td colspan="2">Keine Daten</td></tr>
+              </tbody>
+            </table>
+          </section>
+
+          <section class="bo-panel">
+            <div class="bo-panel-head">
+              <h2>Service</h2>
+              <span>Tickets und Aufgaben</span>
+            </div>
+            <table class="bo-table">
+              <thead><tr><th>Bereich</th><th>Wert</th></tr></thead>
+              <tbody id="reportServiceTableBody">
+                <tr><td colspan="2">Keine Daten</td></tr>
+              </tbody>
+            </table>
+          </section>
+
+          <section class="bo-panel">
+            <div class="bo-panel-head">
+              <h2>Finanzen</h2>
+              <span>Rechnungen und Zahlungen</span>
+            </div>
+            <table class="bo-table">
+              <thead><tr><th>Bereich</th><th>Wert</th></tr></thead>
+              <tbody id="reportFinanceTableBody">
+                <tr><td colspan="2">Keine Daten</td></tr>
+              </tbody>
+            </table>
+          </section>
+        </div>
+      </section>
+
+      <section class="bo-view hidden" id="technikView">
+        <div class="bo-kpi-grid">
+          <article class="bo-kpi-card">
+            <span>Aktive Instanzen</span>
+            <strong id="techActiveInstances">0</strong>
+            <small id="techActiveInstancesMeta">Keine Mandanten geladen</small>
+          </article>
+          <article class="bo-kpi-card">
+            <span>Benutzer gesamt</span>
+            <strong id="techUsers">0</strong>
+            <small id="techUsersMeta">Interne und externe Konten</small>
+          </article>
+          <article class="bo-kpi-card">
+            <span>Backups</span>
+            <strong id="techBackups">OK</strong>
+            <small id="techBackupsMeta">Letzter Lauf unbekannt</small>
+          </article>
+          <article class="bo-kpi-card">
+            <span>Offene Punkte</span>
+            <strong id="techOpenOps">0</strong>
+            <small id="techOpenOpsMeta">Tickets und Aufgaben offen</small>
+          </article>
+        </div>
+        <div class="bo-grid bo-grid-main">
+          <section class="bo-panel">
+            <div class="bo-panel-head">
+              <h2>Systemstatus</h2>
+              <span>Live aus dem Backoffice</span>
+            </div>
+            <table class="bo-table">
+              <thead><tr><th>Bereich</th><th>Status</th><th>Details</th></tr></thead>
+              <tbody id="techSystemTableBody">
+                <tr><td colspan="3">Keine Daten</td></tr>
+              </tbody>
+            </table>
+          </section>
+          <section class="bo-panel">
+            <div class="bo-panel-head">
+              <h2>Betriebslogik</h2>
+              <span>Technische Prioritaeten</span>
+            </div>
+            <table class="bo-table">
+              <thead><tr><th>Thema</th><th>Wert</th></tr></thead>
+              <tbody id="techOperationsTableBody">
+                <tr><td colspan="2">Keine Daten</td></tr>
+              </tbody>
+            </table>
+          </section>
+        </div>
+      </section>
+
+      <section class="bo-view hidden" id="einstellungenView">
+        <div class="bo-customer-layout">
+          <form class="bo-panel bo-customer-form" id="boSettingsForm">
+            <div class="bo-panel-head">
+              <h2>Grundeinstellungen</h2>
+              <span>Branding und Standardwerte</span>
+            </div>
+            <label>Firmenname<input name="firmenname" required placeholder="FleetControl24"></label>
+            <label>Claim<input name="marken_claim" placeholder="Digitale Fuhrparkplattform fuer Unternehmen"></label>
+            <div class="bo-form-grid">
+              <label>Support E-Mail<input name="support_email" type="email" placeholder="support@fleetcontrol24.de"></label>
+              <label>Vertrieb E-Mail<input name="vertrieb_email" type="email" placeholder="vertrieb@fleetcontrol24.de"></label>
+              <label>Antwortadresse<input name="antwortadresse" type="email" placeholder="kontakt@fleetcontrol24.de"></label>
+              <label>Standard-Paket
+                <select name="standard_paket">
+                  <option value="Kostenlos">Kostenlos</option>
+                  <option value="Starter">Starter</option>
+                  <option value="Professional">Professional</option>
+                  <option value="Enterprise">Enterprise</option>
+                </select>
+              </label>
+            </div>
+            <p class="bo-form-message" id="boSettingsMessage"></p>
+            <button type="submit" class="bo-primary-action">Einstellungen speichern</button>
+          </form>
+          <section class="bo-panel bo-table-large">
+            <div class="bo-panel-head">
+              <h2>Aktueller Konfigurationsstand</h2>
+              <span>Wird live aus den Einstellungen aufgebaut</span>
+            </div>
+            <table class="bo-table">
+              <thead><tr><th>Bereich</th><th>Wert</th></tr></thead>
+              <tbody id="boSettingsSummaryBody">
+                <tr><td colspan="2">Keine Daten</td></tr>
+              </tbody>
+            </table>
+          </section>
+          <section class="bo-panel bo-table-large">
+            <div class="bo-panel-head">
+              <h2>Zusatzmodule</h2>
+              <span>Module fuer Kunden und Paketerweiterungen</span>
+            </div>
+            <form class="bo-inline-form" id="boModuleCatalogForm">
+              <input type="hidden" name="id">
+              <input name="name" placeholder="Interner Name, z. B. versicherung" required>
+              <input name="label" placeholder="Anzeigename, z. B. Versicherungen" required>
+              <select name="status">
+                <option value="aktiv">Aktiv</option>
+                <option value="archiviert">Archiviert</option>
+              </select>
+              <button type="submit" class="bo-primary-action">Modul speichern</button>
+              <button type="button" class="bo-inline-btn" id="boModuleCatalogCancelBtn">Zuruecksetzen</button>
+            </form>
+            <p class="bo-form-message" id="boModuleCatalogMessage"></p>
+            <div class="bo-table-wrap">
+              <table class="bo-table">
+                <thead><tr><th>Label</th><th>Name</th><th>Status</th><th>Aktion</th></tr></thead>
+                <tbody id="boModuleCatalogTableBody">
+                  <tr><td colspan="4">Keine Module vorhanden.</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </section>
+        </div>
+      </section>
+    </main>
+  </div>
+
+<script src="/js/backoffice.js?v=20260405-backoffice-finish"></script>
+</body>
+</html>

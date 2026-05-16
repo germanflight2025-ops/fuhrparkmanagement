@@ -3,15 +3,25 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Fuhrparkmanagement</title>
-  <link rel="stylesheet" href="/css/style.css">
+  <title>FleetControl24 App</title>
+  <link rel="stylesheet" href="/css/style.css?v=20260405-rolepkg-finish">
 </head>
 <body>
   <div id="appShell" class="app-shell app-shell-logged-out">
     <aside id="sidebar" class="sidebar hidden">
-      <div>
-        <h1>Fuhrpark</h1>
-        <p class="muted">Management by Michael Weber</p>
+      <div class="sidebar-brand">
+        <svg class="sidebar-logo" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+          <rect width="32" height="32" rx="8" fill="#2563EB"/>
+          <path d="M5 21h22M8 21v-6l4-4h8l4 4v6" stroke="#fff" stroke-width="2" stroke-linejoin="round"/>
+          <circle cx="11" cy="23" r="2" fill="#fff"/>
+          <circle cx="21" cy="23" r="2" fill="#fff"/>
+          <path d="M16 11V7" stroke="#93C5FD" stroke-width="2" stroke-linecap="round"/>
+          <path d="M13 9h6" stroke="#93C5FD" stroke-width="2" stroke-linecap="round"/>
+        </svg>
+        <div>
+          <strong class="sidebar-brand-name">FleetControl24</strong>
+          <span class="sidebar-brand-claim">Digitale Fuhrparkplattform</span>
+        </div>
       </div>
       <nav>
         <button class="nav-btn active" data-view="dashboard">Dashboard</button>
@@ -19,12 +29,16 @@
         <button class="nav-btn" data-view="werkstatt">Werkstatt</button>
         <button class="nav-btn" data-view="schaeden">Schaeden</button>
         <button class="nav-btn" data-view="uvv">UVV</button>
+        <button class="nav-btn" data-view="benachrichtigungen">Benachrichtigungen <span id="notificationBadge" class="badge danger hidden">0</span></button>
         <button class="nav-btn" data-view="benutzer">Benutzer</button>
+        <button class="nav-btn" data-view="licenseCheck">Fuehrerscheinkontrolle</button>
+        <button class="nav-btn" data-view="kontakte">Adressbuch</button>
+        <button class="nav-btn" data-view="reinigung">Reinigung</button>
+        <button class="nav-btn" data-view="lager">Lagerverwaltung</button>
         <button class="nav-btn" data-view="standorte">Standorte</button>
         <button class="nav-btn" data-view="statistik">Statistik</button>
         <button class="nav-btn" data-view="suche">Suche</button>
         <button class="nav-btn" data-view="import">CSV Import</button>
-        <button class="nav-btn" data-view="impressum">Impressum</button>
       </nav>
       <div class="sidebar-footer">
         <div id="userBadge">Nicht angemeldet</div>
@@ -42,21 +56,68 @@
       </header>
 
       <section id="loginView" class="panel visible login-stage">
-        <div class="login-grid login-grid-hero">
-          <div class="login-hero-media">
-            <div class="login-hero-image" aria-hidden="true"></div>
+        <div class="login-saas-layout">
+          <div class="login-saas-left">
+            <div class="login-saas-brand">
+              <svg class="login-brand-logo" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                <rect width="40" height="40" rx="10" fill="#2563EB"/>
+                <path d="M6 27h28M10 27V19l5-5h10l5 5v8" stroke="#fff" stroke-width="2.2" stroke-linejoin="round"/>
+                <circle cx="14" cy="29.5" r="2.5" fill="#fff"/>
+                <circle cx="26" cy="29.5" r="2.5" fill="#fff"/>
+                <path d="M20 14V9" stroke="#93C5FD" stroke-width="2" stroke-linecap="round"/>
+                <path d="M17 11h6" stroke="#93C5FD" stroke-width="2" stroke-linecap="round"/>
+              </svg>
+              <div>
+                <strong class="login-brand-name">FleetControl24</strong>
+                <span class="login-brand-claim">Digitale Fuhrparkplattform</span>
+              </div>
+            </div>
+            <div class="login-saas-hero">
+              <h1>Fuhrpark. Digital.<br>Unter Kontrolle.</h1>
+              <p>FleetControl24 vereint Fahrzeuge, Werkstatt, Schaeden, UVV, Reinigung und Fuehrerscheinkontrolle in einer professionellen Plattform fuer den betrieblichen Alltag.</p>
+              <ul class="login-feature-list">
+                <li>
+                  <span class="login-feature-icon">&#10003;</span>
+                  <div><strong>Zentrale Leitstelle</strong><span>Fahrzeuge, Standorte und Status live im Blick.</span></div>
+                </li>
+                <li>
+                  <span class="login-feature-icon">&#10003;</span>
+                  <div><strong>Fristen &amp; Pruefungen</strong><span>HU, UVV und Werkstatttermine rechtzeitig erkennen.</span></div>
+                </li>
+                <li>
+                  <span class="login-feature-icon">&#10003;</span>
+                  <div><strong>Mehrstandort-faehig</strong><span>Klare Rollen und Standortlogik fuer jede Unternehmensgroesse.</span></div>
+                </li>
+              </ul>
+            </div>
           </div>
-          <div class="panel card accent login-card">
-            <h3>Login</h3>
-            <form id="loginForm" class="form-grid">
-              <label>Benutzername oder E-Mail<input name="login" required placeholder="z. B. Michael Weber oder admin@firma.de"></label>
-              <label>Passwort<input name="passwort" type="password" required placeholder="Passwort eingeben"></label>
-              <button type="submit">Anmelden</button>
-            </form>
-            <p id="loginError" class="error"></p>
+          <div class="login-saas-right">
+            <div class="login-saas-card">
+              <div class="login-card-head">
+                <h2>Willkommen zurueck</h2>
+                <p>Melden Sie sich mit Ihrem Konto an.</p>
+              </div>
+              <form id="loginForm" class="login-form">
+                <div class="login-field">
+                  <label for="loginInput">Benutzername oder E-Mail</label>
+                  <input id="loginInput" name="login" required placeholder="z. B. mweber oder admin@firma.de" autocomplete="username">
+                </div>
+                <div class="login-field">
+                  <label for="loginPassword">Passwort</label>
+                  <input id="loginPassword" name="passwort" type="password" required placeholder="Passwort eingeben" autocomplete="current-password">
+                </div>
+                <button type="submit" class="login-submit-btn">Anmelden</button>
+              </form>
+              <p id="loginError" class="login-error-msg"></p>
+              <div class="login-saas-footer">
+                <span>FleetControl24 &mdash; Michael Weber, Sandweg 6, 63225 Langen</span>
+              </div>
+            </div>
           </div>
         </div>
       </section>
+
+      <div id="staleDataHint" class="stale-data-hint hidden"></div>
 
       <section id="appView" class="hidden">
         <div id="dashboardView" class="view visible">
@@ -89,11 +150,34 @@
               <div id="reminders" class="stack"></div>
             </div>
           </div>
+          <div id="previewPanel" class="panel card preview-panel"></div>
         </div>
 
         <section id="fahrzeugeView" class="view hidden">
           <div class="grid-2 layout-main">
-            <form id="vehicleForm" class="panel card form-grid"></form>
+            <div class="stack">
+              <form id="vehicleForm" class="panel card form-grid"></form>
+              <div id="vehicleDocumentsPanel" class="panel card hidden">
+                <div class="section-head">
+                  <h3>Dokumenten-Archiv</h3>
+                  <button id="closeDocsBtn" class="secondary">Schliessen</button>
+                </div>
+                <div id="vehicleDocumentsList" class="stack compact-stack"></div>
+                <hr>
+                <form id="uploadDocForm" class="form-grid">
+                  <h4>Neues Dokument hochladen</h4>
+                  <label>Name<input name="name" required placeholder="z.B. Versicherungsschein"></label>
+                  <label>Typ<select name="typ">
+                    <option value="Versicherung">Versicherung</option>
+                    <option value="Leasing">Leasing</option>
+                    <option value="Rechnung">Rechnung</option>
+                    <option value="Sonstiges" selected>Sonstiges</option>
+                  </select></label>
+                  <label>Datei<input name="datei" type="file" required></label>
+                  <button type="submit">Hochladen</button>
+                </form>
+              </div>
+            </div>
             <div class="panel card table-wrap">
               <h3>Fahrzeugliste</h3>
               <div id="vehiclesTable"></div>
@@ -101,18 +185,33 @@
           </div>
         </section>
 
-        <section id="werkstattView" class="view hidden">
-            <div class="grid-2 layout-main workshop-view-grid">
-              <form id="workshopForm" class="panel card form-grid workshop-form-panel"></form>
-              <div class="panel card table-wrap workshop-table-panel">
-                <div class="section-head"><h3>Werkstattliste</h3><span class="muted">Alle Werkstattauftraege und Status</span></div>
-                <div id="workshopTable"></div>
+        <div id="vehicleDetailModal" class="modal hidden">
+          <div class="modal-content vehicle-window">
+            <div class="vehicle-detail-top">
+              <div>
+                <p class="eyebrow">Fahrzeugprofil</p>
+                <h3 id="vehicleDetailTitle">Fahrzeug</h3>
+                <p id="vehicleDetailSubtitle" class="muted"></p>
               </div>
+              <button type="button" class="vehicle-modal-close" id="closeVehicleDetailBtn">Schliessen</button>
             </div>
-          </section>
+            <div id="vehicleDetailBody" class="vehicle-detail-body"></div>
+          </div>
+        </div>
+
+        <section id="werkstattView" class="view hidden">
+          <div class="stack workshop-layout-stack">
+            <div id="workshopOverview" class="workshop-overview"></div>
+            <form id="workshopForm" class="panel card form-grid workshop-form-panel"></form>
+            <div class="panel card table-wrap workshop-table-panel">
+              <div class="section-head"><h3>Werkstattliste</h3><span class="muted">Alle Werkstattauftraege und Status</span></div>
+              <div id="workshopTable"></div>
+            </div>
+          </div>
+        </section>
 
         <section id="schaedenView" class="view hidden">
-          <div class="grid-2 layout-main damage-layout" id="damageLayout">
+          <div class="stack damage-layout" id="damageLayout">
             <form id="damageForm" class="panel card form-grid"></form>
             <div class="panel card table-wrap" id="damageTablePanel">
               <h3>Schadenmeldungen</h3>
@@ -125,8 +224,23 @@
           <div class="grid-2 layout-main uvv-layout">
             <form id="uvvForm" class="panel card form-grid"></form>
             <div class="panel card table-wrap">
-              <h3>UVV-Prï¿½fungen</h3>
+              <h3>UVV-Prüfungen</h3>
               <div id="uvvTable"></div>
+            </div>
+          </div>
+        </section>
+
+        <section id="benachrichtigungenView" class="view hidden">
+          <div class="grid-2 layout-main">
+            <div class="panel card">
+              <h3>Dringende Termine</h3>
+              <p class="muted">Termine mit weniger als 30 Tagen Restlaufzeit.</p>
+              <div id="urgentAlerts" class="stack"></div>
+            </div>
+            <div class="panel card">
+              <h3>Werkstatt-Hinweise</h3>
+              <p class="muted">Auftraege, die laenger als geplant dauern oder ueberfaellig sind.</p>
+              <div id="workshopAlerts" class="stack"></div>
             </div>
           </div>
         </section>
@@ -135,16 +249,121 @@
           <div class="grid-2 layout-main">
             <form id="userForm" class="panel card form-grid"></form>
             <div class="panel card table-wrap">
-              <h3>Benutzerï¿½bersicht</h3>
+              <h3>Benutzerübersicht</h3>
               <div id="usersTable"></div>
             </div>
           </div>
         </section>
 
-        <section id="standorteView" class="view hidden">
+        <section id="licenseCheckView" class="view hidden">
+          <div class="grid-2 layout-main">
+            <div class="panel card">
+              <h3>Neue Fuehrerscheinkontrolle</h3>
+              <form id="licenseCheckForm" class="form-grid">
+                <input type="hidden" name="id">
+                <label>Fahrer<select name="benutzer_id" required id="licenseUserSelect"></select></label>
+                <label>Klassen<input name="klassen" placeholder="z.B. B, C, CE"></label>
+                <label>Ausstellungsdatum<input name="ausstellungsdatum" type="date"></label>
+                <label>Gueltig bis<input name="gueltig_bis" type="date"></label>
+                <label>Fuehrerschein seit<input name="besitz_seit" type="date"></label>
+                <label>Pruef-Datum<input name="pruef_datum" type="date" required></label>
+                <label>Naechste Pruefung<input name="naechste_pruefung" type="date" required></label>
+                <label>Bemerkung<textarea name="bemerkung" rows="2"></textarea></label>
+                <p id="licenseCheckMessage" class="muted">Neue Fuehrerscheinkontrolle anlegen oder einen vorhandenen Eintrag bearbeiten.</p>
+                <div class="action-row">
+                  <button type="submit">Kontrolle speichern</button>
+                  <button type="button" class="secondary" id="licenseResetBtn">Zuruecksetzen</button>
+                </div>
+              </form>
+            </div>
+            <div class="panel card table-wrap">
+              <h3>Kontroll-Historie</h3>
+              <div id="licenseCheckTable"></div>
+            </div>
+          </div>
+        </section>
+
+        <section id="kontakteView" class="view hidden">
+          <div class="grid-2 layout-main">
+            <form id="kontaktForm" class="panel card form-grid"></form>
+            <div class="panel card table-wrap">
+              <div class="section-head"><h3>Adressbuch</h3><span class="muted">Werkstatt, Versicherungen und Dienstleister</span></div>
+              <div id="kontakteToolbar" class="contacts-toolbar"></div>
+              <div id="kontakteTable"></div>
+            </div>
+          </div>
+        </section>
+
+        <section id="reinigungView" class="view hidden">
+          <div class="panel card reinigung-controls">
+            <div class="section-head">
+              <div>
+                <h3>Reinigung</h3>
+                <p class="muted">Reinigung nur fuer Hauptadmin und Admin. Fahrzeuge in Werkstatt werden automatisch separat gefuehrt.</p>
+              </div>
+              <div class="action-row">
+                <label>Datum<input id="reinigungDatum" type="date"></label>
+                <label>Reinigungstag
+                  <select id="reinigungTag">
+                    <option value="1">Tag 1</option>
+                    <option value="2">Tag 2</option>
+                  </select>
+                </label>
+                <button id="reinigungRefreshBtn" type="button">Aktualisieren</button>
+                <button id="reinigungPdfBtn" type="button">PDF</button>
+              </div>
+            </div>
+          </div>
+          <div class="grid-2 layout-main">
+            <div class="panel card table-wrap">
+              <div class="section-head"><h3>Aktuelle Fahrzeuge</h3><span class="muted">Nur Fahrzeuge ausserhalb der Werkstatt</span></div>
+              <div id="reinigungAktuellTable"></div>
+            </div>
+            <div class="panel card table-wrap">
+              <div class="section-head"><h3>Wurde gereinigt</h3><span class="muted">Datum wird beim Abhaken automatisch gesetzt</span></div>
+              <div id="reinigungErledigtTable"></div>
+            </div>
+          </div>
+          <div class="panel card table-wrap">
+            <div class="section-head"><h3>In Werkstatt</h3><span class="muted">Automatisch aus Werkstatt uebernommen</span></div>
+            <div id="reinigungWerkstattTable"></div>
+          </div>
+        </section>
+
+<section id="standorteView" class="view hidden">
           <div class="panel card table-wrap">
             <h3>Standorte</h3>
             <div id="locationsTable"></div>
+          </div>
+        </section>
+
+        <section id="lagerView" class="view hidden">
+          <div class="grid-2 layout-main">
+            <div class="panel card">
+              <div class="section-head">
+                <h3>Lagerverwaltung</h3>
+                <span class="muted">Lagerorte, Artikel und Bewegungen</span>
+              </div>
+              <div id="lagerForm"></div>
+            </div>
+            <div class="panel card">
+              <h3>Lagerstatus</h3>
+              <div id="lagerSummary"></div>
+            </div>
+          </div>
+          <div class="grid-2">
+            <div class="panel card table-wrap">
+              <h3>Lagerorte</h3>
+              <div id="lagerorteTable"></div>
+            </div>
+            <div class="panel card table-wrap">
+              <h3>Lagerartikel</h3>
+              <div id="lagerartikelTable"></div>
+            </div>
+          </div>
+          <div class="panel card table-wrap">
+            <h3>Lagerbewegungen</h3>
+            <div id="lagerbewegungenTable"></div>
           </div>
         </section>
 
@@ -199,82 +418,15 @@
             </form>
             <div class="panel card">
               <h3>Import-Ergebnis</h3>
-              <pre id="importResult">Noch kein Import ausgefï¿½hrt.</pre>
+              <pre id="importResult">Noch kein Import ausgeführt.</pre>
             </div>
           </div>
         </section>
 
-        <section id="impressumView" class="view hidden">
-          <div class="panel card impressum-shell">
-            <div class="impressum-hero">
-              <div>
-                <p class="eyebrow">Fuhrparkmanagement</p>
-                <h3>Impressum</h3>
-                <p class="muted">Projekt- und Anbieterinformationen fuer die webbasierte Fuhrparkmanagement-Software.</p>
-              </div>
-              <div class="impressum-badge">Stand: Maerz 2026</div>
-            </div>
-            <div class="impressum-grid">
-              <section class="impressum-card">
-                <h4>Angaben zum Projekt</h4>
-                <dl class="impressum-list">
-                  <div><dt>Projektname</dt><dd>Fuhrparkmanagement</dd></div>
-                  <div><dt>Autor</dt><dd>Michael Weber</dd></div>
-                  <div><dt>Projekttyp</dt><dd>Webbasierte Fuhrparkmanagement-Software</dd></div>
-                  <div><dt>Einsatzbereich</dt><dd>Verwaltung von Fahrzeugen, Werkstattauftraegen, Schaeden und UVV-Pruefungen</dd></div>
-                  <div><dt>Version</dt><dd>MVP / Praesentationsstand</dd></div>
-                </dl>
-              </section>
-              <section class="impressum-card">
-                <h4>Verantwortlich fuer Inhalt</h4>
-                <dl class="impressum-list">
-                  <div><dt>Name</dt><dd>Michael Weber</dd></div>
-                  <div><dt>Rolle</dt><dd>Projektverantwortung, Konzeption und Entwicklung</dd></div>
-                  <div><dt>Kontakt</dt><dd>Bitte mit echten Kontaktdaten ergaenzen, falls die Software oeffentlich betrieben wird.</dd></div>
-                </dl>
-              </section>
-              <section class="impressum-card">
-                <h4>Technische Angaben</h4>
-                <dl class="impressum-list">
-                  <div><dt>Backend</dt><dd>Node.js / Express</dd></div>
-                  <div><dt>Frontend</dt><dd>HTML5, CSS3, JavaScript</dd></div>
-                  <div><dt>Datenhaltung</dt><dd>JSON-basierte lokale Datenstruktur, erweiterbar auf PostgreSQL</dd></div>
-                  <div><dt>Funktionen</dt><dd>Rollenlogik, Standortfilter, CSV-Import, Datei-Upload, PDF-Export, Dashboard</dd></div>
-                </dl>
-              </section>
-              <section class="impressum-card">
-                <h4>Nutzungshinweis</h4>
-                <p>Diese Anwendung wurde als Fach- und Praesentationsprojekt fuer ein digitales Fuhrparkmanagement entwickelt. Vor einem produktiven Einsatz sollten rechtliche Pflichtangaben, Datenschutztexte, Sicherheitsrichtlinien und Betreiberinformationen vollstaendig mit echten Unternehmensdaten ergaenzt werden.</p>
-              </section>
-            </div>
-            <div class="impressum-notes">
-              <section class="impressum-note-card">
-                <h4>Haftung fuer Inhalte</h4>
-                <p>Die Inhalte dieser Anwendung wurden mit groesster Sorgfalt erstellt. Fuer die Vollstaendigkeit, Richtigkeit und Aktualitaet der bereitgestellten Informationen kann im Demonstrations- und Entwicklungsstand jedoch keine Gewaehr uebernommen werden.</p>
-              </section>
-              <section class="impressum-note-card">
-                <h4>Datenschutz</h4>
-                <p>Bei einem produktiven Betrieb sind eine vollstaendige Datenschutzerklaerung, Auftragsverarbeitungsregelungen, Zugriffskonzepte sowie organisatorische und technische Schutzmassnahmen verbindlich zu ergaenzen.</p>
-              </section>
-              <section class="impressum-note-card">
-                <h4>Urheberrecht</h4>
-                <p>Struktur, Inhalte, Layout und Quellcode dieses Projektstandes unterliegen dem Schutz des Urheberrechts, soweit gesetzlich zulaessig. Eine Weiterverwendung sollte nur mit Zustimmung des Projektverantwortlichen erfolgen.</p>
-              </section>
-            </div>
-            <div class="impressum-footer">
-              <strong>Fuhrparkmanagement by Michael Weber</strong>
-              <span class="muted">Professionelle Projektpraesentation fuer Verwaltung, Werkstatt, Schadenmanagement und UVV.</span>
-            </div>
-          </div>
-        </section>
       </section>
     </main>
   </div>
 
-  <script src="/js/app.js"></script>
+<script src="/js/app.js?v=20260405-rolepkg-finish"></script>
 </body>
 </html>
-
-
-
-
